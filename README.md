@@ -1,37 +1,100 @@
-This is a [Next.js](https://nextjs.org) project bootstrapped with [`create-next-app`](https://nextjs.org/docs/app/api-reference/cli/create-next-app).
+# PamPamPay
 
-## Getting Started
+## Overview
 
-First, run the development server:
+PamPamPay is a modern peer-to-peer (P2P) money transfer application designed to facilitate fast, secure, and seamless transactions between users. The application leverages cutting-edge technologies to provide a smooth user experience while ensuring robust authentication and data management.
+
+## Features
+
+- **User Authentication** powered by Clerk
+- **Secure Database Management** using Supabase
+- **Efficient ORM** with Prisma
+- **Type-Safe Development** with TypeScript
+- **Smooth Animations** using Motion
+- **Real-Time Transaction Processing**
+- **Intuitive UI/UX** for seamless money transfers
+
+## Tech Stack
+
+PamPamPay is built using the following core technologies:
+
+### Frontend
+
+- **Next.js** - React framework for server-side rendering and static site generation
+- **TypeScript** - Ensuring type safety and scalability
+- **Motion** - For smooth animations and enhanced user experience
+
+### Backend
+
+- **Supabase** - Postgres database and real-time authentication
+- **Prisma** - ORM for managing database interactions
+- **Clerk** - Authentication and user management solution
+
+## Installation & Setup
+
+To set up PamPamPay locally, follow these steps:
+
+### Prerequisites
+
+Ensure you have the following installed:
+
+- **Node.js** (v16 or later)
+- **npm** or **yarn**
+- **Supabase account & API keys**
+- **Clerk account & API keys**
+
+### Clone the Repository
 
 ```bash
-npm run dev
-# or
-yarn dev
-# or
-pnpm dev
-# or
-bun dev
+git clone https://github.com/your-username/pampampay.git
+cd pampampay
 ```
 
-Open [http://localhost:3000](http://localhost:3000) with your browser to see the result.
+### Install Dependencies
 
-You can start editing the page by modifying `app/page.tsx`. The page auto-updates as you edit the file.
+```bash
+yarn install
+# or
+npm install
+```
 
-This project uses [`next/font`](https://nextjs.org/docs/app/building-your-application/optimizing/fonts) to automatically optimize and load [Geist](https://vercel.com/font), a new font family for Vercel.
+### Environment Variables
 
-## Learn More
+Create a `.env.local` file in the root directory and add the necessary environment variables:
 
-To learn more about Next.js, take a look at the following resources:
+```
+NEXT_PUBLIC_CLERK_FRONTEND_API=<your_clerk_frontend_api>
+CLERK_API_KEY=<your_clerk_api_key>
+SUPABASE_URL=<your_supabase_url>
+SUPABASE_ANON_KEY=<your_supabase_anon_key>
+DATABASE_URL=<your_database_url>
+```
 
-- [Next.js Documentation](https://nextjs.org/docs) - learn about Next.js features and API.
-- [Learn Next.js](https://nextjs.org/learn) - an interactive Next.js tutorial.
+### Run the Development Server
 
-You can check out [the Next.js GitHub repository](https://github.com/vercel/next.js) - your feedback and contributions are welcome!
+```bash
+yarn dev
+# or
+npm run dev
+```
 
-## Deploy on Vercel
+## Deployment
 
-The easiest way to deploy your Next.js app is to use the [Vercel Platform](https://vercel.com/new?utm_medium=default-template&filter=next.js&utm_source=create-next-app&utm_campaign=create-next-app-readme) from the creators of Next.js.
+PamPamPay can be deployed on platforms like **Vercel** or **Netlify**. Ensure your environment variables are correctly set up in the hosting platform.
 
-Check out our [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying) for more details.
-# jat_updated
+## Contributing
+
+We welcome contributions! To contribute:
+
+1. Fork the repository
+2. Create a new branch (`feature-branch`)
+3. Commit your changes
+4. Push to your branch and submit a Pull Request
+
+## License
+
+PamPamPay is open-source and licensed under the **MIT License**.
+
+## Contact
+
+For support or inquiries, reach out to us at [**support@pampampay.com**](mailto:support@pampampay.com).
