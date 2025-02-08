@@ -9,11 +9,13 @@ const MyConnections = async () => {
     <section className="w-full border-t border-gray-800 pt-4">
       <div className="flex text-md space-x-3">
         <Users size={20} />
-        <span>{user.firstName}'s Connections</span>
+        <span>
+          {user.firstName ? user.firstName : user.username}'s Connections
+        </span>
       </div>
-      <div className="mt-3 overflow-y-scroll">
+      <div className="mt-3 flex flex-col space-y-2 overflow-auto max-h-72 md:max-h-96">
         {connections.map((connection) => (
-          <div key={connection.id} className="flex space-x-2">
+          <div key={connection.id}>
             <DisclosureTab connection={connection} />
           </div>
         ))}

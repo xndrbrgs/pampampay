@@ -18,6 +18,7 @@ export async function createOrGetUser() {
       data: {
         clerkUserId: userId,
         email: user.emailAddresses[0].emailAddress,
+        username: user.username,
         firstName: `${user.firstName}`,
         lastName: `${user.lastName}`,
       },
@@ -67,6 +68,7 @@ export async function getConnections() {
               email: true,
               firstName: true,
               lastName: true,
+              username: true,
               profileImage: true,
             },
           },
@@ -83,6 +85,7 @@ export async function getConnections() {
     email: connection.connectedUser.email,
     firstName: connection.connectedUser.firstName,
     lastName: connection.connectedUser.lastName,
+    username: connection.connectedUser.username,
     profileImage: connection.connectedUser.profileImage,
   }));
 

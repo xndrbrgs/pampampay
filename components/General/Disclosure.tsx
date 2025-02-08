@@ -18,7 +18,9 @@ export function DisclosureTab({ connection }: any) {
           />
           <div className="flex flex-col">
             <span className="text-sm">
-              {connection.firstName} {connection.lastName}
+              {connection.firstName && connection.lastName
+              ? `${connection.firstName} ${connection.lastName}`
+              : connection.username}
             </span>
             <span className="text-xs text-gray-400">{connection.email}</span>
           </div>
