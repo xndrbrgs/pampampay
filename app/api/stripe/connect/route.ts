@@ -17,15 +17,17 @@ export async function POST(req: Request) {
         )
 
     } catch (error) {
-        return new Response('Stripe webhook error', { status: 400 });
-
+        if (error instanceof Error) {
+            return new Response(`Stripe webhook error: ${error.message}`, { status: 400 });
+        }
+        return new Response(`Stripe webhook error: ${String(error)}`, { status: 400 });
     }
 
     switch (event.type) {
         case "account.updated": {
             const account = event.data.object;
 
-            const data = await prisma.user.update({
+            await prisma.user.update({
                 where: {
                     connectedAccountId: account.id
                 },

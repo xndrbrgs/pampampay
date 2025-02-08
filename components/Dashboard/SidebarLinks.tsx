@@ -4,12 +4,7 @@ import { usePathname } from "next/navigation";
 import { motion } from "motion/react";
 import Link from "next/link";
 import { cn } from "@/lib/utils";
-import {
-  ArrowRightLeft,
-  CircleDollarSign,
-  HandCoins,
-  House,
-} from "lucide-react";
+import { ArrowRightLeft, HandCoins, House } from "lucide-react";
 
 export const sidebarLinks = [
   {
@@ -27,11 +22,6 @@ export const sidebarLinks = [
     label: "Transactions",
     icon: <ArrowRightLeft size={20} />,
   },
-  // {
-  //   route: "/dashboard/billing",
-  //   label: "Billing",
-  //   icon: <CircleDollarSign size={20} />,
-  // },
 ];
 
 const SidebarLinks = () => {

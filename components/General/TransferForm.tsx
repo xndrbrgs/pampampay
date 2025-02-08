@@ -65,7 +65,7 @@ export function TransferForm({ connections }: TransferFormProps) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      const stripeSession = await createStripeSession({
+      await createStripeSession({
         amount: values.amount,
         paymentDescription: values.paymentDescription,
         recipientEmail: values.recipientEmail,
