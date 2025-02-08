@@ -92,6 +92,26 @@ export async function getConnections() {
 
   return connections;
 }
+export async function deleteConnection({ connectionId }: { connectionId: string }) {
+  const user = await createOrGetUser();
+  if (!user) throw new Error("Not authenticated");
+
+  const connection = await prisma.connection.findUnique({
+    where: { id: connectionId },
+  });
+
+  if (!connection) throw new Error("Connection not found");
+
+  if (connection.userId !== user.id && connection.connectedUserId !== user.id) {
+    throw new Error("Not authorized to delete this connection");
+  }
+
+  await prisma.connection.delete({
+    where: { id: connectionId },
+  });
+
+  return { message: "Connection deleted successfully" };
+}
 
 export async function getUserById({ receiverId }: { receiverId: string }) {
 
