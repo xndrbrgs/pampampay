@@ -3,8 +3,9 @@ import { ClerkProvider } from "@clerk/nextjs";
 import localFont from "next/font/local";
 import { Toaster } from "@/components/ui/toaster";
 import { dark } from "@clerk/themes";
-import "./globals.css";
 import { ReactLenis } from "@/components/General/Lenis";
+import { SpeedInsights } from '@vercel/speed-insights/next';
+import "./globals.css";
 
 const BasisRegular = localFont({
   src: "../public/fonts/BasisGrotesqueArabicPro-Regular.ttf",
@@ -44,6 +45,7 @@ export default function RootLayout({
             className={`${BasisRegular.variable} ${Editorial.variable} antialiased dark font-basis`}
           >
             {children}
+            <SpeedInsights />
             <Toaster />
           </body>
         </ReactLenis>
