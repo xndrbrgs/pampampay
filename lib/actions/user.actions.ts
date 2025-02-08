@@ -54,6 +54,19 @@ export async function getAllUsers() {
   return allUsers;
 }
 
+export async function getStripeConnnectUser(userId: string) {
+  const data = await prisma.user.findUnique({
+    where: {
+      clerkUserId: userId,
+    },
+    select: {
+      stripeConnectedLinked: true,
+    },
+  });
+
+  return data;
+}
+
 export async function getConnections() {
   const user = await createOrGetUser();
   if (!user) throw new Error("Not authenticated");
