@@ -100,8 +100,8 @@ export async function createStripeSession({
       }
     },
 
-    success_url: 'http://localhost:3000/dashboard/payment/success',
-    cancel_url: 'http://localhost:3000/dashboard/payment/cancel',
+    success_url: 'https://www.pampampay.com/dashboard/payment/success',
+    cancel_url: 'https://www.pampampay.com/dashboard/payment/cancel',
   })
 
   // Save transaction details to the database
@@ -136,8 +136,8 @@ export async function createStripeAccountLink() {
 
   const accountLink = await stripe.accountLinks.create({
     account: data?.connectedAccountId!,
-    refresh_url: 'http://localhost:3000/dashboard/pay-and-request',
-    return_url: `http://localhost:3000/dashboard/return/${data?.connectedAccountId}`,
+    refresh_url: 'https://www.pampampay.com/dashboard/pay-and-request',
+    return_url: `https://www.pampampay.com/dashboard/return/${data?.connectedAccountId}`,
     type: 'account_onboarding',
   });
 
