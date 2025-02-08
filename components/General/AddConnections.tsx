@@ -25,6 +25,7 @@ type User = {
   email: string;
   firstName: string | null;
   lastName: string | null;
+  username: string | null;
   profileImage: string | null;
 };
 
@@ -100,7 +101,7 @@ export function AddConnection({ onAddConnection }: AddConnectionProps) {
             onValueChange={setSelectedUserId}
             value={selectedUserId || undefined}
           >
-            <SelectTrigger className="w-full">
+            <SelectTrigger className="w-full py-7">
               <SelectValue placeholder="Select a user to connect with" />
             </SelectTrigger>
             <SelectContent>
@@ -111,6 +112,15 @@ export function AddConnection({ onAddConnection }: AddConnectionProps) {
                       <ConnectUserProfile
                         firstName={user.firstName}
                         lastName={user.lastName}
+                        username={user.username || ""}
+                        email={user.email}
+                        img={user.profileImage}
+                      />
+                    ) : user.username ? (
+                      <ConnectUserProfile
+                        firstName=""
+                        lastName=""
+                        username={user.username}
                         email={user.email}
                         img={user.profileImage}
                       />

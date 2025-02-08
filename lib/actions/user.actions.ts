@@ -46,6 +46,7 @@ export async function getAllUsers() {
       email: true,
       firstName: true,
       lastName: true,
+      username: true,
       profileImage: true,
     },
   });

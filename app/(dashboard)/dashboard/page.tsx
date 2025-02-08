@@ -9,7 +9,7 @@ export default function Dashboard() {
         title="My Dashboard"
         subtext="Access and manage your account and transactions"
       />
-      <div className="pt-4">
+      <div className="pt-4 max-w-3xl">
         <AddConnection onAddConnection={addConnection} />
       </div>
     </section>
