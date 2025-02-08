@@ -87,7 +87,7 @@ export function AddConnection({ onAddConnection }: AddConnectionProps) {
   };
 
   return (
-    <Card className="bg-white/10 backdrop-blur-md border border-white/20 shadow-md card-width">
+    <Card className="bg-white/10 backdrop-blur-md border border-white/20 shadow-md">
       <CardHeader>
         <CardTitle>Add Connection </CardTitle>
         <CardDescription>

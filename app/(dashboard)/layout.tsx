@@ -24,9 +24,9 @@ export default async function DashboardLayout({
           <div className="sticky top-0 z-50 backdrop-blur-xl shadow-lg">
             <div className="md:hidden flex justify-between items-center p-4">
               <div className="relative flex items-center">
-                <div className="relative h-10 w-10">
+                <div className="relative h-7 w-7">
                   <Image
-                    src="/images/logo.svg"
+                    src="/images/iconsvg.svg"
                     alt="logo"
                     fill
                     style={{
@@ -34,7 +34,7 @@ export default async function DashboardLayout({
                     }}
                   />
                 </div>
-                <span className="font-editorial text-sm">PamPamPay</span>
+                <span className="font-editorial text-lg pt-1 pl-2">PamPamPay</span>
               </div>
               <MobileNav />
             </div>
