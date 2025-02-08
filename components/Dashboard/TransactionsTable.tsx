@@ -12,7 +12,18 @@ import { formatAmount, formatDateTime } from "@/lib/utils";
 interface Transaction {
   id: string;
   amount: number;
-  description: string;
+  description: string | null; // No change needed here
+  sender?: {
+    // Add sender if it's needed
+    id: string;
+    clerkUserId: string;
+    email: string;
+    firstName: string | null;
+    lastName: string | null;
+    profileImage: string | null;
+    connectedAccountId: string;
+    stripeConnectedLinked: boolean;
+  };
   receiver: { email: string };
   updatedAt: string;
   status: string;
