@@ -1,0 +1,56 @@
+datasource db {
+  provider  = "postgresql"
+  url       = env("DATABASE_URL")
+  directUrl = env("DIRECT_URL")
+}
+
+generator client {
+  provider = "prisma-client-js"
+}
+
+model User {
+  id                    String       @id @default(cuid())
+  clerkUserId           String       @unique
+  email                 String       @unique
+  firstName             String?
+  lastName              String?
+  profileImage          String?
+  connectedAccountId    String       @unique
+  stripeConnectedLinked Boolean      @default(false)
+  connections           Connection[] @relation("UserConnections")
+  connectedTo           Connection[] @relation("ConnectedToUser")
+  sentTransfers         Transfer[]   @relation("SenderTransfers")
+  receivedTransfers     Transfer[]   @relation("ReceiverTransfers")
+}
+
+model Connection {
+  id              String   @id @default(cuid())
+  userId          String
+  connectedUserId String
+  user            User     @relation("UserConnections", fields: [userId], references: [id])
+  connectedUser   User     @relation("ConnectedToUser", fields: [connectedUserId], references: [id])
+  createdAt       DateTime @default(now())
+
+  @@unique([userId, connectedUserId])
+}
+
+model Transfer {
+  id                   String         @id @default(cuid())
+  amount               Float
+  description          String?
+  senderId             String
+  receiverId           String
+  paymentIntentId      String?
+  sender               User           @relation("SenderTransfers", fields: [senderId], references: [id])
+  receiver             User           @relation("ReceiverTransfers", fields: [receiverId], references: [id])
+  status               TransferStatus
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+  transactionReference String? // For additional tracking if needed
+}
+
+enum TransferStatus {
+  PENDING
+  COMPLETED
+  FAILED
+}
