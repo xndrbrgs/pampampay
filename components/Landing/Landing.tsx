@@ -44,7 +44,7 @@ const Landing = () => {
       </div>
       <div className="relative h-screen flex flex-col justify-center items-center mx-auto max-w-2xl px-6 lg:max-w-7xl lg:px-8 overflow-hidden z-20">
         {/* Background Image */}
-        <div className="absolute bottom-0 left-1/2 transform -translate-x-1/2 w-[95%] h-[50%] brightness-75 hover:brightness-100 transition duration-300 z-10">
+        <div className="absolute -bottom-24 left-1/2 transform -translate-x-1/2 w-[95%] h-[50%] brightness-75 hover:brightness-100 transition duration-300 z-10">
           <BrowserCard
             imageSrc="/images/dashboard.webp" // Ensure this path is correct
             altText="Webpage Content"
@@ -63,7 +63,7 @@ const Landing = () => {
           </div>
           <span className="font-editorial text-lg">PamPamPay</span>
         </div>
-        <div className="mb-20">
+        <div className="mb-40">
           <h1 className="font-editorial mx-auto text-balance text-center text-3xl md:text-5xl lg:text-8xl leading-[1.2] text-white relative z-10">
             Your Money, Smarter. <br />
             Your Life, Simpler.
