@@ -3,9 +3,29 @@
 import { useState, useRef, useEffect } from "react";
 import { motion } from "framer-motion";
 
+const FallbackMenu = () => {
+  return (
+    <div className="text-center text-gray-500">
+      <p>Menu</p>
+    </div>
+  );
+};
+
 const HamburgerMenu = () => {
   const [isOpen, setIsOpen] = useState(false);
+  const [isMobile, setIsMobile] = useState(true); // Default to true for mobile
   const menuRef = useRef<HTMLDivElement>(null);
+
+  // Check if the window is mobile-sized
+  useEffect(() => {
+    const handleResize = () => {
+      setIsMobile(window.innerWidth < 768); // Adjust the breakpoint as needed
+    };
+
+    handleResize(); // Check on mount
+    window.addEventListener("resize", handleResize);
+    return () => window.removeEventListener("resize", handleResize);
+  }, []);
 
   // Close when clicking outside
   useEffect(() => {
@@ -17,6 +37,11 @@ const HamburgerMenu = () => {
     document.addEventListener("mousedown", handleClickOutside);
     return () => document.removeEventListener("mousedown", handleClickOutside);
   }, []);
+
+  // If not mobile, render the fallback
+  if (!isMobile) {
+    return <FallbackMenu />;
+  }
 
   return (
     <div
