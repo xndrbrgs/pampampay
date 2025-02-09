@@ -6,7 +6,7 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { AlignJustify } from "lucide-react";
+import { AlignJustify, Menu } from "lucide-react";
 import Image from "next/image";
 import SidebarLinks from "../Dashboard/SidebarLinks";
 import MyConnections from "./MyConnections";
@@ -19,7 +19,8 @@ const MobileNav = () => {
   return (
     <Sheet>
       <SheetTrigger>
-        <HamburgerMenu />
+          {/* <HamburgerMenu /> */}
+          <Menu />
       </SheetTrigger>
       <SheetContent side={"left"}>
         <VisuallyHidden.Root>
