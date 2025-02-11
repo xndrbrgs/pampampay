@@ -35,13 +35,17 @@ export async function getAllUsers() {
 
   const currentUser = await prisma.user.findUnique({
     where: { clerkUserId: user.clerkUserId },
+    select: {
+      id: true,
+      stripeConnectedLinked: true,
+    },
   });
   if (!currentUser) throw new Error("User not found");
 
   const allUsers = await prisma.user.findMany({
-    where: {
-      id: { not: currentUser.id },
-    },
+    where: currentUser.stripeConnectedLinked
+      ? { id: { not: currentUser.id } }
+      : { stripeConnectedLinked: true, id: { not: currentUser.id } },
     select: {
       id: true,
       customId: true,
@@ -109,6 +113,8 @@ export async function getConnections() {
 
   return connections;
 }
+
+
 export async function deleteConnection({ connectionId }: { connectionId: string }) {
   const user = await createOrGetUser();
   if (!user) throw new Error("Not authenticated");

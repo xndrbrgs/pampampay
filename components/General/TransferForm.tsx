@@ -23,14 +23,9 @@ import {
   SelectValue,
 } from "@/components/ui/select";
 
-import {
-  Card,
-  CardContent,
-  CardDescription,
-  CardHeader,
-  CardTitle,
-} from "@/components/ui/card";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
+import { motion } from "framer-motion";
 import { createStripeSession } from "@/lib/actions/transfer.actions";
 
 type TransferFormProps = {
@@ -71,7 +66,7 @@ export function TransferForm({ connections }: TransferFormProps) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      const stripeSession = await createStripeSession({
+      await createStripeSession({
         amount: values.amount,
         paymentDescription: values.paymentDescription,
         recipientEmail: values.recipientEmail,
@@ -91,125 +86,132 @@ export function TransferForm({ connections }: TransferFormProps) {
   }
 
   return (
-    <Card className="bg-white/10 backdrop-blur-md border border-white/20 shadow-md">
-      <CardHeader>
-        <CardTitle>Initiate Transfer</CardTitle>
-        <CardDescription>Transfer money to a connection.</CardDescription>
-      </CardHeader>
-      <CardContent>
-        <Form {...form}>
-          <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
-            <FormField
-              control={form.control}
-              name="paymentDescription"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>What is this payment for?</FormLabel>
-                  <FormControl>
-                    <Input placeholder="Consultation Fees" {...field} />
-                  </FormControl>
-                  <FormDescription>Write a small description.</FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-            <FormField
-              control={form.control}
-              name="amount"
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Amount</FormLabel>
-                  <FormControl>
-                    <Input
-                      type="number"
-                      step="0.01"
-                      {...field}
-                      onChange={(e) => {
-                        const value = parseFloat(e.target.value);
-                        // Ensure the value is greater than zero
-                        if (value > 0) {
-                          field.onChange(value);
-                        } else {
-                          // Optionally, you can set a minimum value or reset to a default
-                          field.onChange(0.01); // Set to a small positive number
-                        }
-                      }}
-                    />
-                  </FormControl>
-                  <FormDescription>
-                    Enter the amount you want to transfer.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
-
-            <FormField
-              control={form.control}
-              name="recipientId" // Store the connection ID
-              render={({ field }) => (
-                <FormItem>
-                  <FormLabel>Recipient</FormLabel>
-                  <Select
-                    onValueChange={(value) => {
-                      const selectedConnection = connections.find(
-                        (connection) => connection.userId === value
-                      );
-                      field.onChange(value); // Set the ID
-                      form.setValue(
-                        "recipientEmail",
-                        selectedConnection?.email || ""
-                      ); // Set the email
-                    }}
-                    defaultValue={field.value}
-                  >
+    <Card className="bg-white/0.5 backdrop-blur-md border border-white/20 shadow-md">
+      <motion.section
+        initial={{ opacity: 0 }}
+        animate={{ opacity: 1 }}
+        transition={{ duration: 0.3 }}
+      >
+        <CardHeader>
+          <CardTitle>Stripe Transfer</CardTitle>
+        </CardHeader>
+        <CardContent>
+          <Form {...form}>
+            <form onSubmit={form.handleSubmit(onSubmit)} className="space-y-5">
+              <FormField
+                control={form.control}
+                name="paymentDescription"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>What is this payment for?</FormLabel>
                     <FormControl>
-                      <SelectTrigger>
-                        <SelectValue placeholder="Select a recipient" />
-                      </SelectTrigger>
+                      <Input placeholder="Consultation Fees" {...field} />
                     </FormControl>
-                    <SelectContent>
-                      {connections.map((connection) => (
-                        <SelectItem
-                          key={connection.userId}
-                          value={connection.userId} // Use connection.id as the value
-                        >
-                          <div className="flex space-x-2 p-2 scale-100 md:scale-90 lg:scale-100">
-                            <img
-                              src={
-                                connection.profileImage ||
-                                "/default-profile.png"
-                              }
-                              alt={connection.username || "User"}
-                              className="h-8 w-8 rounded-full"
-                            />
-                            <div className="flex flex-col">
-                              <span className="text-sm">
-                                {connection.username}
-                              </span>
-                              <span className="text-xs text-gray-400 truncate">
-                                {connection.customId}
-                              </span>
-                            </div>
-                          </div>
-                        </SelectItem>
-                      ))}
-                    </SelectContent>
-                  </Select>
-                  <FormDescription>
-                    Select the recipient for your transfer.
-                  </FormDescription>
-                  <FormMessage />
-                </FormItem>
-              )}
-            />
+                    <FormDescription>
+                      Write a small description.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+              <FormField
+                control={form.control}
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Amount</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="1"
+                        {...field}
+                        onChange={(e) => {
+                          const value = parseInt(e.target.value, 10);
+                          // Ensure the value is a whole number greater than 0
+                          if (value > 0) {
+                            field.onChange(value);
+                          } else {
+                            // Optionally, you can set a minimum value or reset to a default
+                            field.onChange(1); // Set to a minimum whole number
+                          }
+                        }}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Enter the whole number amount you want to transfer.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
 
-            <Button type="submit" disabled={isLoading}>
-              {isLoading ? "Initiating Transfer..." : "Initiate Transfer"}
-            </Button>
-          </form>
-        </Form>
-      </CardContent>
+              <FormField
+                control={form.control}
+                name="recipientId" // Store the connection ID
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Recipient</FormLabel>
+                    <Select
+                      onValueChange={(value) => {
+                        const selectedConnection = connections.find(
+                          (connection) => connection.userId === value
+                        );
+                        field.onChange(value); // Set the ID
+                        form.setValue(
+                          "recipientEmail",
+                          selectedConnection?.email || ""
+                        ); // Set the email
+                      }}
+                      defaultValue={field.value}
+                    >
+                      <FormControl>
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a recipient" />
+                        </SelectTrigger>
+                      </FormControl>
+                      <SelectContent>
+                        {connections.map((connection) => (
+                          <SelectItem
+                            key={connection.userId}
+                            value={connection.userId} // Use connection.id as the value
+                          >
+                            <div className="flex space-x-2 p-2 scale-100 md:scale-90 lg:scale-100">
+                              <img
+                                src={
+                                  connection.profileImage ||
+                                  "/default-profile.png"
+                                }
+                                alt={connection.username || "User"}
+                                className="h-8 w-8 rounded-full"
+                              />
+                              <div className="flex flex-col">
+                                <span className="text-sm">
+                                  {connection.username}
+                                </span>
+                                <span className="text-xs text-gray-400 truncate">
+                                  {connection.customId}
+                                </span>
+                              </div>
+                            </div>
+                          </SelectItem>
+                        ))}
+                      </SelectContent>
+                    </Select>
+                    <FormDescription>
+                      Select the recipient for your transfer.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <Button type="submit" disabled={isLoading}>
+                {isLoading ? "Initiating Transfer..." : "Initiate Transfer"}
+              </Button>
+            </form>
+          </Form>
+        </CardContent>
+      </motion.section>
     </Card>
   );
 }

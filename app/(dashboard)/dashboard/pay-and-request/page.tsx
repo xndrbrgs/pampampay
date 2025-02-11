@@ -1,32 +1,7 @@
 import Header from "@/components/General/Header";
-import { getConnections } from "@/lib/actions/user.actions";
-import { TransferForm } from "@/components/General/TransferForm";
-import prisma from "@/lib/db";
-import { currentUser } from "@clerk/nextjs/server";
+import TransferTabs from "@/components/General/TransferTabs";
 
-async function getUserData(userId: string) {
-  const data = await prisma.user.findUnique({
-    where: {
-      clerkUserId: userId,
-    },
-    select: {
-      stripeConnectedLinked: true,
-    },
-  });
-
-  return data;
-}
-
-export default async function TransferPage() {
-  const connections = await getConnections();
-
-  const user = await currentUser();
-  if (!user) {
-    return <div>User not found</div>;
-  }
-
-  const data = await getUserData(user.id);
-
+export default function TransferPage() {
   return (
     <section className="p-6 h-screen">
       <Header
@@ -34,7 +9,7 @@ export default async function TransferPage() {
         subtext="Manage your transfers easily and safely."
       />
       <div className="flex flex-col gap-4 max-w-3xl">
-        <TransferForm connections={connections} />
+        <TransferTabs />
       </div>
     </section>
   );
