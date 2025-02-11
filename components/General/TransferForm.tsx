@@ -34,7 +34,13 @@ import { useToast } from "@/hooks/use-toast";
 import { createStripeSession } from "@/lib/actions/transfer.actions";
 
 type TransferFormProps = {
-  connections: Array<{ userId: string; email: string }>;
+  connections: Array<{
+    userId: string;
+    email: string;
+    username: string;
+    profileImage: string;
+    customId: string;
+  }>;
 };
 
 const formSchema = z.object({
@@ -65,7 +71,7 @@ export function TransferForm({ connections }: TransferFormProps) {
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      await createStripeSession({
+      const stripeSession = await createStripeSession({
         amount: values.amount,
         paymentDescription: values.paymentDescription,
         recipientEmail: values.recipientEmail,
@@ -168,7 +174,24 @@ export function TransferForm({ connections }: TransferFormProps) {
                           key={connection.userId}
                           value={connection.userId} // Use connection.id as the value
                         >
-                          {connection.email}
+                          <div className="flex space-x-2 p-2 scale-100 md:scale-90 lg:scale-100">
+                            <img
+                              src={
+                                connection.profileImage ||
+                                "/default-profile.png"
+                              }
+                              alt={connection.username || "User"}
+                              className="h-8 w-8 rounded-full"
+                            />
+                            <div className="flex flex-col">
+                              <span className="text-sm">
+                                {connection.username}
+                              </span>
+                              <span className="text-xs text-gray-400 truncate">
+                                {connection.customId}
+                              </span>
+                            </div>
+                          </div>
                         </SelectItem>
                       ))}
                     </SelectContent>

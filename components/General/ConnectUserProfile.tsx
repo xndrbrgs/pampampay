@@ -1,17 +1,13 @@
 interface ConnectUserProfileProps {
-  firstName: string;
-  lastName: string;
   username: string;
-  email: string;
+  customId: string;
   img: string | null;
 }
 
 const ConnectUserProfile = ({
-  firstName,
-  lastName,
   username,
-  email,
   img,
+  customId,
 }: ConnectUserProfileProps) => {
   return (
     <div className="">
@@ -25,17 +21,13 @@ const ConnectUserProfile = ({
             />
           ) : (
             <span className="text-gray-500 text-xs">
-              {firstName && lastName
-                ? `${firstName[0].toUpperCase()}${lastName[0].toUpperCase()}`
-                : username[0].toUpperCase()}
+              {username[0].toUpperCase()}
             </span>
           )}
         </div>
         <div>
-            <div className="text-sm font-medium text-gray-300">
-            {firstName && lastName ? `${firstName} ${lastName}` : username}
-            </div>
-          <div className="text-xs text-gray-500">{email}</div>
+          <div className="text-sm font-medium text-gray-300">{username}</div>
+          <div className="text-xs text-gray-500">{customId}</div>
         </div>
       </div>
     </div>

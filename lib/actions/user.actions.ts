@@ -2,6 +2,7 @@
 
 import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "../db";
+import { custom } from "zod";
 
 // Get user
 
@@ -43,6 +44,7 @@ export async function getAllUsers() {
     },
     select: {
       id: true,
+      customId: true,
       email: true,
       firstName: true,
       lastName: true,
@@ -79,6 +81,7 @@ export async function getConnections() {
           connectedUser: {
             select: {
               id: true,
+              customId: true,
               email: true,
               firstName: true,
               lastName: true,
@@ -96,6 +99,7 @@ export async function getConnections() {
   const connections = currentUser.connections.map((connection) => ({
     id: connection.id,
     userId: connection.connectedUserId,
+    customId: connection.connectedUser.customId,
     email: connection.connectedUser.email,
     firstName: connection.connectedUser.firstName,
     lastName: connection.connectedUser.lastName,

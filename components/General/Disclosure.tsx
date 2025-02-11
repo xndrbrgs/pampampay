@@ -13,16 +13,14 @@ export function DisclosureTab({ connection }: any) {
         <div className="flex space-x-2 p-2 scale-100 md:scale-90 lg:scale-100">
           <img
             src={connection.profileImage || "/default-profile.png"}
-            alt={connection.firstName || "User"}
+            alt={connection.username || "User"}
             className="h-8 w-8 rounded-full"
           />
           <div className="flex flex-col">
-            <span className="text-sm">
-              {connection.firstName && connection.lastName
-              ? `${connection.firstName} ${connection.lastName}`
-              : connection.username}
+            <span className="text-sm">{connection.username}</span>
+            <span className="text-xs text-gray-400 truncate">
+              {connection.customId}
             </span>
-            <span className="text-xs text-gray-400">{connection.email}</span>
           </div>
         </div>
       </DisclosureTrigger>

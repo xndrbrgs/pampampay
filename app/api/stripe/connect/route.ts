@@ -13,21 +13,19 @@ export async function POST(req: Request) {
         event = stripe.webhooks.constructEvent(
             body,
             signature,
-            process.env.STRIPE_WEBHOOK_SECRET!
+            process.env.STRIPE_CONNECT_WEBHOOK_SECRET!
         )
 
     } catch (error) {
-        if (error instanceof Error) {
-            return new Response(`Stripe webhook error: ${error.message}`, { status: 400 });
-        }
-        return new Response(`Stripe webhook error: ${String(error)}`, { status: 400 });
+        return new Response('Stripe webhook error', { status: 400 });
+
     }
 
     switch (event.type) {
         case "account.updated": {
             const account = event.data.object;
 
-            await prisma.user.update({
+            const data = await prisma.user.update({
                 where: {
                     connectedAccountId: account.id
                 },
@@ -45,4 +43,3 @@ export async function POST(req: Request) {
 
     return new Response(null, { status: 200 });
 }
-

@@ -2,6 +2,8 @@ import prisma from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
+import { generateUsername } from 'friendly-username-generator';
+import { v4 as uuidv4 } from 'uuid';
 
 export async function GET() {
     const { userId } = await auth();
@@ -41,17 +43,29 @@ export async function GET() {
         });
 
 
-        dbUser = await prisma.user.create({
-            data: {
-                clerkUserId: user.id,
-                firstName: user.firstName ?? '',
-                lastName: user.lastName ?? '',
-                email: user.emailAddresses[0].emailAddress ?? '',
-                profileImage: user.imageUrl ?? '',
-                connectedAccountId: stripeAccount.id ?? '',
-                stripeConnectedLinked: false
-            },
+        const userData = {
+            clerkUserId: user?.id ?? '',
+            customId: uuidv4(),
+            firstName: user?.firstName ?? '',
+            lastName: user?.lastName ?? '',
+            email: (user?.emailAddresses && user.emailAddresses.length > 0)
+                ? user.emailAddresses[0].emailAddress
+                : '',
+            profileImage: `https://picsum.photos/seed/${user?.id}/200/300`,
+            username: user?.username ?? generateUsername(),
+            connectedAccountId: stripeAccount?.id ?? '',
+            stripeConnectedLinked: false
+        };
+
+        // Log the userData object
+        console.log('User Data:', userData);
+
+        const dbUser = await prisma.user.create({
+            data: userData,
         });
+
+        
+
     }
 
     // Perform redirect with returned user object

@@ -14,7 +14,7 @@ interface Transaction {
   id: string;
   amount: number;
   description: string;
-  receiver: { email: string };
+  receiver: { username: string };
   updatedAt: string;
   status: string;
 }
@@ -63,7 +63,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
                   {transaction.description}
                 </TableCell>
                 <TableCell className="hidden lg:table-cell">
-                  {transaction.receiver.email}
+                  {transaction.receiver.username}
                 </TableCell>
                 <TableCell className="hidden lg:table-cell">
                   {formatDateTime(transaction.updatedAt).dateTime}
@@ -106,7 +106,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
             <div className="text-sm">{transaction.description}</div>
             <div className="text-sm text-muted-foreground mt-1">
               {type === "sent" ? "Sent to: " : "Received from: "}
-              {transaction.receiver.email}
+              {transaction.receiver.username}
             </div>
             <div className="text-sm text-muted-foreground mt-1">
               {formatDateTime(transaction.updatedAt).dateTime}

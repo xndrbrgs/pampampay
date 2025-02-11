@@ -22,6 +22,7 @@ import ConnectUserProfile from "./ConnectUserProfile";
 
 type User = {
   id: string;
+  customId: string;
   email: string;
   firstName: string | null;
   lastName: string | null;
@@ -108,21 +109,17 @@ export function AddConnection({ onAddConnection }: AddConnectionProps) {
               {users.map((user) => (
                 <SelectItem key={user.id} value={user.id}>
                   <div className="flex items-center space-x-2">
-                    {user.firstName && user.lastName ? (
+                    {user.username ? (
                       <ConnectUserProfile
-                        firstName={user.firstName}
-                        lastName={user.lastName}
                         username={user.username || ""}
-                        email={user.email}
                         img={user.profileImage}
+                        customId={user.customId}
                       />
                     ) : user.username ? (
                       <ConnectUserProfile
-                        firstName=""
-                        lastName=""
                         username={user.username}
-                        email={user.email}
                         img={user.profileImage}
+                        customId={user.customId}
                       />
                     ) : (
                       user.email

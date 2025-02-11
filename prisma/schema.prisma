@@ -10,6 +10,7 @@ generator client {
 
 model User {
   id                    String       @id @default(cuid())
+  customId              String
   clerkUserId           String       @unique
   email                 String       @unique
   firstName             String?
@@ -41,6 +42,7 @@ model Transfer {
   description          String?
   senderId             String
   receiverId           String
+  transferReceiptUrl   String?
   paymentIntentId      String?
   sender               User           @relation("SenderTransfers", fields: [senderId], references: [id])
   receiver             User           @relation("ReceiverTransfers", fields: [receiverId], references: [id])

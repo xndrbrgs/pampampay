@@ -1,9 +1,9 @@
-import React from "react";
 import { SignInButton } from "@clerk/nextjs";
 import CustomButton from "../General/CustomButton";
 import Image from "next/image";
 import BrowserCard from "../General/BrowserCard";
 import { Spotlight } from "../ui/spotlight";
+import LoadingIntro from "./LoadingIntro";
 
 const Landing = () => {
   return (
@@ -64,10 +64,10 @@ const Landing = () => {
           <span className="font-editorial text-lg">PamPamPay</span>
         </div>
         <div className="mb-40">
-          <h1 className="font-editorial mx-auto text-balance text-center text-3xl md:text-5xl lg:text-8xl leading-[1.2] text-white relative z-10">
-            Your Money, Smarter. <br />
-            Your Life, Simpler.
-          </h1>
+          <div className="space-y-2">
+            <LoadingIntro />
+          </div>
+
           <div className="flex space-x-4 mt-6 w-full mx-auto justify-center relative z-10">
             <SignInButton>
               <CustomButton>Register</CustomButton>
