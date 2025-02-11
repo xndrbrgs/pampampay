@@ -19,11 +19,21 @@ export async function GET() {
         return new NextResponse(`User doesn't exist`, { status: 401 });
     }
 
+
     let dbUser = await prisma.user.findUnique({
         where: {
             clerkUserId: user.id,
         },
     });
+
+    if (dbUser) {
+        await prisma.transfer.deleteMany({
+            where: {
+                senderId: dbUser.id,
+                status: 'PENDING',
+            },
+        });
+    }
 
     if (!dbUser) {
         const stripeAccount = await stripe.accounts.create({
@@ -60,11 +70,9 @@ export async function GET() {
         // Log the userData object
         console.log('User Data:', userData);
 
-        const dbUser = await prisma.user.create({
+        await prisma.user.create({
             data: userData,
         });
-
-        
 
     }
 

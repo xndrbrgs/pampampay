@@ -4,7 +4,6 @@ import { getUserTransactions } from "@/lib/actions/transfer.actions";
 
 const TransactionsPage = async () => {
   const { sentTransfers, receivedTransfers } = await getUserTransactions();
-  
 
   return (
     <section className="p-6 h-screen gap-y-4">

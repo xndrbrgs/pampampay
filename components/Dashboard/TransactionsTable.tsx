@@ -9,6 +9,8 @@ import {
   TableRow,
 } from "@/components/ui/table";
 import { formatAmount, formatDateTime } from "@/lib/utils";
+import { currentUser } from "@clerk/nextjs/server";
+import { getStripeConnnectUser } from "@/lib/actions/user.actions";
 
 interface Transaction {
   id: string;
@@ -24,10 +26,17 @@ interface TransactionsTableProps {
   sentTransfers: Transaction[];
 }
 
-const TransactionsTable: React.FC<TransactionsTableProps> = ({
+const TransactionsTable: React.FC<TransactionsTableProps> = async ({
   receivedTransfers,
   sentTransfers,
 }) => {
+  const user = await currentUser();
+  if (!user) {
+    return <div>User not found</div>;
+  }
+
+  const data = await getStripeConnnectUser(user.id);
+
   const renderTable = (
     transactions: Transaction[],
     type: "sent" | "received"
@@ -66,7 +75,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
                   {transaction.receiver.username}
                 </TableCell>
                 <TableCell className="hidden lg:table-cell">
-                  {formatDateTime(transaction.updatedAt).dateTime}
+                  {formatDateTime(new Date(transaction.updatedAt)).dateTime}
                 </TableCell>
                 <TableCell className="text-right capitalize">
                   {transaction.status}
@@ -109,7 +118,7 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
               {transaction.receiver.username}
             </div>
             <div className="text-sm text-muted-foreground mt-1">
-              {formatDateTime(transaction.updatedAt).dateTime}
+              {formatDateTime(new Date(transaction.updatedAt)).dateTime}
             </div>
           </div>
         ))}
@@ -123,11 +132,13 @@ const TransactionsTable: React.FC<TransactionsTableProps> = ({
         {renderTable(sentTransfers, "sent")}
         {renderMobileDetails(sentTransfers, "sent")}
       </div>
-      <div className="space-y-4">
-        <h2 className="text-2xl">Transfers Received</h2>
-        {renderTable(receivedTransfers, "received")}
-        {renderMobileDetails(receivedTransfers, "received")}
-      </div>
+      {data?.stripeConnectedLinked === true && (
+        <div className="space-y-4">
+          <h2 className="text-2xl">Transfers Received</h2>
+          {renderTable(receivedTransfers, "received")}
+          {renderMobileDetails(receivedTransfers, "received")}
+        </div>
+      )}
     </section>
   );
 };

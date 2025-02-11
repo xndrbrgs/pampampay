@@ -100,12 +100,12 @@ export async function createStripeSession({
       }
     },
 
-    success_url: 'https://www.pampampay.com/dashboard/payment/success',
-    cancel_url: 'https://www.pampampay.com/dashboard/payment/cancel',
+    success_url: 'http://localhost:3000/dashboard/payment/success',
+    cancel_url: 'http://localhost:3000/dashboard/payment/cancel',
   })
 
   // Save transaction details to the database
-  const transfer = await prisma.transfer.create({
+  await prisma.transfer.create({
     data: {
       id: session.id, // Use the Stripe session ID as the transfer ID
       amount,
@@ -136,8 +136,8 @@ export async function createStripeAccountLink() {
 
   const accountLink = await stripe.accountLinks.create({
     account: data?.connectedAccountId!,
-    refresh_url: 'https://www.pampampay.com/dashboard/pay-and-request',
-    return_url: `https://www.pampampay.com/dashboard/return/${data?.connectedAccountId}`,
+    refresh_url: 'http://localhost:3000/dashboard/pay-and-request',
+    return_url: `http://localhost:3000/dashboard/return/${data?.connectedAccountId}`,
     type: 'account_onboarding',
   });
 
@@ -163,88 +163,6 @@ export async function getStripeDashboard() {
   return redirect(loginLink.url!);
 }
 
-// export async function getUserTransactions() {
-//   const user = await createOrGetUser();
-//   if (!user.id) throw new Error("Not authenticated");
-
-//   const currentUser = await prisma.user.findUnique({
-//     where: { clerkUserId: user.clerkUserId },
-//   });
-//   if (!currentUser) throw new Error("User not found");
-
-//   // Check if the user is connected to Stripe
-//   if (currentUser.stripeConnectedLinked) {
-//     // User is authenticated via Stripe Connect, fetch transactions from Stripe
-//     const transactions = await stripe.balanceTransactions.list({
-//       limit: 10,
-//       expand: ['data.source'],
-//     });
-
-//     console.log(transactions);
-
-//     // Filter transactions to match the currentUser
-//     const userTransactions = transactions.data.filter((transaction) => {
-//       const transactionEmail = transaction.source?.billing_details?.email;
-//       return transactionEmail === currentUser.email; // Match email or any other unique identifier
-//     });
-
-//     // Fetch user details for each transaction's receiverId
-//     const enrichedTransactions = await Promise.all(userTransactions.map(async (transaction) => {
-//       const transfer = await prisma.transfer.findFirst({
-//         where: {
-//           transactionReference: transaction.id, // Assuming you store the Stripe transaction ID in your database
-//         },
-//       });
-
-//       // Fetch user details for the receiverId
-//       if (!transfer?.receiverId) throw new Error("Receiver ID not found");
-//       const userToConnect = await getUserById({ receiverId: transfer.receiverId });
-
-//       return {
-//         ...transaction,
-//         transfer, // Add the transfer data to the transaction
-//         receiver: userToConnect, // Add the user details for the receiver
-//       };
-//     }));
-
-//     return enrichedTransactions;
-//   } else {
-//     // User is not authenticated via Stripe Connect, fetch transfer items from the database
-//     const transferItems = await prisma.transfer.findMany({
-//       where: {
-//         senderId: currentUser.id, // Fetch transfers sent by the current user
-//       },
-//       include: {
-//         receiver: true, // Include receiver details if needed
-//       },
-//     });
-
-//     return transferItems;
-//   }
-// }
-
-// export async function getUserTransactions() {
-//   const user = await createOrGetUser();
-//   if (!user.id) throw new Error("Not authenticated");
-
-//   const currentUser = await prisma.user.findUnique({
-//     where: { clerkUserId: user.clerkUserId },
-//   });
-//   if (!currentUser) throw new Error("User not found");
-
-
-//   const transferItems = await prisma.transfer.findMany({
-//     where: {
-//       senderId: currentUser.id, // Fetch transfers sent by the current user
-//     },
-//     include: {
-//       receiver: true, // Include receiver details if needed
-//     },
-//   });
-
-//   return transferItems;
-// }
-
 export async function getUserTransactions() {
   const user = await createOrGetUser();
   if (!user.id) throw new Error("Not authenticated");
@@ -257,8 +175,8 @@ export async function getUserTransactions() {
   const transferItems = await prisma.transfer.findMany({
     where: {
       OR: [
-        { senderId: currentUser.id }, // Fetch transfers sent by the current user
-        { receiverId: currentUser.id }, // Fetch transfers received by the current user
+        { senderId: currentUser.id, status: 'COMPLETED' }, // Fetch completed transfers sent by the current user
+        { receiverId: currentUser.id, status: 'COMPLETED' }, // Fetch completed transfers received by the current user
       ],
     },
     include: {

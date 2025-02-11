@@ -19,9 +19,9 @@ const TransferTabs = async () => {
       </CardHeader>
       <CardContent>
         <Tabs defaultValue="stripe">
-          <TabsList>
-            <TabsTrigger value="stripe">Stripe</TabsTrigger>
-            <TabsTrigger value="auth">Authorize.NET</TabsTrigger>
+          <TabsList className="">
+            <TabsTrigger value="stripe">Amazon Pay, Cash App, Visa</TabsTrigger>
+            <TabsTrigger value="auth">Android Pay</TabsTrigger>
           </TabsList>
           <TabsContent value="stripe" className="pt-2">
             <TransferForm connections={connections} />
