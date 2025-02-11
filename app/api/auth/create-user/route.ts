@@ -51,7 +51,7 @@ export async function GET() {
             email: (user?.emailAddresses && user.emailAddresses.length > 0)
                 ? user.emailAddresses[0].emailAddress
                 : '',
-            profileImage: `https://picsum.photos/seed/${user?.id}/200/300`,
+            profileImage: `https://picsum.photos/seed/${user?.id}/300/300`,
             username: user?.username ?? generateUsername(),
             connectedAccountId: stripeAccount?.id ?? '',
             stripeConnectedLinked: false
