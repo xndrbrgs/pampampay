@@ -94,7 +94,7 @@ export async function createStripeSession({
     ],
 
     payment_intent_data: {
-      // application_fee_amount: Math.round((amount * 100) * 0.05), // 5% fee
+      application_fee_amount: Math.round((amount * 100) * 0.05), // 5% fee
       transfer_data: {
         destination: recipientUser.connectedAccountId!,
       }
