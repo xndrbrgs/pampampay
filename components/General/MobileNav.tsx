@@ -1,26 +1,23 @@
 import {
   Sheet,
   SheetContent,
-  SheetDescription,
-  SheetHeader,
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { AlignJustify, Menu } from "lucide-react";
+import { Menu } from "lucide-react";
 import Image from "next/image";
 import SidebarLinks from "../Dashboard/SidebarLinks";
 import MyConnections from "./MyConnections";
-import { SignedIn, UserButton } from "@clerk/nextjs";
+import { SignedIn, UserButton, SignOutButton  } from "@clerk/nextjs";
 import Logout from "../Dashboard/Logout";
 import { VisuallyHidden } from "radix-ui";
-import HamburgerMenu from "./Hamburger";
 
 const MobileNav = () => {
   return (
     <Sheet>
       <SheetTrigger>
-          {/* <HamburgerMenu /> */}
-          <Menu />
+        {/* <HamburgerMenu /> */}
+        <Menu />
       </SheetTrigger>
       <SheetContent side={"left"}>
         <VisuallyHidden.Root>
@@ -32,7 +29,9 @@ const MobileNav = () => {
               <div className="relative h-7 w-7">
                 <Image src="/images/iconsvg.svg" alt="logo" fill />
               </div>
-              <span className="font-editorial text-md pt-1 pl-2">PamPamPay</span>
+              <span className="font-editorial text-md pt-1 pl-2">
+                PamPamPay
+              </span>
             </div>
             <SidebarLinks />
             <MyConnections />
@@ -41,8 +40,9 @@ const MobileNav = () => {
             <SignedIn>
               <div className="flex items-center space-x-3">
                 <UserButton />
-                <div>
+                <div className="flex space-x-2">
                   <Logout />
+                  <SignOutButton />
                 </div>
               </div>
             </SignedIn>
