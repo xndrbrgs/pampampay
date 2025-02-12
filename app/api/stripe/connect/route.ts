@@ -5,7 +5,13 @@ import { headers } from "next/headers";
 export async function POST(req: Request) {
     const body = await req.text();
 
-    const signature = (await headers()).get("Stripe-Signature") || '';
+    const signature = (await headers()).get("Stripe-Signature");
+
+    if (!signature) {
+        console.error('Stripe-Signature header is missing.');
+        return new Response('Stripe webhook error: Missing signature', { status: 400 });
+    }
+
 
     let event;
 
