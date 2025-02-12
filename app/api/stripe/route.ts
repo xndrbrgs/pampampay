@@ -11,7 +11,19 @@ export const config = {
 export async function POST(req: Request) {
     const body = await req.text();
 
-    const signature = (await headers()).get("Stripe-Signature") || '';
+    const signature = (await headers()).get("Stripe-Signature");
+
+    if (!signature) {
+        console.error('Stripe-Signature header is missing.');
+        return new Response('Stripe webhook error: Missing signature', { status: 400 });
+    }
+
+    const webhookSecret = process.env.STRIPE_USER_CHECKOUT_WEBHOOK_OFFICIAL;
+
+    if (!webhookSecret) {
+        console.error('STRIPE_USER_CHECKOUT_WEBHOOK_OFFICIAL is not set.');
+        return new Response('Stripe webhook error: Missing webhook secret', { status: 500 });
+    }
 
     let event;
 
@@ -19,10 +31,11 @@ export async function POST(req: Request) {
         event = stripe.webhooks.constructEvent(
             body,
             signature,
-            process.env.STRIPE_USER_CHECKOUT_WEBHOOK_OFFICIAL!
-        )
+            webhookSecret
+        );
 
-    } catch (error) {
+    } catch (error: any) {
+        console.error('Stripe webhook error:', error.message);
         return new Response('Stripe webhook error', { status: 400 });
 
     }
@@ -31,23 +44,32 @@ export async function POST(req: Request) {
         case "checkout.session.completed": {
             const session = event.data.object;
 
-            await prisma.transfer.update({
-                where: {
-                    id: session.id
-                },
-                data: {
-                    status: 'COMPLETED',
+            if (session.id) {
+                try {
+                    await prisma.transfer.update({
+                        where: {
+                            id: session.id
+                        },
+                        data: {
+                            status: 'COMPLETED',
+                        }
+                    });
+                    console.log(`Updated transfer status to COMPLETED for session ${session.id}`);
+                } catch (prismaError: any) {
+                    console.error('Prisma update error:', prismaError.message);
+                    // Consider a more specific error response if the update fails
                 }
-            })
+            } else {
+                console.warn('Session ID is missing in the event data.');
+            }
 
             break;
         }
         default: {
-            console.log('unhandled event', event.type);
+            console.log('unhandled event', event.type, event);
         }
     }
 
 
     return new Response(null, { status: 200 });
 }
-

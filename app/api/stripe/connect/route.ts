@@ -2,13 +2,6 @@ import prisma from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { headers } from "next/headers";
 
-export const config = {
-    api: {
-        bodyParser: false,
-    },
-};
-
-
 export async function POST(req: Request) {
     const body = await req.text();
 
@@ -19,6 +12,12 @@ export async function POST(req: Request) {
         return new Response('Stripe webhook error: Missing signature', { status: 400 });
     }
 
+    const webhookSecret = process.env.STRIPE_USER_CONNECT_WEBHOOK_OFFICIAL;
+
+    if (!webhookSecret) {
+        console.error('STRIPE_USER_CONNECT_WEBHOOK_OFFICIAL is not set.');
+        return new Response('Stripe webhook error: Missing webhook secret', { status: 500 });
+    }
 
     let event;
 
@@ -26,34 +25,43 @@ export async function POST(req: Request) {
         event = stripe.webhooks.constructEvent(
             body,
             signature,
-            process.env.STRIPE_USER_CONNECT_WEBHOOK_OFFICIAL!
-        )
+            webhookSecret
+        );
 
-        console.log(`Received Stripe Connect event: ${event.type}`)
+        console.log(`Received Stripe Connect event: ${event.type}`);
 
-    } catch (error) {
+    } catch (error: any) {
+        console.error('Stripe webhook error:', error.message, error);
         return new Response('Stripe webhook error', { status: 400 });
-
     }
 
     switch (event.type) {
         case "account.updated": {
             const account = event.data.object;
 
-            await prisma.user.update({
-                where: {
-                    connectedAccountId: account.id
-                },
-                data: {
-                    stripeConnectedLinked: account.capabilities?.transfers === "pending" || account.capabilities?.transfers === "inactive" ? false : true
+            if (account.id) {
+                try {
+                    await prisma.user.update({
+                        where: {
+                            connectedAccountId: account.id
+                        },
+                        data: {
+                            stripeConnectedLinked: account.capabilities?.transfers === "pending" || account.capabilities?.transfers === "inactive" ? false : true
+                        }
+                    });
+                    console.log(`Updated user account status for ${account.id}`);
+                } catch (prismaError: any) {
+                    console.error('Prisma update error:', prismaError.message);
+                    // Consider a more specific error response if the update fails
                 }
-            })
-            console.log(`Updated user account status for ${account.id}`)
+            } else {
+                console.warn('Account ID is missing in the event data.');
+            }
 
             break;
         }
         default: {
-            console.log('unhandled event', event.type);
+            console.log('unhandled event', event.type, event);
         }
     }
 
