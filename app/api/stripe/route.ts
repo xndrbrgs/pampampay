@@ -13,7 +13,7 @@ export async function POST(req: Request) {
         event = stripe.webhooks.constructEvent(
             body,
             signature,
-            process.env.STRIPE_USER_CHECKOUT_WEBHOOK!
+            process.env.STRIPE_USER_CHECKOUT_WEBHOOK_OFFICIAL!
         )
 
     } catch (error) {
