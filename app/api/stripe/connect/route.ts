@@ -16,6 +16,8 @@ export async function POST(req: Request) {
             process.env.STRIPE_USER_CONNECT_WEBHOOK_OFFICIAL!
         )
 
+        console.log(`Received Stripe Connect event: ${event.type}`)
+
     } catch (error) {
         return new Response('Stripe webhook error', { status: 400 });
 
@@ -33,6 +35,7 @@ export async function POST(req: Request) {
                     stripeConnectedLinked: account.capabilities?.transfers === "pending" || account.capabilities?.transfers === "inactive" ? false : true
                 }
             })
+            console.log(`Updated user account status for ${account.id}`)
 
             break;
         }
