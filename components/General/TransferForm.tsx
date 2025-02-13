@@ -25,7 +25,7 @@ import {
 
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
-import { AnimatePresence, motion } from "framer-motion";
+import { motion } from "framer-motion";
 import { createStripeSession } from "@/lib/actions/transfer.actions";
 
 type TransferFormProps = {
@@ -86,7 +86,7 @@ export function TransferForm({ connections }: TransferFormProps) {
   }
 
   return (
-    <Card className="bg-white/0.5 backdrop-blur-md border border-white/20 shadow-md">
+    <Card className="bg-transparent backdrop-blur-md border border-white/20 shadow-md mt-3">
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -113,39 +113,43 @@ export function TransferForm({ connections }: TransferFormProps) {
                     <FormMessage />
                   </FormItem>
                 )}
-                />
-                <FormField
+              />
+              <FormField
                 control={form.control}
                 name="amount"
                 render={({ field }) => (
                   <FormItem>
-                  <FormLabel>Amount</FormLabel>
-                  <FormControl>
-                  <Input
-                  type="number"
-                  step="0.01"
-                  {...field}
-                  onChange={(e) => {
-                    const value = parseFloat(e.target.value);
-                    // Ensure the value is a positive number with up to 2 decimal places
-                    if (value >= 0 && /^\d+(\.\d{0,2})?$/.test(e.target.value)) {
-                    field.onChange(value);
-                    } else {
-                    // Optionally, you can set a minimum value or reset to a default
-                    field.onChange(0); // Set to a minimum value of 0
-                    }
-                  }}
-                  />
-                  </FormControl>
-                  <FormDescription>
-                  Enter the amount you want to transfer. You can use whole numbers or amounts with up to 2 decimal places.
-                  </FormDescription>
-                  <FormMessage />
+                    <FormLabel>Amount</FormLabel>
+                    <FormControl>
+                      <Input
+                        type="number"
+                        step="0.01"
+                        {...field}
+                        onChange={(e) => {
+                          const value = parseFloat(e.target.value);
+                          // Ensure the value is a positive number with up to 2 decimal places
+                          if (
+                            value >= 0 &&
+                            /^\d+(\.\d{0,2})?$/.test(e.target.value)
+                          ) {
+                            field.onChange(value);
+                          } else {
+                            // Optionally, you can set a minimum value or reset to a default
+                            field.onChange(0); // Set to a minimum value of 0
+                          }
+                        }}
+                      />
+                    </FormControl>
+                    <FormDescription>
+                      Enter the amount you want to transfer. You can use whole
+                      numbers or amounts with up to 2 decimal places.
+                    </FormDescription>
+                    <FormMessage />
                   </FormItem>
                 )}
-                />
+              />
 
-                <FormField
+              <FormField
                 control={form.control}
                 name="recipientId" // Store the connection ID
                 render={({ field }) => (

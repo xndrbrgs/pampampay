@@ -8,6 +8,7 @@ import {
 } from "@/components/ui/card";
 import { TransferForm } from "./TransferForm";
 import { getConnections } from "@/lib/actions/user.actions";
+import AuthNetForm from "./AuthNetForm";
 
 const TransferTabs = async () => {
   const connections = await getConnections();
@@ -17,7 +18,7 @@ const TransferTabs = async () => {
         <CardTitle>Initiate Transfer</CardTitle>
         <CardDescription>Transfer money to a connection.</CardDescription>
       </CardHeader>
-      <CardContent>
+      <CardContent className="w-full">
         <Tabs defaultValue="stripe">
           <TabsList className="">
             <TabsTrigger value="stripe">Amazon Pay, Cash App, Visa</TabsTrigger>
@@ -27,7 +28,7 @@ const TransferTabs = async () => {
             <TransferForm connections={connections} />
           </TabsContent>
           <TabsContent value="auth" className="pt-2">
-            Under Construction
+            <AuthNetForm />
           </TabsContent>
         </Tabs>
       </CardContent>
