@@ -20,20 +20,20 @@ export async function GET() {
     }
 
 
-    let dbUser = await prisma.user.findUnique({
-        where: {
-            clerkUserId: user.id,
-        },
-    });
+    // let dbUser = await prisma.user.findUnique({
+    //     where: {
+    //         clerkUserId: user.id,
+    //     },
+    // });
 
-    if (dbUser) {
-        await prisma.transfer.deleteMany({
-            where: {
-                senderId: dbUser.id,
-                status: 'PENDING',
-            },
-        });
-    }
+    // if (dbUser) {
+    //     await prisma.transfer.deleteMany({
+    //         where: {
+    //             senderId: dbUser.id,
+    //             status: 'PENDING',
+    //         },
+    //     });
+    // }
 
     // if (!dbUser) {
     //     const stripeAccount = await stripe.accounts.create({
