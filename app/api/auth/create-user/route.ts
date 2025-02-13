@@ -27,16 +27,12 @@ export async function GET() {
     });
 
     if (dbUser) {
-        const oneWeekAgo = new Date();
-        oneWeekAgo.setDate(oneWeekAgo.getDate() - 7);
+
 
         await prisma.transfer.deleteMany({
             where: {
                 senderId: dbUser.id,
                 status: 'PENDING',
-                createdAt: {
-                    lt: oneWeekAgo,
-                },
             },
         });
     }
