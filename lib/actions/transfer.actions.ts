@@ -175,8 +175,8 @@ export async function getUserTransactions() {
   const transferItems = await prisma.transfer.findMany({
     where: {
       OR: [
-        { senderId: currentUser.id, status: 'COMPLETED' }, // Fetch completed transfers sent by the current user
-        { receiverId: currentUser.id, status: 'COMPLETED' }, // Fetch completed transfers received by the current user
+        { senderId: currentUser.id }, // Fetch completed transfers sent by the current user
+        { receiverId: currentUser.id }, // Fetch completed transfers received by the current user
       ],
     },
     include: {
