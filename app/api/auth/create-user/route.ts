@@ -35,46 +35,46 @@ export async function GET() {
         });
     }
 
-    if (!dbUser) {
-        const stripeAccount = await stripe.accounts.create({
-            email: user.emailAddresses[0].emailAddress ?? '',
-            controller: {
-                losses: {
-                    payments: 'application'
-                },
-                fees: {
-                    payer: 'application'
-                },
-                stripe_dashboard: {
-                    type: 'express'
-                }
-            }
+    // if (!dbUser) {
+    //     const stripeAccount = await stripe.accounts.create({
+    //         email: user.emailAddresses[0].emailAddress ?? '',
+    //         controller: {
+    //             losses: {
+    //                 payments: 'application'
+    //             },
+    //             fees: {
+    //                 payer: 'application'
+    //             },
+    //             stripe_dashboard: {
+    //                 type: 'express'
+    //             }
+    //         }
 
-        });
+    //     });
 
 
-        const userData = {
-            clerkUserId: user?.id ?? '',
-            customId: uuidv4(),
-            firstName: user?.firstName ?? '',
-            lastName: user?.lastName ?? '',
-            email: (user?.emailAddresses && user.emailAddresses.length > 0)
-                ? user.emailAddresses[0].emailAddress
-                : '',
-            profileImage: `https://picsum.photos/seed/${user?.id}/300/300`,
-            username: user?.username ?? generateUsername(),
-            connectedAccountId: stripeAccount?.id ?? '',
-            stripeConnectedLinked: false
-        };
+    //     const userData = {
+    //         clerkUserId: user?.id ?? '',
+    //         customId: uuidv4(),
+    //         firstName: user?.firstName ?? '',
+    //         lastName: user?.lastName ?? '',
+    //         email: (user?.emailAddresses && user.emailAddresses.length > 0)
+    //             ? user.emailAddresses[0].emailAddress
+    //             : '',
+    //         profileImage: `https://picsum.photos/seed/${user?.id}/300/300`,
+    //         username: user?.username ?? generateUsername(),
+    //         connectedAccountId: stripeAccount?.id ?? '',
+    //         stripeConnectedLinked: false
+    //     };
 
-        // Log the userData object
-        console.log('User Data:', userData);
+    //     // Log the userData object
+    //     console.log('User Data:', userData);
 
-        await prisma.user.create({
-            data: userData,
-        });
+    //     await prisma.user.create({
+    //         data: userData,
+    //     });
 
-    }
+    // }
 
     // Perform redirect with returned user object
 
