@@ -12,10 +12,10 @@ export async function POST(req: Request) {
         return new Response('Stripe webhook error: Missing signature', { status: 400 });
     }
 
-    const webhookSecret = process.env.STRIPE_USER_CONNECT_WEBHOOK_OFFICIAL;
+    const webhookSecret = process.env.STRIPE_CONNECT_WEBHOOK_SECRET;
 
     if (!webhookSecret) {
-        console.error('STRIPE_USER_CONNECT_WEBHOOK_OFFICIAL is not set.');
+        console.error('STRIPE_CONNECT_WEBHOOK_SECRET is not set.');
         return new Response('Stripe webhook error: Missing webhook secret', { status: 500 });
     }
 
