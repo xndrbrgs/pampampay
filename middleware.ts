@@ -1,12 +1,31 @@
-import { clerkMiddleware } from '@clerk/nextjs/server'
+import { clerkMiddleware, createRouteMatcher } from '@clerk/nextjs/server';
+import { NextResponse } from 'next/server';
 
-export default clerkMiddleware()
+const isPublicRoute = createRouteMatcher([
+  '/api/stripe/connect', // Your Stripe webhook route
+  '/api/stripe', // Your Stripe webhook route
+  // Add other public routes here, if any
+]);
 
 export const config = {
   matcher: [
-    // Skip Next.js internals and all static files, unless found in search params
-    '/((?!_next|[^?]*\\.(?:html?|css|js(?!on)|jpe?g|webp|png|gif|svg|ttf|woff2?|ico|csv|docx?|xlsx?|zip|webmanifest)).*)',
-    // Always run for API routes
-    '/(api|trpc)(.*)',
+    /*
+     * Match all request paths except for the ones starting with:
+     * - _next
+     * - static (static files)
+     * - favicon.ico (favicon file)
+     * - public files
+     */
+    '/((?!static|.*\\..*|_next|favicon.ico).*)',
+    '/',
   ],
-}
+};
+
+export default clerkMiddleware((auth, req) => {
+  if (isPublicRoute(req)) {
+    return NextResponse.next();
+  }
+
+  // If the route is not public, continue to apply authentication
+  return NextResponse.next();
+});
