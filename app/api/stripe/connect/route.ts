@@ -1,6 +1,11 @@
 import prisma from "@/lib/db";
 import { stripe } from "@/lib/stripe";
 import { headers } from "next/headers";
+import Cors from 'micro-cors';
+
+Cors({
+    allowMethods: ['POST', 'HEAD'],
+});
 
 export async function POST(req: Request) {
     const body = await req.text();

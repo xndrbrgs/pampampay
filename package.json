@@ -32,6 +32,7 @@
     "friendly-username-generator": "^2.0.4",
     "lenis": "^1.1.20",
     "lucide-react": "^0.473.0",
+    "micro-cors": "^0.1.1",
     "motion": "^12.3.1",
     "next": "^15.1.6",
     "query-string": "^9.1.1",
@@ -47,6 +48,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/micro-cors": "^0.1.5",
     "@types/node": "^20",
     "@types/react": "^19",
     "@types/react-dom": "^19",
