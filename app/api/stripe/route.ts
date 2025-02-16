@@ -10,7 +10,7 @@ Cors({
 export async function POST(req: Request) {
     const body = await req.text();
 
-    const signature = (await headers()).get("Stripe-Signature");
+    const signature = (await headers()).get("stripe-signature");
 
     if (!signature) {
         console.error('Stripe-Signature header is missing.');
