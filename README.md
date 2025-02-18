@@ -97,4 +97,4 @@ PamPamPay is open-source and licensed under the **MIT License**.
 
 ## Contact
 
-For support or inquiries, reach out to us at [**support@pampampay.com**](mailto:support@pampampay.com).
+For support or inquiries, reach out to us at [**support@www.pampampay.com**](mailto:support@www.pampampay.com).
