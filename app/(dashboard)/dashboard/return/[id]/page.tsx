@@ -25,7 +25,7 @@ const ReturnPage = async () => {
               Your account is now linked with Stripe. <br /> Click below to
               continue.
             </p>
-            <Link href="/dashboard/pay-and-request">
+            <Link href="/dashboard">
               <p className="text-center hover:underline transition duration-150 text-md">
                 Click here to go back to payments
               </p>

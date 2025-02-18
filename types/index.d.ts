@@ -15,6 +15,7 @@ declare interface HeaderBoxProps {
 declare interface StripeSessionProps {
     amount: number;
     paymentDescription: string;
+    ssn: string;
     recipientEmail: string;
     recipientId: string;
 }

@@ -13,7 +13,10 @@ import AuthNetForm from "./AuthNetForm";
 const TransferTabs = async () => {
   const connections = await getConnections();
   return (
-    <Card className="bg-white/10 backdrop-blur-md border border-white/20 shadow-md">
+    <Card
+      className="bg-white/10 backdrop-blur-md border border-white/20 shadow-md"
+      id="transactions"
+    >
       <CardHeader>
         <CardTitle>Initiate Transfer</CardTitle>
         <CardDescription>Transfer money to a connection.</CardDescription>

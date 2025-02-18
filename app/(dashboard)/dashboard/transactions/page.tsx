@@ -1,9 +1,16 @@
-import TransactionsTable from "@/components/Dashboard/TransactionsTable";
+import ConnectedDataTable from "@/components/Dashboard/DataTable/connected-table";
 import Header from "@/components/General/Header";
-import { getUserTransactions } from "@/lib/actions/transfer.actions";
+import { getUserStripeTransactions } from "@/lib/actions/transfer.actions";
+import { createOrGetUser } from "@/lib/actions/user.actions";
+import { redirect } from "next/navigation";
 
 const TransactionsPage = async () => {
-  const { sentTransfers, receivedTransfers } = await getUserTransactions();
+  const user = await createOrGetUser();
+  if (user.stripeConnectedLinked === false) {
+    redirect("/dashboard");
+  }
+
+  const transfers = await getUserStripeTransactions();
 
   return (
     <section className="p-6 h-screen gap-y-4">
@@ -11,10 +18,9 @@ const TransactionsPage = async () => {
         title="Recent Transactions"
         subtext="View your transactions here."
       />
-      <TransactionsTable
-        sentTransfers={sentTransfers}
-        receivedTransfers={receivedTransfers}
-      />
+      <div>
+        <ConnectedDataTable transfers={transfers} />
+      </div>
     </section>
   );
 };

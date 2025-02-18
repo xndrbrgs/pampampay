@@ -6,17 +6,17 @@ import Link from "next/link";
 import { cn } from "@/lib/utils";
 import { ArrowRightLeft, HandCoins, House } from "lucide-react";
 
-export const sidebarLinks = [
+const sidebarLinks = [
   {
     route: "/dashboard",
     label: "Dashboard",
     icon: <House size={20} />,
   },
-  {
-    route: "/dashboard/pay-and-request",
-    label: "Pay & Request",
-    icon: <HandCoins size={20} />,
-  },
+  // {
+  //   route: "/dashboard/pay-and-request",
+  //   label: "Pay & Request",
+  //   icon: <HandCoins size={20} />,
+  // },
   {
     route: "/dashboard/transactions",
     label: "Transactions",
@@ -24,7 +24,11 @@ export const sidebarLinks = [
   },
 ];
 
-const SidebarLinks = () => {
+interface SidebarLinksProps {
+  stripeConnectedLinked: boolean;
+}
+
+const SidebarLinks: React.FC<SidebarLinksProps> = ({ stripeConnectedLinked }) => {
   const pathname = usePathname();
 
   const listVariants = {
@@ -36,6 +40,10 @@ const SidebarLinks = () => {
     hidden: { opacity: 0, y: 20 },
     visible: { opacity: 1, y: 0, transition: { duration: 0.4 } },
   };
+  const filteredLinks = stripeConnectedLinked
+    ? sidebarLinks
+    : sidebarLinks.filter(link => link.route === "/dashboard");
+
   return (
     <motion.div
       className="flex flex-col space-y-5 py-4"
@@ -43,7 +51,7 @@ const SidebarLinks = () => {
       animate="visible"
       variants={listVariants}
     >
-      {sidebarLinks.map((link) => {
+      {filteredLinks.map((link) => {
         const isActive =
           pathname === link.route ||
           pathname.startsWith(`/dashboard/${link.route}/`);

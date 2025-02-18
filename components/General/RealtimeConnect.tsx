@@ -94,7 +94,7 @@ const RealtimeConnect = ({ user, connections }: RealtimeConnectProps) => {
               <DisclosureContent>
                 <div className="overflow-hidden py-3 mx-auto justify-center flex w-full">
                   <Button>
-                    <Link href="/dashboard/pay-and-request">
+                    <Link href="#transactions">
                       Perform Transfer
                     </Link>
                   </Button>

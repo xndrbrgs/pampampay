@@ -25,7 +25,7 @@ const CancelPage = async () => {
               Something went wrong with your payment. <br /> Please try again
               later.
             </p>
-            <Link href="/dashboard/pay-and-request">
+            <Link href="/dashboard">
               <p className="text-center hover:underline transition duration-150 text-md">
                 Click here to go back to payments
               </p>

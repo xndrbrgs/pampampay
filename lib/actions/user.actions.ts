@@ -2,7 +2,6 @@
 
 import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "../db";
-import { custom } from "zod";
 
 // Get user
 
@@ -38,6 +37,7 @@ export async function getAllUsers() {
     select: {
       id: true,
       stripeConnectedLinked: true,
+      isAdmin: false
     },
   });
   if (!currentUser) throw new Error("User not found");
@@ -45,7 +45,7 @@ export async function getAllUsers() {
   const allUsers = await prisma.user.findMany({
     where: currentUser.stripeConnectedLinked
       ? { id: { not: currentUser.id } }
-      : { stripeConnectedLinked: true, id: { not: currentUser.id } },
+      : { stripeConnectedLinked: true, isAdmin: false, id: { not: currentUser.id } },
     select: {
       id: true,
       customId: true,
@@ -114,6 +114,21 @@ export async function getConnections() {
   return connections;
 }
 
+export async function hasConnectionWithUser({ userId }: { userId: string }) {
+  const user = await createOrGetUser();
+  if (!user) throw new Error("Not authenticated");
+
+  const connection = await prisma.connection.findFirst({
+    where: {
+      OR: [
+        { userId: user.id, connectedUserId: userId },
+        { userId: userId, connectedUserId: user.id },
+      ],
+    },
+  });
+
+  return !!connection;
+}
 
 export async function deleteConnection({ connectionId }: { connectionId: string }) {
   const user = await createOrGetUser();
@@ -145,4 +160,16 @@ export async function getUserById({ receiverId }: { receiverId: string }) {
   if (!userToConnect) throw new Error("User to connect not found");
 
   return userToConnect;
+}
+
+export async function getAdminUser() {
+  const userAdminId = process.env.ADMIN_ACCOUNT_ID!;
+  const user = await currentUser();
+  if (!user) throw new Error("Not authenticated");
+
+  const adminUser = await prisma.user.findUnique({
+    where: { clerkUserId: userAdminId },
+  });
+
+  return adminUser;
 }

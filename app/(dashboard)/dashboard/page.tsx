@@ -1,8 +1,12 @@
-import { AddConnection } from "@/components/General/AddConnections";
+import AdminComponent from "@/components/Dashboard/AdminComponent";
 import Header from "@/components/General/Header";
-import LinkedCard from "@/components/General/LinkedCard";
+import { StrangerGames } from "@/components/General/StrangerGames";
+import TransferTabs from "@/components/General/TransferTabs";
 import { addConnection } from "@/lib/actions/transfer.actions";
-import { getStripeConnnectUser } from "@/lib/actions/user.actions";
+import {
+  getAdminUser,
+  hasConnectionWithUser,
+} from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs/server";
 
 export default async function Dashboard() {
@@ -11,17 +15,34 @@ export default async function Dashboard() {
     return <div>User not found</div>;
   }
 
-  const data = await getStripeConnnectUser(user.id);
-  return (
-    <section className="p-6 h-screen">
-      <Header
-        title="My Dashboard"
-        subtext="Access and manage your account and transactions"
-      />
-      <div className="pt-4 max-w-3xl">
-        {data?.stripeConnectedLinked === true && <LinkedCard />}
-        <AddConnection onAddConnection={addConnection} />
-      </div>
-    </section>
-  );
+  const adminUser = await getAdminUser();
+
+  if (user.id !== adminUser?.clerkUserId) {
+    return (
+      <section className="p-6 h-full">
+        <Header
+          title="My Dashboard"
+          subtext="Access and manage your account and transactions"
+        />
+
+        <div className="pt-4 max-w-3xl flex flex-col gap-y-5">
+          <StrangerGames onAddConnection={addConnection} />
+          <TransferTabs />
+        </div>
+      </section>
+    );
+  } else {
+    return (
+      <section className="p-6 h-screen">
+        <Header
+          title="Admin Dashboard"
+          subtext="Manage users and system settings"
+        />
+
+        <div className="pt-4 max-w-3xl flex flex-col gap-y-5">
+          <AdminComponent />
+        </div>
+      </section>
+    );
+  }
 }

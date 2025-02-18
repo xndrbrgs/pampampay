@@ -17,6 +17,7 @@ model User {
   lastName              String?
   username              String?
   profileImage          String?
+  isAdmin               Boolean      @default(false)
   connectedAccountId    String       @unique
   stripeConnectedLinked Boolean      @default(false)
   connections           Connection[] @relation("UserConnections")
@@ -42,8 +43,7 @@ model Transfer {
   description          String?
   senderId             String
   receiverId           String
-  transferReceiptUrl   String?
-  paymentIntentId      String?
+  ssn                  String
   sender               User           @relation("SenderTransfers", fields: [senderId], references: [id])
   receiver             User           @relation("ReceiverTransfers", fields: [receiverId], references: [id])
   status               TransferStatus

@@ -6,7 +6,11 @@ import SidebarLinks from "./SidebarLinks";
 import SearchBar from "./SearchBar";
 import MyConnections from "../General/MyConnections";
 
-const Sidebar = () => {
+interface SidebarProps {
+  stripeConnected: boolean;
+}
+
+const Sidebar: React.FC<SidebarProps> = ({ stripeConnected }) => {
   return (
     <section className="hidden md:flex side-width sticky justify-between flex-col top-4 h-screen p-6 border-r">
       <div className="flex flex-col space-y-4">
@@ -24,7 +28,7 @@ const Sidebar = () => {
           <span className="font-editorial text-lg pt-[0.25rem]">PamPamPay</span>
         </div>
         <SearchBar />
-        <SidebarLinks />
+        <SidebarLinks stripeConnectedLinked={stripeConnected} />
         <MyConnections />
       </div>
       <div className="border-t border-gray-800 pt-4 mb-8">

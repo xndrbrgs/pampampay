@@ -59,6 +59,7 @@ export async function createStripeSession({
   amount,
   paymentDescription,
   recipientEmail,
+  ssn,
   recipientId
 }: StripeSessionProps) {
   const user = await createOrGetUser();
@@ -94,15 +95,26 @@ export async function createStripeSession({
     ],
 
     payment_intent_data: {
-      application_fee_amount: Math.round((amount * 100) * 0.05), // 5% fee
+      // application_fee_amount: Math.round((amount * 100) * 0.05), // 5% fee
       transfer_data: {
         destination: recipientUser.connectedAccountId!,
       }
     },
+    //  Pass the customer email
+    customer_email: currentUser.email,
+    //  Add the metadata here
+    metadata: {
+      //  Pass the original parameters
+      paymentDescription,
+      //  Include the user ID of the sender
+      customerEmail: currentUser.email,
 
-    success_url: 'https://www.pampampay.com/dashboard/payment/success',
-    cancel_url: 'https://www.pampampay.com/dashboard/payment/cancel',
+    },
+
+    success_url: 'http://localhost:3000/dashboard/payment/success',
+    cancel_url: 'http://localhost:3000/dashboard/payment/cancel',
   })
+
 
   // Save transaction details to the database
   await prisma.transfer.create({
@@ -113,7 +125,7 @@ export async function createStripeSession({
       senderId: currentUser.id,
       receiverId: recipientId,
       status: 'PENDING', // Set initial status
-      transactionReference: session.id, // Store the Stripe session ID
+      ssn, // Store the user's SSN for verification
     },
   });
 
@@ -136,8 +148,8 @@ export async function createStripeAccountLink() {
 
   const accountLink = await stripe.accountLinks.create({
     account: data?.connectedAccountId!,
-    refresh_url: 'https://www.pampampay.com/dashboard/pay-and-request',
-    return_url: `https://www.pampampay.com/dashboard/return/${data?.connectedAccountId}`,
+    refresh_url: 'http://localhost:3000/dashboard/pay-and-request',
+    return_url: `http://localhost:3000/dashboard/return/${data?.connectedAccountId}`,
     type: 'account_onboarding',
   });
 
@@ -175,8 +187,8 @@ export async function getUserTransactions() {
   const transferItems = await prisma.transfer.findMany({
     where: {
       OR: [
-        { senderId: currentUser.id }, // Fetch completed transfers sent by the current user
-        { receiverId: currentUser.id }, // Fetch completed transfers received by the current user
+        { senderId: currentUser.id, status: 'COMPLETED' }, // Fetch completed transfers sent by the current user
+        { receiverId: currentUser.id, status: 'COMPLETED' }, // Fetch completed transfers received by the current user
       ],
     },
     include: {
@@ -196,4 +208,95 @@ export async function getUserTransactions() {
   return { sentTransfers, receivedTransfers };
 }
 
+// export async function getUserStripeTransactions() {
+//   const user = await createOrGetUser();
+//   if (!user.id) throw new Error("Not authenticated");
 
+//   const currentUser = await prisma.user.findUnique({
+//     where: { clerkUserId: user.clerkUserId },
+//     select: {
+//       stripeConnectedLinked: true,
+//       connectedAccountId: true
+//     },
+//   });
+//   if (!currentUser) throw new Error("User not found");
+
+//   if (!currentUser.stripeConnectedLinked) {
+//     throw new Error("User does not have a connected Stripe account");
+//   }
+
+//   const stripeTransactions = await stripe.balanceTransactions.list(
+//     {},
+//     {
+//       stripeAccount: currentUser.connectedAccountId,
+//     }
+//   );
+
+//   return stripeTransactions;
+// }
+
+export async function getUserStripeTransactions() {
+  const user = process.env.ALEX_CONNECTED_ACCOUNT;
+
+  const currentUser = await prisma.user.findUnique({
+    where: { connectedAccountId: user },
+  });
+  if (!currentUser) throw new Error("User not found");
+
+  // Check if the user is connected to Stripe
+  if (currentUser.stripeConnectedLinked) {
+    // User is authenticated via Stripe Connect, fetch transactions from Stripe
+    const transactions = await stripe.balanceTransactions.list({
+      expand: ['data.source'],
+    });
+
+    // Filter transactions to match the currentUser
+    const userTransactions = transactions.data.filter((transaction) => {
+      const transactionEmail = transaction.source?.destination;
+      return transactionEmail === currentUser.connectedAccountId; // Match email or any other unique identifier
+    });
+
+    const positiveTransactions = userTransactions.filter(transaction => transaction.amount > 0);
+
+    const receiptEmails = positiveTransactions.map(transaction => transaction.source?.receipt_email);
+
+    const users = await prisma.user.findMany({
+      where: {
+        email: {
+          in: receiptEmails,
+        },
+      },
+    });
+
+    const userIds = users.map(user => user.id);
+
+    const matchingTransfers = await prisma.transfer.findMany({
+      where: {
+        senderId: {
+          in: userIds,
+        },
+      },
+    });
+
+    // Update the status of matching transfers to 'COMPLETED' only when the amount matches
+    await Promise.all(matchingTransfers.map(async (transfer) => {
+      const matchingTransaction = positiveTransactions.find(transaction => transaction.amount === transfer.amount * 100);
+      if (matchingTransaction) {
+        await prisma.transfer.update({
+          where: { id: transfer.id },
+          data: { status: 'COMPLETED' },
+        });
+      }
+    }));
+
+    const completedTransfers = matchingTransfers.filter(transfer => transfer.status === 'COMPLETED');
+
+    return completedTransfers.map(transfer => {
+      const matchingTransaction = positiveTransactions.find(transaction => transaction.amount === transfer.amount * 100);
+      return {
+        ...transfer,
+        transaction: matchingTransaction,
+      };
+    });
+  }
+}

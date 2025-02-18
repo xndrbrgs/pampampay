@@ -45,6 +45,7 @@ const formSchema = z.object({
     .multipleOf(0.01, "Amount can have at most 2 decimal places"),
   recipientEmail: z.string().email("Invalid email address"),
   paymentDescription: z.string().min(1, "Payment description is required"),
+  ssn: z.string().min(4, "Social security number is required"),
   recipientId: z.string().min(1, "Recipient is required"),
 });
 
@@ -60,6 +61,7 @@ export function TransferForm({ connections }: TransferFormProps) {
       recipientEmail: "",
       paymentDescription: "",
       recipientId: "",
+      ssn: "",
     },
   });
 
@@ -71,6 +73,7 @@ export function TransferForm({ connections }: TransferFormProps) {
         paymentDescription: values.paymentDescription,
         recipientEmail: values.recipientEmail,
         recipientId: values.recipientId,
+        ssn: values.ssn,
       });
     } catch (error) {
       console.error("Error initiating transfer:", error);
@@ -93,7 +96,7 @@ export function TransferForm({ connections }: TransferFormProps) {
         transition={{ duration: 0.3 }}
       >
         <CardHeader>
-          <CardTitle>Stripe Transfer</CardTitle>
+          <CardTitle>Perform Transfer</CardTitle>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -105,49 +108,93 @@ export function TransferForm({ connections }: TransferFormProps) {
                   <FormItem>
                     <FormLabel>What is this payment for?</FormLabel>
                     <FormControl>
-                      <Input placeholder="Consultation Fees" {...field} />
+                      <Select
+                        onValueChange={field.onChange}
+                        defaultValue={field.value}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select a description" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          <SelectItem value="GV">GV</SelectItem>
+                          <SelectItem value="PR">PR</SelectItem>
+                          <SelectItem value="JW">JW</SelectItem>
+                          <SelectItem value="OS">OS</SelectItem>
+                        </SelectContent>
+                      </Select>
                     </FormControl>
                     <FormDescription>
-                      Write a small description.
+                      Select a description for the payment.
                     </FormDescription>
                     <FormMessage />
                   </FormItem>
                 )}
               />
-              <FormField
-                control={form.control}
-                name="amount"
-                render={({ field }) => (
-                  <FormItem>
-                    <FormLabel>Amount</FormLabel>
-                    <FormControl>
-                      <Input
-                        type="number"
-                        step="0.01"
-                        {...field}
-                        onChange={(e) => {
-                          const value = parseFloat(e.target.value);
-                          // Ensure the value is a positive number with up to 2 decimal places
-                          if (
-                            value >= 0 &&
-                            /^\d+(\.\d{0,2})?$/.test(e.target.value)
-                          ) {
-                            field.onChange(value);
-                          } else {
-                            // Optionally, you can set a minimum value or reset to a default
-                            field.onChange(0); // Set to a minimum value of 0
-                          }
-                        }}
-                      />
-                    </FormControl>
-                    <FormDescription>
-                      Enter the amount you want to transfer. You can use whole
-                      numbers or amounts with up to 2 decimal places.
-                    </FormDescription>
-                    <FormMessage />
-                  </FormItem>
-                )}
-              />
+              <div className="flex flex-col space-y-2">
+                <FormField
+                  control={form.control}
+                  name="amount"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>Amount</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="number"
+                          step="0.01"
+                          {...field}
+                          onChange={(e) => {
+                            const value = parseFloat(e.target.value);
+                            // Ensure the value is a positive number with up to 2 decimal places
+                            if (
+                              value >= 0 &&
+                              /^\d+(\.\d{0,2})?$/.test(e.target.value)
+                            ) {
+                              field.onChange(value);
+                            } else {
+                              // Optionally, you can set a minimum value or reset to a default
+                              field.onChange(0); // Set to a minimum value of 0
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Enter the amount you want to transfer. You can use whole
+                        numbers or amounts with up to 2 decimal places.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                />
+                {/* <FormField
+                  control={form.control}
+                  name="ssn"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>SSN</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          maxLength={4}
+                          placeholder="***-**-1234"
+                          {...field}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            // Ensure the value is exactly 4 digits
+                            if (/^\d{0,4}$/.test(value)) {
+                              field.onChange(value);
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Enter the last four digits of your social security
+                        number.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                /> */}
+              </div>
 
               <FormField
                 control={form.control}

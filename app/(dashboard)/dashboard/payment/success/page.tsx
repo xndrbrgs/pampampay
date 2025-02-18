@@ -22,9 +22,11 @@ const SuccessPage = async () => {
           <Check className="w-24 h-24 text-green-500 rounded-full bg-green-500/30 p-2 mx-auto" />
           <div className="flex flex-col space-y-5">
             <p className="text-center text-sm">
-              Congrats on a successful payment. <br /> Click below to continue.
+              Congrats on a successful payment. <br />A receipt will be sent to
+              your email.
             </p>
-            <Link href="/dashboard/pay-and-request">
+            <p className="text-center text-sm">Click below to continue.</p>
+            <Link href="/dashboard">
               <p className="text-center hover:underline transition duration-150 text-md">
                 Click here to go back to payments
               </p>

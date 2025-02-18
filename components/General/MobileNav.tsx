@@ -4,15 +4,18 @@ import {
   SheetTitle,
   SheetTrigger,
 } from "@/components/ui/sheet";
-import { Menu } from "lucide-react";
 import Image from "next/image";
 import SidebarLinks from "../Dashboard/SidebarLinks";
 import MyConnections from "./MyConnections";
-import { SignedIn, UserButton, SignOutButton  } from "@clerk/nextjs";
+import { SignedIn, SignOutButton, UserButton } from "@clerk/nextjs";
 import Logout from "../Dashboard/Logout";
 import { VisuallyHidden } from "radix-ui";
+import { LogOut, Menu } from "lucide-react";
+interface SidebarProps {
+  stripeConnected: boolean;
+}
 
-const MobileNav = () => {
+const MobileNav: React.FC<SidebarProps> = ({ stripeConnected }) => {
   return (
     <Sheet>
       <SheetTrigger>
@@ -33,16 +36,20 @@ const MobileNav = () => {
                 PamPamPay
               </span>
             </div>
-            <SidebarLinks />
+            <SidebarLinks stripeConnectedLinked={stripeConnected} />
             <MyConnections />
           </div>
           <div className="border-t border-gray-800 pt-4">
             <SignedIn>
-              <div className="flex items-center space-x-3">
-                <UserButton />
-                <div className="flex space-x-2">
+              <div className="flex justify-between items-center px-3">
+                <div className="flex items-center space-x-3">
+                  <UserButton />
                   <Logout />
-                  <SignOutButton />
+                </div>
+                <div className="text-red-400 size-3">
+                  <SignOutButton>
+                    <LogOut />
+                  </SignOutButton>
                 </div>
               </div>
             </SignedIn>
