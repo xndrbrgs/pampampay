@@ -89,7 +89,7 @@ export function TransferForm({ connections }: TransferFormProps) {
   }
 
   return (
-    <Card className="bg-transparent backdrop-blur-md border border-white/20 shadow-md mt-3">
+    <Card className="bg-transparent border border-white/20 shadow-md mt-3">
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}

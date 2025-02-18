@@ -8,7 +8,7 @@ import { Construction } from "lucide-react";
 
 const AuthNetForm = () => {
   return (
-    <Card className="bg-transparent backdrop-blur-md border border-white/20 shadow-md mt-3">
+    <Card className="bg-transparent border border-white/20 shadow-md mt-3">
       <CardHeader>
         <CardTitle className="flex items-center gap-x-3">
           Under Contruction
