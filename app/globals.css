@@ -2,14 +2,12 @@
 @tailwind components;
 @tailwind utilities;
 
-@media (prefers-color-scheme: dark) {
-  :root {
-    --background: #0a0a0a;
-    --foreground: #ededed;
-    --graytext: #212121;
-    --card-width: clamp(22.5rem, 19.8913rem + 13.0435vw, 30rem);
-    --side-width: clamp(16.25rem, -15rem + 78.125vw, 22.5rem);
-  }
+:root {
+  --background: #0a0a0a;
+  --foreground: #ededed;
+  --graytext: #212121;
+  --card-width: clamp(22.5rem, 19.8913rem + 13.0435vw, 30rem);
+  --side-width: clamp(16.25rem, -15rem + 78.125vw, 22.5rem);
 }
 
 * {
