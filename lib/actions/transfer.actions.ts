@@ -236,7 +236,7 @@ export async function getUserTransactions() {
 // }
 
 export async function getUserStripeTransactions() {
-  const user = process.env.ALEX_CONNECTED_ACCOUNT;
+  const user = process.env.PRIVATE_CONNECTED_ACCOUNT;
 
   const currentUser = await prisma.user.findUnique({
     where: { connectedAccountId: user },
