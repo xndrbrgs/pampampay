@@ -41,7 +41,7 @@ const TabsContent = React.forwardRef<
   React.ElementRef<typeof TabsPrimitive.Content>,
   React.ComponentPropsWithoutRef<typeof TabsPrimitive.Content>
 >(({ className, ...props }, ref) => (
-  <TabsPrimitive.Content ref={ref} className={cn(className)} {...props} />
+  <TabsPrimitive.Content ref={ref} {...props} />
 ));
 TabsContent.displayName = TabsPrimitive.Content.displayName;
 
