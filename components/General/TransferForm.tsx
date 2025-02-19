@@ -45,7 +45,7 @@ const formSchema = z.object({
     .multipleOf(0.01, "Amount can have at most 2 decimal places"),
   recipientEmail: z.string().email("Invalid email address"),
   paymentDescription: z.string().min(1, "Payment description is required"),
-  ssn: z.string().min(4, "Social security number is required"),
+  // ssn: z.string().min(4, "Social security number is required"),
   recipientId: z.string().min(1, "Recipient is required"),
 });
 
@@ -61,7 +61,7 @@ export function TransferForm({ connections }: TransferFormProps) {
       recipientEmail: "",
       paymentDescription: "",
       recipientId: "",
-      ssn: "",
+      // ssn: "",
     },
   });
 
@@ -73,7 +73,7 @@ export function TransferForm({ connections }: TransferFormProps) {
         paymentDescription: values.paymentDescription,
         recipientEmail: values.recipientEmail,
         recipientId: values.recipientId,
-        ssn: values.ssn,
+        // ssn: values.ssn,
       });
     } catch (error) {
       console.error("Error initiating transfer:", error);
@@ -165,7 +165,7 @@ export function TransferForm({ connections }: TransferFormProps) {
                     </FormItem>
                   )}
                 />
-                <FormField
+                {/* <FormField
                   control={form.control}
                   name="ssn"
                   render={({ field }) => (
@@ -193,7 +193,7 @@ export function TransferForm({ connections }: TransferFormProps) {
                       <FormMessage />
                     </FormItem>
                   )}
-                />
+                /> */}
               </div>
 
               <FormField

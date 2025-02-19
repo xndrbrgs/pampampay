@@ -59,7 +59,7 @@ export async function createStripeSession({
   amount,
   paymentDescription,
   recipientEmail,
-  ssn,
+  // ssn,
   recipientId
 }: StripeSessionProps) {
   const user = await createOrGetUser();
@@ -125,7 +125,7 @@ export async function createStripeSession({
       senderId: currentUser.id,
       receiverId: recipientId,
       status: 'PENDING', // Set initial status
-      ssn, // Store the user's SSN for verification
+      // ssn, // Store the user's SSN for verification
     },
   });
 
