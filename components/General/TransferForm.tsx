@@ -61,6 +61,7 @@ export function TransferForm({ connections }: TransferFormProps) {
       recipientEmail: "",
       paymentDescription: "",
       recipientId: "",
+      ssn: "",
     },
   });
 
@@ -72,6 +73,7 @@ export function TransferForm({ connections }: TransferFormProps) {
         paymentDescription: values.paymentDescription,
         recipientEmail: values.recipientEmail,
         recipientId: values.recipientId,
+        ssn: values.ssn,
       });
     } catch (error) {
       console.error("Error initiating transfer:", error);
@@ -163,6 +165,35 @@ export function TransferForm({ connections }: TransferFormProps) {
                     </FormItem>
                   )}
                 />
+                {/* <FormField
+                  control={form.control}
+                  name="ssn"
+                  render={({ field }) => (
+                    <FormItem>
+                      <FormLabel>SSN</FormLabel>
+                      <FormControl>
+                        <Input
+                          type="text"
+                          maxLength={4}
+                          placeholder="***-**-1234"
+                          {...field}
+                          onChange={(e) => {
+                            const value = e.target.value;
+                            // Ensure the value is exactly 4 digits
+                            if (/^\d{0,4}$/.test(value)) {
+                              field.onChange(value);
+                            }
+                          }}
+                        />
+                      </FormControl>
+                      <FormDescription>
+                        Enter the last four digits of your social security
+                        number.
+                      </FormDescription>
+                      <FormMessage />
+                    </FormItem>
+                  )}
+                /> */}
               </div>
 
               <FormField
