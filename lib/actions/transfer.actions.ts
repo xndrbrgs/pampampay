@@ -59,8 +59,8 @@ export async function createStripeSession({
   amount,
   paymentDescription,
   recipientEmail,
-  ssn,
-  recipientId
+  recipientId,
+  // ssn
 }: StripeSessionProps) {
   const user = await createOrGetUser();
   if (!user.id) throw new Error("Not authenticated");
@@ -125,7 +125,7 @@ export async function createStripeSession({
       senderId: currentUser.id,
       receiverId: recipientId,
       status: 'PENDING', // Set initial status
-      ssn, // Store the user's SSN for verification
+      // ssn, // Store the user's SSN for verification
     },
   });
 

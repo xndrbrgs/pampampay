@@ -61,7 +61,6 @@ export function TransferForm({ connections }: TransferFormProps) {
       recipientEmail: "",
       paymentDescription: "",
       recipientId: "",
-      ssn: "",
     },
   });
 
@@ -73,7 +72,6 @@ export function TransferForm({ connections }: TransferFormProps) {
         paymentDescription: values.paymentDescription,
         recipientEmail: values.recipientEmail,
         recipientId: values.recipientId,
-        ssn: values.ssn,
       });
     } catch (error) {
       console.error("Error initiating transfer:", error);
