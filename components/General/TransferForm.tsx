@@ -165,7 +165,7 @@ export function TransferForm({ connections }: TransferFormProps) {
                     </FormItem>
                   )}
                 />
-                {/* <FormField
+                <FormField
                   control={form.control}
                   name="ssn"
                   render={({ field }) => (
@@ -193,7 +193,7 @@ export function TransferForm({ connections }: TransferFormProps) {
                       <FormMessage />
                     </FormItem>
                   )}
-                /> */}
+                />
               </div>
 
               <FormField
