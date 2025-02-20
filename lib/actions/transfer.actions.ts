@@ -291,11 +291,23 @@ export async function getUserStripeTransactions() {
 
     const completedTransfers = matchingTransfers.filter(transfer => transfer.status === 'COMPLETED');
 
-    return completedTransfers.map(transfer => {
+    const senderEmails = await Promise.all(
+      completedTransfers.map(async (transfer) => {
+        const sender = await prisma.user.findUnique({
+          where: { id: transfer.senderId },
+          select: { email: true },
+        });
+        return sender?.email;
+      })
+    );
+
+
+    return completedTransfers.map((transfer, index) => {
       const matchingTransaction = positiveTransactions.find(transaction => transaction.amount === transfer.amount * 100);
       return {
         ...transfer,
         transaction: matchingTransaction,
+        senderEmail: senderEmails[index],
       };
     });
   }

@@ -162,6 +162,20 @@ export async function getUserById({ receiverId }: { receiverId: string }) {
   return userToConnect;
 }
 
+export async function getEmailBySenderId({ senderId }: { senderId: string }) {
+  const userEmail = await prisma.user.findUnique({
+    where: {
+      id: senderId
+    },
+    select: {
+      email: true
+    }
+  })
+
+  if (!userEmail) throw new Error("User's email not found");
+  return userEmail;
+}
+
 export async function getAdminUser() {
   const userAdminId = process.env.ADMIN_ACCOUNT_ID!;
   const user = await currentUser();

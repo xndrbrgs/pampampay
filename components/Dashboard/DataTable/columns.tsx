@@ -4,6 +4,7 @@ import type { ColumnDef } from "@tanstack/react-table";
 import { formatAmount, formatDateTime } from "@/lib/utils";
 import { Button } from "@/components/ui/button";
 import { ArrowUpDown } from "lucide-react";
+import { Badge } from "@/components/ui/badge";
 
 export type Transfer = {
   id: string;
@@ -11,6 +12,7 @@ export type Transfer = {
   description: string;
   createdAt: string;
   status: string;
+  senderEmail: string;
   transaction: {
     source?: {
       receipt_email?: string;
@@ -33,7 +35,9 @@ export const columns: ColumnDef<Transfer>[] = [
       );
     },
     cell: ({ row }) => (
-      <div className="font-medium">{formatAmount(row.getValue("amount"))}</div>
+      <div className="font-medium text-green-500">
+        {formatAmount(row.getValue("amount"))}
+      </div>
     ),
   },
   {
@@ -46,15 +50,10 @@ export const columns: ColumnDef<Transfer>[] = [
   {
     accessorKey: "email",
     header: "Email",
-    cell: ({ row }) => (
-      <div>{row.original.transaction.source?.receipt_email || "N/A"}</div>
-    ),
+    cell: ({ row }) => <div>{row.original.senderEmail || "N/A"}</div>,
     filterFn: (row, id, value) => {
-      return (
-        row.original.transaction.source?.receipt_email
-          ?.toLowerCase()
-          .includes(value.toLowerCase()) ?? false
-      );
+      const email = row.original.senderEmail;
+      return email?.toLowerCase().includes(value.toLowerCase()) ?? false;
     },
   },
   {
@@ -80,7 +79,9 @@ export const columns: ColumnDef<Transfer>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
-      <div className="capitalize">{row.getValue("status")}</div>
+      <div className="capitalize">
+        <Badge>{row.getValue("status")}</Badge>
+      </div>
     ),
   },
 ];
