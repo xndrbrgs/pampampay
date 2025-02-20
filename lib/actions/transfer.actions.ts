@@ -247,8 +247,10 @@ export async function getUserStripeTransactions() {
   if (currentUser.stripeConnectedLinked) {
     // User is authenticated via Stripe Connect, fetch transactions from Stripe
     const transactions = await stripe.balanceTransactions.list({
+      limit: 100,
       expand: ['data.source'],
     });
+
 
     // Filter transactions to match the currentUser
     const userTransactions = transactions.data.filter((transaction) => {

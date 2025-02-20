@@ -11,7 +11,7 @@ const TransactionsPage = async () => {
   }
 
   const transfers = await getUserStripeTransactions();
-  console.log(transfers);
+  // console.log(transfers);
 
   return (
     <section className="p-6 h-screen gap-y-4">

@@ -46,7 +46,7 @@ const Landing = () => {
         {/* Background Image */}
         <div className="absolute -bottom-24 left-1/2 transform -translate-x-1/2 w-[95%] h-[50%] brightness-75 hover:brightness-100 transition duration-300 z-10">
           <BrowserCard
-            imageSrc="/images/dashboard.webp" // Ensure this path is correct
+            imageSrc="/images/dash.webp" // Ensure this path is correct
             altText="Webpage Content"
           />
         </div>
