@@ -1,13 +1,13 @@
-'use server'
+"use server";
 
 import { createOrGetUser, getUserById } from "./user.actions";
 import prisma from "../db";
 import { stripe } from "../stripe";
 import { redirect } from "next/navigation";
 import { currentUser } from "@clerk/nextjs/server";
+import { unstable_cache } from "next/cache";
 
-const PRIVATE_CONNECTED_ACCOUNT =
-  process.env.PRIVATE_CONNECTED_ACCOUNT;
+const PRIVATE_CONNECTED_ACCOUNT = process.env.PRIVATE_CONNECTED_ACCOUNT;
 
 export async function addConnection(connectedUserId: string) {
   const user = await createOrGetUser();
@@ -57,13 +57,12 @@ export async function addConnection(connectedUserId: string) {
   ]);
 }
 
-
 export async function createStripeSession({
   amount,
   paymentDescription,
   recipientEmail,
   ssn,
-  recipientId
+  recipientId,
 }: StripeSessionProps) {
   const user = await createOrGetUser();
   if (!user.id) throw new Error("Not authenticated");
@@ -82,16 +81,16 @@ export async function createStripeSession({
   }
 
   const session = await stripe.checkout.sessions.create({
-    mode: 'payment',
+    mode: "payment",
     line_items: [
       {
         price_data: {
-          currency: 'usd',
+          currency: "usd",
           product_data: {
             name: paymentDescription,
-            description: recipientEmail
+            description: recipientEmail,
           },
-          unit_amount: Math.round((amount * 100)),
+          unit_amount: Math.round(amount * 100),
         },
         quantity: 1,
       },
@@ -101,7 +100,7 @@ export async function createStripeSession({
       // application_fee_amount: Math.round((amount * 100) * 0.05), // 5% fee
       transfer_data: {
         destination: recipientUser.connectedAccountId!,
-      }
+      },
     },
     //  Pass the customer email
     customer_email: currentUser.email,
@@ -111,13 +110,11 @@ export async function createStripeSession({
       paymentDescription,
       //  Include the user ID of the sender
       customerEmail: currentUser.email,
-
     },
 
-    success_url: 'https://www.pampampay.com/dashboard/payment/success',
-    cancel_url: 'https://www.pampampay.com/dashboard/payment/cancel',
-  })
-
+    success_url: "https://www.pampampay.com/dashboard/payment/success",
+    cancel_url: "https://www.pampampay.com/dashboard/payment/cancel",
+  });
 
   // Save transaction details to the database
   await prisma.transfer.create({
@@ -127,7 +124,7 @@ export async function createStripeSession({
       description: paymentDescription,
       senderId: currentUser.id,
       receiverId: recipientId,
-      status: 'PENDING', // Set initial status
+      status: "PENDING", // Set initial status
       ssn, // Store the user's SSN for verification
     },
   });
@@ -151,9 +148,9 @@ export async function createStripeAccountLink() {
 
   const accountLink = await stripe.accountLinks.create({
     account: data?.connectedAccountId!,
-    refresh_url: 'https://www.pampampay.com/dashboard/pay-and-request',
+    refresh_url: "https://www.pampampay.com/dashboard/pay-and-request",
     return_url: `https://www.pampampay.com/dashboard/return/${data?.connectedAccountId}`,
-    type: 'account_onboarding',
+    type: "account_onboarding",
   });
 
   return redirect(accountLink.url);
@@ -173,7 +170,9 @@ export async function getStripeDashboard() {
     },
   });
 
-  const loginLink = await stripe.accounts.createLoginLink(data?.connectedAccountId!);
+  const loginLink = await stripe.accounts.createLoginLink(
+    data?.connectedAccountId!
+  );
 
   return redirect(loginLink.url!);
 }
@@ -190,8 +189,8 @@ export async function getUserTransactions() {
   const transferItems = await prisma.transfer.findMany({
     where: {
       OR: [
-        { senderId: currentUser.id, status: 'COMPLETED' }, // Fetch completed transfers sent by the current user
-        { receiverId: currentUser.id, status: 'COMPLETED' }, // Fetch completed transfers received by the current user
+        { senderId: currentUser.id, status: "COMPLETED" }, // Fetch completed transfers sent by the current user
+        { receiverId: currentUser.id, status: "COMPLETED" }, // Fetch completed transfers received by the current user
       ],
     },
     include: {
@@ -226,7 +225,6 @@ export async function getUserTransactions() {
 //       limit: 100,
 //       expand: ['data.source'],
 //     });
-
 
 //     // Filter transactions to match the currentUser
 //     const userTransactions = transactions.data.filter((transaction) => {
@@ -279,7 +277,6 @@ export async function getUserTransactions() {
 //       })
 //     );
 
-
 //     return completedTransfers.map((transfer, index) => {
 //       const matchingTransaction = positiveTransactions.find(transaction => transaction.amount === transfer.amount * 100);
 //       return {
@@ -291,111 +288,217 @@ export async function getUserTransactions() {
 //   }
 // }
 
-export async function getUserStripeTransactions() {
-  if (!PRIVATE_CONNECTED_ACCOUNT) {
-    console.error(
-      'PRIVATE_CONNECTED_ACCOUNT environment variable not set.'
+// export async function getUserStripeTransactions() {
+//   if (!PRIVATE_CONNECTED_ACCOUNT) {
+//     console.error("PRIVATE_CONNECTED_ACCOUNT environment variable not set.");
+//     return []; // Or handle the error appropriately
+//   }
+
+//   const currentUser = await prisma.user.findUnique({
+//     where: { connectedAccountId: PRIVATE_CONNECTED_ACCOUNT },
+//   });
+
+//   if (!currentUser) {
+//     throw new Error("User not found");
+//   }
+
+//   if (!currentUser.stripeConnectedLinked) {
+//     return []; // Or handle the case where the user isn't connected to Stripe
+//   }
+
+//   // Fetch transactions from Stripe (consider pagination if needed)
+//   const transactions = await stripe.balanceTransactions.list({
+//     limit: 100,
+//     expand: ["data.source"], // Only expand what you need
+//   });
+
+//   const userTransactions = transactions.data.filter(
+//     (transaction) =>
+//       transaction.source?.destination === currentUser.connectedAccountId
+//   );
+
+//   const positiveTransactions = userTransactions.filter(
+//     (transaction) => transaction.amount > 0
+//   );
+
+//   const receiptEmails = positiveTransactions.map(
+//     (transaction) => transaction.source?.receipt_email
+//   );
+
+//   // Fetch users in a single query
+//   const users = await prisma.user.findMany({
+//     where: {
+//       email: {
+//         in: receiptEmails,
+//       },
+//     },
+//     select: { id: true, email: true }, // Only fetch necessary fields
+//   });
+
+//   const userMap = new Map(users.map((user) => [user.email, user.id]));
+
+//   // Fetch matching transfers in a single query
+//   const userIds = Array.from(userMap.values());
+//   const matchingTransfers = await prisma.transfer.findMany({
+//     where: {
+//       senderId: {
+//         in: userIds,
+//       },
+//     },
+//   });
+
+//   // Prepare updates for transfers
+//   const transfersToUpdate = matchingTransfers.filter((transfer) => {
+//     const matchingTransaction = positiveTransactions.find(
+//       (transaction) => transaction.amount === transfer.amount * 100
+//     );
+//     return matchingTransaction && transfer.status !== "COMPLETED"; // Only update if not already completed
+//   });
+
+//   // Update transfers in batch
+//   await prisma.transfer.updateMany({
+//     where: {
+//       id: {
+//         in: transfersToUpdate.map((transfer) => transfer.id),
+//       },
+//     },
+//     data: { status: "COMPLETED" },
+//   });
+
+//   // Fetch completed transfers (after the update)
+//   const completedTransfers = await prisma.transfer.findMany({
+//     where: {
+//       senderId: {
+//         in: userIds,
+//       },
+//       status: "COMPLETED",
+//     },
+//   });
+
+//   // Create a map of senderId to email for efficient lookup
+//   const senderEmailMap = new Map<string, string | undefined>();
+//   for (const user of users) {
+//     senderEmailMap.set(user.id, user.email);
+//   }
+
+//   // Combine data
+//   return completedTransfers.map((transfer) => {
+//     const matchingTransaction = positiveTransactions.find(
+//       (transaction) => transaction.amount === transfer.amount * 100
+//     );
+//     return {
+//       ...transfer,
+//       transaction: matchingTransaction,
+//       senderEmail: senderEmailMap.get(transfer.senderId),
+//     };
+//   });
+// }
+
+export const getUserStripeTransactions = unstable_cache(
+  async () => {
+    if (!PRIVATE_CONNECTED_ACCOUNT) {
+      console.error("PRIVATE_CONNECTED_ACCOUNT environment variable not set.");
+      return [];
+    }
+
+    const currentUser = await prisma.user.findUnique({
+      where: { connectedAccountId: PRIVATE_CONNECTED_ACCOUNT },
+    });
+
+    if (!currentUser) {
+      throw new Error("User not found");
+    }
+
+    if (!currentUser.stripeConnectedLinked) {
+      return [];
+    }
+
+    // Fetch transactions from Stripe (consider pagination if needed)
+    const transactions = await stripe.balanceTransactions.list({
+      limit: 100,
+      expand: ["data.source"], // Only expand what you need
+    });
+
+    const userTransactions = transactions.data.filter(
+      (transaction) =>
+        transaction.source?.destination === currentUser.connectedAccountId
     );
-    return []; // Or handle the error appropriately
-  }
 
-  const currentUser = await prisma.user.findUnique({
-    where: { connectedAccountId: PRIVATE_CONNECTED_ACCOUNT },
-  });
-
-  if (!currentUser) {
-    throw new Error('User not found');
-  }
-
-  if (!currentUser.stripeConnectedLinked) {
-    return []; // Or handle the case where the user isn't connected to Stripe
-  }
-
-  // Fetch transactions from Stripe (consider pagination if needed)
-  const transactions = await stripe.balanceTransactions.list({
-    limit: 100,
-    expand: ['data.source'], // Only expand what you need
-  });
-
-  const userTransactions = transactions.data.filter(
-    (transaction) =>
-      transaction.source?.destination ===
-      currentUser.connectedAccountId
-  );
-
-  const positiveTransactions = userTransactions.filter(
-    (transaction) => transaction.amount > 0
-  );
-
-  const receiptEmails = positiveTransactions.map(
-    (transaction) => transaction.source?.receipt_email
-  );
-
-  // Fetch users in a single query
-  const users = await prisma.user.findMany({
-    where: {
-      email: {
-        in: receiptEmails,
-      },
-    },
-    select: { id: true, email: true }, // Only fetch necessary fields
-  });
-
-  const userMap = new Map(users.map((user) => [user.email, user.id]));
-
-  // Fetch matching transfers in a single query
-  const userIds = Array.from(userMap.values());
-  const matchingTransfers = await prisma.transfer.findMany({
-    where: {
-      senderId: {
-        in: userIds,
-      },
-    },
-  });
-
-  // Prepare updates for transfers
-  const transfersToUpdate = matchingTransfers.filter((transfer) => {
-    const matchingTransaction = positiveTransactions.find(
-      (transaction) => transaction.amount === transfer.amount * 100
+    const positiveTransactions = userTransactions.filter(
+      (transaction) => transaction.amount > 0
     );
-    return matchingTransaction && transfer.status !== 'COMPLETED'; // Only update if not already completed
-  });
 
-  // Update transfers in batch
-  await prisma.transfer.updateMany({
-    where: {
-      id: {
-        in: transfersToUpdate.map((transfer) => transfer.id),
-      },
-    },
-    data: { status: 'COMPLETED' },
-  });
-
-  // Fetch completed transfers (after the update)
-  const completedTransfers = await prisma.transfer.findMany({
-    where: {
-      senderId: {
-        in: userIds,
-      },
-      status: 'COMPLETED',
-    },
-  });
-
-  // Create a map of senderId to email for efficient lookup
-  const senderEmailMap = new Map<string, string | undefined>();
-  for (const user of users) {
-    senderEmailMap.set(user.id, user.email);
-  }
-
-  // Combine data
-  return completedTransfers.map((transfer) => {
-    const matchingTransaction = positiveTransactions.find(
-      (transaction) => transaction.amount === transfer.amount * 100
+    const receiptEmails = positiveTransactions.map(
+      (transaction) => transaction.source?.receipt_email
     );
-    return {
-      ...transfer,
-      transaction: matchingTransaction,
-      senderEmail: senderEmailMap.get(transfer.senderId),
-    };
-  });
-}
+
+    // Fetch users in a single query
+    const users = await prisma.user.findMany({
+      where: {
+        email: {
+          in: receiptEmails,
+        },
+      },
+      select: { id: true, email: true }, // Only fetch necessary fields
+    });
+
+    const userMap = new Map(users.map((user) => [user.email, user.id]));
+
+    // Fetch matching transfers in a single query
+    const userIds = Array.from(userMap.values());
+    const matchingTransfers = await prisma.transfer.findMany({
+      where: {
+        senderId: {
+          in: userIds,
+        },
+      },
+    });
+
+    // Prepare updates for transfers
+    const transfersToUpdate = matchingTransfers.filter((transfer) => {
+      const matchingTransaction = positiveTransactions.find(
+        (transaction) => transaction.amount === transfer.amount * 100
+      );
+      return matchingTransaction && transfer.status !== "COMPLETED"; // Only update if not already completed
+    });
+
+    // Update transfers in batch
+    await prisma.transfer.updateMany({
+      where: {
+        id: {
+          in: transfersToUpdate.map((transfer) => transfer.id),
+        },
+      },
+      data: { status: "COMPLETED" },
+    });
+
+    // Fetch completed transfers (after the update)
+    const completedTransfers = await prisma.transfer.findMany({
+      where: {
+        senderId: {
+          in: userIds,
+        },
+        status: "COMPLETED",
+      },
+    });
+
+    // Create a map of senderId to email for efficient lookup
+    const senderEmailMap = new Map<string, string | undefined>();
+    for (const user of users) {
+      senderEmailMap.set(user.id, user.email);
+    }
+
+    return completedTransfers.map((transfer) => {
+      const matchingTransaction = positiveTransactions.find(
+        (transaction) => transaction.amount === transfer.amount * 100
+      );
+      return {
+        ...transfer,
+        transaction: matchingTransaction,
+        senderEmail: senderEmailMap.get(transfer.senderId),
+      };
+    });
+  },
+  [`stripe-transactions-${PRIVATE_CONNECTED_ACCOUNT}`],
+  { revalidate: 600, tags: ["stripe-transactions"] }
+);
