@@ -1,6 +1,7 @@
 import { Client, Environment, ApiError, OrdersController } from "@paypal/paypal-server-sdk"
 import prisma from "./db"
 import { createOrGetUser } from "./actions/user.actions"
+import { unstable_cache } from "next/cache"
 
 const client = new Client({
   clientCredentialsAuthCredentials: {
@@ -138,7 +139,7 @@ export async function capturePayPalTransfer(transferId: string) {
   }
 }
 
-export async function getPayPalTransactions() {
+export const getPayPalTransactions = unstable_cache(async () => {
   const transactions = await prisma.paypalTransfer.findMany({
     where: { status: 'COMPLETED' },
   });
@@ -155,4 +156,5 @@ export async function getPayPalTransactions() {
     })
   );
   return transactionsWithUserEmails;
-}
+}, [`paypal-transactions`],
+  { revalidate: 600, tags: ["paypal-transactions"] });
