@@ -9,6 +9,7 @@ import {
 import { TransferForm } from "./TransferForm";
 import { getConnections } from "@/lib/actions/user.actions";
 import AuthNetForm from "./AuthNetForm";
+import { PaypalForm } from "../Paypal/PaypalForm";
 
 const TransferTabs = async () => {
   const connections = await getConnections();
@@ -25,14 +26,18 @@ const TransferTabs = async () => {
         <Tabs defaultValue="stripe">
           <TabsList className="">
             <TabsTrigger value="stripe">Amazon Pay, Cash App, Visa</TabsTrigger>
-            <TabsTrigger value="auth">Android Pay</TabsTrigger>
+            <TabsTrigger value="paypal">Paypal, Venmo</TabsTrigger>
+            {/* <TabsTrigger value="auth">Android Pay</TabsTrigger> */}
           </TabsList>
           <TabsContent value="stripe" className="pt-2">
             <TransferForm connections={connections} />
           </TabsContent>
-          <TabsContent value="auth" className="pt-2">
-            <AuthNetForm />
+          <TabsContent value="paypal" className="pt-2">
+            <PaypalForm connections={connections} />
           </TabsContent>
+          {/* <TabsContent value="auth" className="pt-2">
+            <AuthNetForm />
+          </TabsContent> */}
         </Tabs>
       </CardContent>
     </Card>

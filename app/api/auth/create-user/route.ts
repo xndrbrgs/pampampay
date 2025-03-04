@@ -39,6 +39,15 @@ export async function GET() {
                 },
             },
         });
+        await prisma.paypalTransfer.deleteMany({
+            where: {
+                senderId: dbUser.id,
+                status: 'PENDING',
+                createdAt: {
+                    lt: fourteenDaysAgo,
+                },
+            },
+        });
     }
 
     if (!dbUser) {

@@ -22,11 +22,10 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-
 import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
-import { createStripeSession } from "@/lib/actions/transfer.actions";
+import { PayPalButtonsWrapper } from "./paypal-buttons";
 
 type TransferFormProps = {
   connections: Array<{
@@ -45,12 +44,12 @@ const formSchema = z.object({
     .multipleOf(0.01, "Amount can have at most 2 decimal places"),
   recipientEmail: z.string().email("Invalid email address"),
   paymentDescription: z.string().min(1, "Payment description is required"),
-  // ssn: z.string().min(4, "Social security number is required"),
   recipientId: z.string().min(1, "Recipient is required"),
 });
 
-export function TransferForm({ connections }: TransferFormProps) {
+export function PaypalForm({ connections }: TransferFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [showPayPal, setShowPayPal] = useState(false);
 
   const { toast } = useToast();
 
@@ -61,20 +60,13 @@ export function TransferForm({ connections }: TransferFormProps) {
       recipientEmail: "",
       paymentDescription: "",
       recipientId: "",
-      // ssn: "",
     },
   });
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
     setIsLoading(true);
     try {
-      await createStripeSession({
-        amount: values.amount,
-        paymentDescription: values.paymentDescription,
-        recipientEmail: values.recipientEmail,
-        recipientId: values.recipientId,
-        ssn: "", // values.ssn,
-      });
+      setShowPayPal(true);
     } catch (error) {
       console.error("Error initiating transfer:", error);
       toast({
@@ -130,80 +122,47 @@ export function TransferForm({ connections }: TransferFormProps) {
                   </FormItem>
                 )}
               />
-              <div className="flex flex-col space-y-2">
-                <FormField
-                  control={form.control}
-                  name="amount"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>Amount</FormLabel>
-                      <FormControl>
-                        <Select
-                          onValueChange={(value) =>
-                            field.onChange(Number(value))
-                          }
-                          defaultValue={field.value.toString()}
-                        >
-                          <SelectTrigger>
-                            <SelectValue placeholder="Select an amount" />
-                          </SelectTrigger>
-                          <SelectContent>
-                            {[
-                              5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90,
-                              100,
-                            ].map((value) => (
-                              <SelectItem
-                                key={value}
-                                value={value.toString()}
-                                className="py-1"
-                              >
-                                ${value}
-                              </SelectItem>
-                            ))}
-                          </SelectContent>
-                        </Select>
-                      </FormControl>
-                      <FormDescription>
-                        Select the amount you want to transfer.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                />
-                {/* <FormField
-                  control={form.control}
-                  name="ssn"
-                  render={({ field }) => (
-                    <FormItem>
-                      <FormLabel>SSN</FormLabel>
-                      <FormControl>
-                        <Input
-                          type="text"
-                          maxLength={4}
-                          placeholder="***-**-1234"
-                          {...field}
-                          onChange={(e) => {
-                            const value = e.target.value;
-                            // Ensure the value is exactly 4 digits
-                            if (/^\d{0,4}$/.test(value)) {
-                              field.onChange(value);
-                            }
-                          }}
-                        />
-                      </FormControl>
-                      <FormDescription>
-                        Enter the last four digits of your social security
-                        number.
-                      </FormDescription>
-                      <FormMessage />
-                    </FormItem>
-                  )}
-                /> */}
-              </div>
 
               <FormField
                 control={form.control}
-                name="recipientId" // Store the connection ID
+                name="amount"
+                render={({ field }) => (
+                  <FormItem>
+                    <FormLabel>Amount</FormLabel>
+                    <FormControl>
+                      <Select
+                        onValueChange={(value) => field.onChange(Number(value))}
+                        defaultValue={field.value.toString()}
+                      >
+                        <SelectTrigger>
+                          <SelectValue placeholder="Select an amount" />
+                        </SelectTrigger>
+                        <SelectContent>
+                          {[
+                            5, 10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100,
+                          ].map((value) => (
+                            <SelectItem
+                              key={value}
+                              value={value.toString()}
+                              className="py-1"
+                            >
+                              ${value}
+                            </SelectItem>
+                          ))}
+                        </SelectContent>
+                      </Select>
+                    </FormControl>
+                    <FormDescription>
+                      Select the amount you want to transfer.
+                    </FormDescription>
+                    <FormMessage />
+                  </FormItem>
+                )}
+              />
+
+              <FormField
+                control={form.control}
+                name="recipientId"
                 render={({ field }) => (
                   <FormItem>
                     <FormLabel>Recipient</FormLabel>
@@ -212,11 +171,11 @@ export function TransferForm({ connections }: TransferFormProps) {
                         const selectedConnection = connections.find(
                           (connection) => connection.userId === value
                         );
-                        field.onChange(value); // Set the ID
+                        field.onChange(value);
                         form.setValue(
                           "recipientEmail",
                           selectedConnection?.email || ""
-                        ); // Set the email
+                        );
                       }}
                       defaultValue={field.value}
                     >
@@ -229,13 +188,14 @@ export function TransferForm({ connections }: TransferFormProps) {
                         {connections.map((connection) => (
                           <SelectItem
                             key={connection.userId}
-                            value={connection.userId} // Use connection.id as the value
+                            value={connection.userId}
                           >
                             <div className="flex space-x-2 p-2 scale-100 md:scale-90 lg:scale-100">
                               <img
                                 src={
                                   connection.profileImage ||
-                                  "/default-profile.png"
+                                  "/default-profile.png" ||
+                                  "/placeholder.svg"
                                 }
                                 alt={connection.username || "User"}
                                 className="h-8 w-8 rounded-full"
@@ -261,11 +221,35 @@ export function TransferForm({ connections }: TransferFormProps) {
                 )}
               />
 
-              <Button type="submit" disabled={isLoading}>
-                {isLoading ? "Initiating Transfer..." : "Initiate Transfer"}
-              </Button>
+              {!showPayPal && (
+                <Button type="submit" disabled={isLoading}>
+                  {isLoading ? "Initiating Transfer..." : "Initiate Transfer"}
+                </Button>
+              )}
             </form>
           </Form>
+          {showPayPal && (
+            <motion.div
+              className="mt-5"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <PayPalButtonsWrapper
+                amount={form.getValues().amount}
+                recipientId={form.getValues().recipientId}
+                paymentDescription={form.getValues().paymentDescription}
+              />
+              <Button
+                variant="outline"
+                className="w-full mt-4"
+                onClick={() => setShowPayPal(false)}
+                disabled={isLoading}
+              >
+                Cancel
+              </Button>
+            </motion.div>
+          )}
         </CardContent>
       </motion.section>
     </Card>

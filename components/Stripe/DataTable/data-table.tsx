@@ -23,6 +23,7 @@ import {
 } from "@/components/ui/table";
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
+import ExportButton from "./ExportButton";
 
 interface DataTableProps<TData, TValue> {
   columns: ColumnDef<TData, TValue>[];
@@ -55,7 +56,7 @@ export function DataTable<TData, TValue>({
 
   return (
     <div className="w-[20rem] md:w-full">
-      <div className="flex items-center py-4">
+      <div className="flex py-4 justify-between items-center flex-col lg:flex-row space-y-3 lg:space-y-0">
         <Input
           placeholder="Filter by email..."
           value={(table.getColumn("email")?.getFilterValue() as string) ?? ""}
@@ -64,6 +65,7 @@ export function DataTable<TData, TValue>({
           }
           className="max-w-sm"
         />
+        <ExportButton />
       </div>
       <div className="rounded-md border">
         <Table>

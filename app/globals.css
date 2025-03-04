@@ -46,6 +46,10 @@
   @apply bg-white/10 backdrop-blur-md border border-white/20 shadow-md;
 }
 
+.select-content {
+  scroll-behavior: smooth;
+}
+
 html.lenis,
 html.lenis body {
   height: auto;

@@ -1,12 +1,11 @@
 import AdminComponent from "@/components/Dashboard/AdminComponent";
+import ExportButton from "@/components/Stripe/DataTable/ExportButton";
 import Header from "@/components/General/Header";
 import { StrangerGames } from "@/components/General/StrangerGames";
 import TransferTabs from "@/components/General/TransferTabs";
+import { PayPalProvider } from "@/components/Paypal/PaypalProvider";
 import { addConnection } from "@/lib/actions/transfer.actions";
-import {
-  getAdminUser,
-  hasConnectionWithUser,
-} from "@/lib/actions/user.actions";
+import { getAdminUser } from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs/server";
 
 export default async function Dashboard() {
@@ -19,17 +18,19 @@ export default async function Dashboard() {
 
   if (user.id !== adminUser?.clerkUserId) {
     return (
-      <section className="p-6 h-full">
-        <Header
-          title="My Dashboard"
-          subtext="Access and manage your account and transactions"
-        />
+      <PayPalProvider>
+        <section className="p-6 h-full">
+          <Header
+            title="My Dashboard"
+            subtext="Access and manage your account and transactions"
+          />
 
-        <div className="pt-4 max-w-3xl flex flex-col gap-y-5">
-          <StrangerGames onAddConnection={addConnection} />
-          <TransferTabs />
-        </div>
-      </section>
+          <div className="pt-4 max-w-3xl flex flex-col gap-y-5">
+            <StrangerGames onAddConnection={addConnection} />
+            <TransferTabs />
+          </div>
+        </section>
+      </PayPalProvider>
     );
   } else {
     return (

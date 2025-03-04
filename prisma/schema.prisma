@@ -9,21 +9,23 @@ generator client {
 }
 
 model User {
-  id                    String       @id @default(cuid())
-  customId              String
-  clerkUserId           String       @unique
-  email                 String       @unique
-  firstName             String?
-  lastName              String?
-  username              String?
-  profileImage          String?
-  isAdmin               Boolean      @default(false)
-  connectedAccountId    String       @unique
-  stripeConnectedLinked Boolean      @default(false)
-  connections           Connection[] @relation("UserConnections")
-  connectedTo           Connection[] @relation("ConnectedToUser")
-  sentTransfers         Transfer[]   @relation("SenderTransfers")
-  receivedTransfers     Transfer[]   @relation("ReceiverTransfers")
+  id                      String           @id @default(cuid())
+  customId                String
+  clerkUserId             String           @unique
+  email                   String           @unique
+  firstName               String?
+  lastName                String?
+  username                String?
+  profileImage            String?
+  isAdmin                 Boolean          @default(false)
+  connectedAccountId      String           @unique
+  stripeConnectedLinked   Boolean          @default(false)
+  connections             Connection[]     @relation("UserConnections")
+  connectedTo             Connection[]     @relation("ConnectedToUser")
+  sentTransfers           Transfer[]       @relation("SenderTransfers")
+  receivedTransfers       Transfer[]       @relation("ReceiverTransfers")
+  paypalSentTransfers     PaypalTransfer[] @relation("PaypalSenderTransfers")
+  paypalReceiverTransfers PaypalTransfer[] @relation("PaypalReceiverTransfers")
 }
 
 model Connection {
@@ -50,6 +52,19 @@ model Transfer {
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @updatedAt
   transactionReference String? // For additional tracking if needed
+}
+
+model PaypalTransfer {
+  id                   String         @id @default(cuid())
+  amount               Float
+  description          String?
+  senderId             String
+  receiverId           String
+  sender               User           @relation("PaypalSenderTransfers", fields: [senderId], references: [id])
+  receiver             User           @relation("PaypalReceiverTransfers", fields: [receiverId], references: [id])
+  status               TransferStatus
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
 }
 
 enum TransferStatus {
