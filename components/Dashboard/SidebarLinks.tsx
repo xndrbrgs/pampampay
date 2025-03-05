@@ -28,7 +28,9 @@ interface SidebarLinksProps {
   stripeConnectedLinked: boolean;
 }
 
-const SidebarLinks: React.FC<SidebarLinksProps> = ({ stripeConnectedLinked }) => {
+const SidebarLinks: React.FC<SidebarLinksProps> = ({
+  stripeConnectedLinked,
+}) => {
   const pathname = usePathname();
 
   const listVariants = {
@@ -42,7 +44,7 @@ const SidebarLinks: React.FC<SidebarLinksProps> = ({ stripeConnectedLinked }) =>
   };
   const filteredLinks = stripeConnectedLinked
     ? sidebarLinks
-    : sidebarLinks.filter(link => link.route === "/dashboard");
+    : sidebarLinks.filter((link) => link.route === "/dashboard");
 
   return (
     <motion.div
