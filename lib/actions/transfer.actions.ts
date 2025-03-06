@@ -245,7 +245,9 @@ export const getUserStripeTransactions = unstable_cache(
     );
 
     const receiptEmails = positiveTransactions.map(
-      (transaction) => transaction.source?.receipt_email
+      (transaction) =>
+        transaction.source?.receipt_email ||
+        transaction.source?.billing_details?.email
     );
 
     // Fetch users in a single query
