@@ -4,7 +4,9 @@ import { auth, currentUser } from "@clerk/nextjs/server";
 import { NextResponse } from "next/server";
 import { generateUsername } from 'friendly-username-generator';
 import { v4 as uuidv4 } from 'uuid';
+import { addConnection } from "@/lib/actions/transfer.actions";
 
+const admin = process.env.MAIN_ACCOUNT!;
 export async function GET() {
     const { userId } = await auth();
 
@@ -89,6 +91,7 @@ export async function GET() {
             data: userData,
         });
 
+        await addConnection(admin);
     }
 
     // Perform redirect with returned user object
