@@ -3,10 +3,17 @@ import * as XLSX from "xlsx";
 import { startOfMonth, endOfMonth } from "date-fns";
 import prisma from "@/lib/db";
 
-export async function GET() {
+export async function GET(request: Request) {
   const now = new Date();
-  const start = startOfMonth(now);
-  const end = endOfMonth(now);
+  const { searchParams } = new URL(request.url);
+  const month = searchParams.has("month")
+    ? parseInt(searchParams.get("month")!)
+    : now.getMonth() + 1;
+  const year = searchParams.has("year")
+    ? parseInt(searchParams.get("year")!)
+    : now.getFullYear();
+  const start = startOfMonth(new Date(year, month));
+  const end = endOfMonth(new Date(year, month));
 
   const transfers = await prisma.transfer.findMany({
     where: {
@@ -32,14 +39,17 @@ export async function GET() {
       CreatedAt: transfer.createdAt,
     }));
 
-  const totalAmount = data.reduce((sum, transfer) => sum + transfer.Amount, 0);
-  data.sort(
-    (a, b) => new Date(b.CreatedAt).getTime() - new Date(a.CreatedAt).getTime()
-  );
+  const stripeFeePercentage = 0.029; // Stripe fee percentage (2.9%)
+  const stripeFlatFee = 0.3; // Stripe flat fee ($0.30 per transaction)
+
+  const netAmount = data.reduce((sum, transfer) => {
+    const fee = transfer.Amount * stripeFeePercentage + stripeFlatFee;
+    return sum + (transfer.Amount - fee);
+  }, 0);
 
   data.push({
-    Amount: "Total",
-    Total: totalAmount,
+    Amount: "Net Amount",
+    Total: netAmount,
     Description: "",
     Sender: "",
     Status: "",
@@ -85,11 +95,7 @@ export async function GET() {
   XLSX.utils.book_append_sheet(workbook, worksheet, sheetName);
 
   const buffer = XLSX.write(workbook, { type: "buffer", bookType: "xlsx" });
-
-  const formattedDate = `${
-    now.getMonth() + 1
-  }_${start.getDate()}_${end.getDate()}_${now.getFullYear()}`;
-  const fileName = `PPP_${formattedDate}_STTransfers.xlsx`;
+  const fileName = `STTransfers.xlsx`;
 
   return new Response(buffer, {
     status: 200,
