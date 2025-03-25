@@ -18,7 +18,10 @@ export async function POST(req: Request, { params }: { params: { transferId: str
             // Update the transfer status in the database
             await prisma.paypalTransfer.update({
                 where: { id: transferId },
-                data: { status: "COMPLETED" },
+                data: {
+                    status: "COMPLETED",
+                    createdAt: new Date(), // Update createdAt to the current timestamp
+                },
             })
         }
         // Check if the response contains an error
