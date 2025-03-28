@@ -187,3 +187,42 @@ export async function getAdminUser() {
 
   return adminUser;
 }
+
+export const fetchActiveMonths = async () => {
+
+  const transfers = await prisma.transfer.findMany({
+    where: {
+      status: "COMPLETED",
+    },
+    select: {
+      createdAt: true,
+    },
+  });
+  const paypalTransfers = await prisma.paypalTransfer.findMany({
+    where: {
+      status: "COMPLETED",
+    },
+    select: {
+      createdAt: true,
+    },
+  });
+
+
+  const monthsSet = new Set<string>();
+
+  transfers.forEach((transfer) => {
+    const month = transfer.createdAt.toISOString().slice(5, 7) + '-' + transfer.createdAt.toISOString().slice(0, 4); // Format as MM-YYYY
+    monthsSet.add(month);
+  });
+
+  const paypalMonthsSet = new Set<string>();
+  paypalTransfers.forEach((transfer) => {
+    const month = transfer.createdAt.toISOString().slice(5, 7) + '-' + transfer.createdAt.toISOString().slice(0, 4); // Format as MM-YYYY
+    paypalMonthsSet.add(month);
+  });
+
+  return {
+    transfers: Array.from(monthsSet).sort((a, b) => (a < b ? 1 : -1)), // Sort in descending order
+    paypalTransfers: Array.from(paypalMonthsSet).sort((a, b) => (a < b ? 1 : -1)), // Sort in descending order
+  };
+}

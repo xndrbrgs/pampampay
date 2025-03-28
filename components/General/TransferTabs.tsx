@@ -25,7 +25,7 @@ const TransferTabs = async () => {
       <CardContent className="w-full">
         <Tabs defaultValue="stripe">
           <TabsList className="">
-            <TabsTrigger value="stripe">Amazon Pay, Cash App, Visa</TabsTrigger>
+            <TabsTrigger value="stripe">Cash App, Apple Pay</TabsTrigger>
             <TabsTrigger value="paypal">Paypal, Venmo</TabsTrigger>
             {/* <TabsTrigger value="auth">Android Pay</TabsTrigger> */}
           </TabsList>

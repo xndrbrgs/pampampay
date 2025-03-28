@@ -1,16 +1,33 @@
 "use client";
 
 import { Button } from "@/components/ui/button";
+import { fetchActiveMonths } from "@/lib/actions/user.actions";
 import { useState } from "react";
+import { useEffect } from "react";
 
-export default function PaypalExportButton() {
+export default function ExportButton() {
   const [isExporting, setIsExporting] = useState(false);
+  useEffect(() => {
+    const getActiveMonths = async () => {
+      try {
+        const activeMonths = await fetchActiveMonths();
+        setMonths(activeMonths.paypalTransfers);
+      } catch (error) {
+        console.error("Failed to fetch active months:", error);
+      }
+    };
+
+    getActiveMonths();
+  }, []);
 
   const handleExport = async () => {
     setIsExporting(true);
     try {
       // Simply open the API route in a new tab or redirect
-      window.open("/api/export-transfers/paypal", "_blank");
+      window.open(
+        `/api/export-transfers/paypal?month=${selectedMonth}`,
+        "_blank"
+      );
     } catch (error) {
       console.error("Export failed:", error);
     } finally {
@@ -18,17 +35,33 @@ export default function PaypalExportButton() {
     }
   };
 
+  const [months, setMonths] = useState<string[]>([]);
+  const [selectedMonth, setSelectedMonth] = useState(new Date().getMonth());
+
+  const handleMonthChange = (event: React.ChangeEvent<HTMLSelectElement>) => {
+    setSelectedMonth(parseInt(event.target.value));
+  };
+
   return (
-    <Button onClick={handleExport} disabled={isExporting} className="w-[20rem]">
-      {isExporting
-        ? "Exporting..."
-        : `Export Paypal Transfers - (${new Date().toLocaleString("default", {
-            month: "long",
-          })} 1-${new Date(
-            new Date().getFullYear(),
-            new Date().getMonth() + 1,
-            0
-          ).getDate()}, ${new Date().getFullYear()})`}
-    </Button>
+    <div>
+      <select
+        value={selectedMonth}
+        onChange={handleMonthChange}
+        className="mr-5 p-2 border rounded"
+      >
+        {months.map((month, index) => (
+          <option key={index} value={index}>
+            {month}
+          </option>
+        ))}
+      </select>
+      <Button
+        onClick={handleExport}
+        disabled={isExporting}
+        className="w-[20rem]"
+      >
+        {isExporting ? "Exporting..." : "Export Paypal Transfers"}
+      </Button>
+    </div>
   );
 }
