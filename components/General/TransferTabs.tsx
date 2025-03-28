@@ -32,9 +32,9 @@ const TransferTabs = async () => {
           <TabsContent value="stripe" className="pt-2">
             <TransferForm connections={connections} />
           </TabsContent>
-          <TabsContent value="paypal" className="pt-2">
+          {/* <TabsContent value="paypal" className="pt-2">
             <PaypalForm connections={connections} />
-          </TabsContent>
+          </TabsContent> */}
           {/* <TabsContent value="auth" className="pt-2">
             <AuthNetForm />
           </TabsContent> */}
