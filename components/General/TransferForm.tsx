@@ -27,6 +27,7 @@ import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
 import { useToast } from "@/hooks/use-toast";
 import { motion } from "framer-motion";
 import { createStripeSession } from "@/lib/actions/transfer.actions";
+import { SquarePaymentModal } from "../Square/square-payment-modal";
 
 type TransferFormProps = {
   connections: Array<{
@@ -51,6 +52,7 @@ const formSchema = z.object({
 
 export function TransferForm({ connections }: TransferFormProps) {
   const [isLoading, setIsLoading] = useState(false);
+  const [showSquare, setShowSquare] = useState(false);
 
   const { toast } = useToast();
 
@@ -89,7 +91,7 @@ export function TransferForm({ connections }: TransferFormProps) {
   }
 
   return (
-    <Card className="bg-transparent border border-white/20 shadow-md mt-3">
+    <Card className="bg-white/10 backdrop-blur-md border border-white/20 shadow-md mt-3">
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -266,6 +268,15 @@ export function TransferForm({ connections }: TransferFormProps) {
               </Button>
             </form>
           </Form>
+           {/* Square Payment Modal */}
+           <SquarePaymentModal
+            isOpen={showSquare}
+            onClose={() => setShowSquare(false)}
+            amount={form.getValues().amount}
+            recipientId={form.getValues().recipientId}
+            paymentDescription={form.getValues().paymentDescription}
+            recipientEmail={form.getValues().recipientEmail}
+          />
         </CardContent>
       </motion.section>
     </Card>

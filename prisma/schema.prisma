@@ -26,6 +26,10 @@ model User {
   receivedTransfers       Transfer[]       @relation("ReceiverTransfers")
   paypalSentTransfers     PaypalTransfer[] @relation("PaypalSenderTransfers")
   paypalReceiverTransfers PaypalTransfer[] @relation("PaypalReceiverTransfers")
+  squareSentTransfers     SquareTransfer[] @relation("SquareSenderTransfers")
+  squareReceiverTransfers SquareTransfer[] @relation("SquareReceiverTransfers")
+  coinbaseSentTransfers   CoinbaseTransfer[] @relation("CoinbaseSenderTransfers")
+  coinbaseReceiverTransfers CoinbaseTransfer[] @relation("CoinbaseReceiverTransfers")
 }
 
 model Connection {
@@ -62,6 +66,35 @@ model PaypalTransfer {
   receiverId           String
   sender               User           @relation("PaypalSenderTransfers", fields: [senderId], references: [id])
   receiver             User           @relation("PaypalReceiverTransfers", fields: [receiverId], references: [id])
+  status               TransferStatus
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
+}
+
+model CoinbaseTransfer {
+  id               String   @id @default(cuid())
+  amount           Float
+  currency         String   @default("USD")
+  status           String // PENDING, COMPLETED, FAILED, CANCELLED, DELAYED, RESOLVED
+  description      String?
+  coinbaseChargeId String?  @unique
+  coinbaseCode     String?
+  senderId         String
+  receiverId       String
+  sender           User     @relation("CoinbaseSenderTransfers", fields: [senderId], references: [id])
+  receiver         User     @relation("CoinbaseReceiverTransfers", fields: [receiverId], references: [id])
+  createdAt        DateTime @default(now())
+  updatedAt        DateTime @updatedAt
+}
+
+model SquareTransfer {
+  id                   String         @id @default(cuid())
+  amount               Float
+  description          String?
+  senderId             String
+  receiverId           String
+  sender               User           @relation("SquareSenderTransfers", fields: [senderId], references: [id])
+  receiver             User           @relation("SquareReceiverTransfers", fields: [receiverId], references: [id])
   status               TransferStatus
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @updatedAt

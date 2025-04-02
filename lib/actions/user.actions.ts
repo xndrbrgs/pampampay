@@ -1,4 +1,4 @@
-"use server"
+"use server";
 
 import { auth, currentUser } from "@clerk/nextjs/server";
 import prisma from "../db";
@@ -37,7 +37,7 @@ export async function getAllUsers() {
     select: {
       id: true,
       stripeConnectedLinked: true,
-      isAdmin: false
+      isAdmin: false,
     },
   });
   if (!currentUser) throw new Error("User not found");
@@ -45,7 +45,11 @@ export async function getAllUsers() {
   const allUsers = await prisma.user.findMany({
     where: currentUser.stripeConnectedLinked
       ? { id: { not: currentUser.id } }
-      : { stripeConnectedLinked: true, isAdmin: false, id: { not: currentUser.id } },
+      : {
+          stripeConnectedLinked: true,
+          isAdmin: false,
+          id: { not: currentUser.id },
+        },
     select: {
       id: true,
       customId: true,
@@ -130,7 +134,11 @@ export async function hasConnectionWithUser({ userId }: { userId: string }) {
   return !!connection;
 }
 
-export async function deleteConnection({ connectionId }: { connectionId: string }) {
+export async function deleteConnection({
+  connectionId,
+}: {
+  connectionId: string;
+}) {
   const user = await createOrGetUser();
   if (!user) throw new Error("Not authenticated");
 
@@ -152,7 +160,6 @@ export async function deleteConnection({ connectionId }: { connectionId: string 
 }
 
 export async function getUserById({ receiverId }: { receiverId: string }) {
-
   const userToConnect = await prisma.user.findUnique({
     where: { id: receiverId },
   });
@@ -165,12 +172,12 @@ export async function getUserById({ receiverId }: { receiverId: string }) {
 export async function getEmailBySenderId({ senderId }: { senderId: string }) {
   const userEmail = await prisma.user.findUnique({
     where: {
-      id: senderId
+      id: senderId,
     },
     select: {
-      email: true
-    }
-  })
+      email: true,
+    },
+  });
 
   if (!userEmail) throw new Error("User's email not found");
   return userEmail;
@@ -189,7 +196,6 @@ export async function getAdminUser() {
 }
 
 export const fetchActiveMonths = async () => {
-
   const transfers = await prisma.transfer.findMany({
     where: {
       status: "COMPLETED",
@@ -206,23 +212,50 @@ export const fetchActiveMonths = async () => {
       createdAt: true,
     },
   });
-
+  const squareTransfers = await prisma.squareTransfer.findMany({
+    where: {
+      status: "COMPLETED",
+    },
+    select: {
+      createdAt: true,
+    },
+  });
 
   const monthsSet = new Set<string>();
 
   transfers.forEach((transfer) => {
-    const month = transfer.createdAt.toISOString().slice(5, 7) + '-' + transfer.createdAt.toISOString().slice(0, 4); // Format as MM-YYYY
+    const month =
+      transfer.createdAt.toISOString().slice(5, 7) +
+      "-" +
+      transfer.createdAt.toISOString().slice(0, 4); // Format as MM-YYYY
     monthsSet.add(month);
   });
 
   const paypalMonthsSet = new Set<string>();
   paypalTransfers.forEach((transfer) => {
-    const month = transfer.createdAt.toISOString().slice(5, 7) + '-' + transfer.createdAt.toISOString().slice(0, 4); // Format as MM-YYYY
+    const month =
+      transfer.createdAt.toISOString().slice(5, 7) +
+      "-" +
+      transfer.createdAt.toISOString().slice(0, 4); // Format as MM-YYYY
     paypalMonthsSet.add(month);
+  });
+
+  const squareMonthsSet = new Set<string>();
+  squareTransfers.forEach((transfer) => {
+    const month =
+      transfer.createdAt.toISOString().slice(5, 7) +
+      "-" +
+      transfer.createdAt.toISOString().slice(0, 4); // Format as MM-YYYY
+    squareMonthsSet.add(month);
   });
 
   return {
     transfers: Array.from(monthsSet).sort((a, b) => (a < b ? 1 : -1)), // Sort in descending order
-    paypalTransfers: Array.from(paypalMonthsSet).sort((a, b) => (a < b ? 1 : -1)), // Sort in descending order
+    paypalTransfers: Array.from(paypalMonthsSet).sort((a, b) =>
+      a < b ? 1 : -1
+    ), // Sort in descending order
+    squareTransfers: Array.from(squareMonthsSet).sort((a, b) =>
+      a < b ? 1 : -1
+    ), // Sort in descending order
   };
-}
+};

@@ -5,6 +5,8 @@ import { createOrGetUser } from "@/lib/actions/user.actions";
 import { redirect } from "next/navigation";
 import PaypalDataTable from "@/components/Paypal/DataTable/connected-table";
 import { getPayPalTransactions } from "@/lib/paypal";
+import SquareDataTable from "@/components/Square/DataTable/connected-table";
+import { getSquareTransactions } from "@/lib/actions/square.actions";
 
 const TransactionsPage = async () => {
   const user = await createOrGetUser();
@@ -13,7 +15,8 @@ const TransactionsPage = async () => {
   }
 
   const stripeTransfers = await getUserStripeTransactions();
-  const transfers = await getPayPalTransactions();
+  const paypalTransfers = await getPayPalTransactions();
+  const squareTransfers = await getSquareTransactions();
 
   return (
     <section className="p-6 h-full gap-y-4">
@@ -23,7 +26,8 @@ const TransactionsPage = async () => {
       />
       <div className="flex flex-col gap-y-4">
         <ConnectedDataTable transfers={stripeTransfers} />
-        <PaypalDataTable transfers={transfers} />
+        <PaypalDataTable transfers={paypalTransfers} />
+        <SquareDataTable transfers={squareTransfers} />
       </div>
     </section>
   );

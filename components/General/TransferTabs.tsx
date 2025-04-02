@@ -26,7 +26,8 @@ const TransferTabs = async () => {
         <Tabs defaultValue="stripe">
           <TabsList className="">
             <TabsTrigger value="stripe">Cash App, Apple Pay</TabsTrigger>
-            <TabsTrigger value="paypal">Paypal, Venmo</TabsTrigger>
+            {/* <TabsTrigger value="paypal">Paypal, Venmo</TabsTrigger> */}
+            <TabsTrigger value="square">Google Pay, Card</TabsTrigger>
             {/* <TabsTrigger value="auth">Android Pay</TabsTrigger> */}
           </TabsList>
           <TabsContent value="stripe" className="pt-2">
@@ -38,6 +39,10 @@ const TransferTabs = async () => {
           {/* <TabsContent value="auth" className="pt-2">
             <AuthNetForm />
           </TabsContent> */}
+          <TabsContent value="square" className="pt-2">
+            <TransferForm connections={connections} />
+          </TabsContent>
+
         </Tabs>
       </CardContent>
     </Card>

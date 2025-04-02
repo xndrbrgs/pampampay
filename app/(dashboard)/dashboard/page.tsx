@@ -1,6 +1,6 @@
 import AdminComponent from "@/components/Dashboard/AdminComponent";
 import Header from "@/components/General/Header";
-import TransferTabs from "@/components/General/TransferTabs";
+import { GeneralPaymentForm } from "@/components/Payments/PaymentForm";
 import { PayPalProvider } from "@/components/Paypal/PaypalProvider";
 import { getAdminUser } from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs/server";
@@ -23,7 +23,7 @@ export default async function Dashboard() {
           />
 
           <div className="pt-4 max-w-3xl flex flex-col gap-y-5">
-            <TransferTabs />
+            <GeneralPaymentForm connections={connections} />
           </div>
         </section>
       </PayPalProvider>
