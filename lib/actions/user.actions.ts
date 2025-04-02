@@ -220,6 +220,14 @@ export const fetchActiveMonths = async () => {
       createdAt: true,
     },
   });
+  const coinbaseTransfers = await prisma.coinbaseTransfer.findMany({
+    where: {
+      status: "COMPLETED",
+    },
+    select: {
+      createdAt: true,
+    },
+  });
 
   const monthsSet = new Set<string>();
 
@@ -249,12 +257,24 @@ export const fetchActiveMonths = async () => {
     squareMonthsSet.add(month);
   });
 
+  const coinbaseMonthsSet = new Set<string>();
+  coinbaseTransfers.forEach((transfer) => {
+    const month =
+      transfer.createdAt.toISOString().slice(5, 7) +
+      "-" +
+      transfer.createdAt.toISOString().slice(0, 4); // Format as MM-YYYY
+    coinbaseMonthsSet.add(month);
+  });
+
   return {
     transfers: Array.from(monthsSet).sort((a, b) => (a < b ? 1 : -1)), // Sort in descending order
     paypalTransfers: Array.from(paypalMonthsSet).sort((a, b) =>
       a < b ? 1 : -1
     ), // Sort in descending order
     squareTransfers: Array.from(squareMonthsSet).sort((a, b) =>
+      a < b ? 1 : -1
+    ), // Sort in descending order
+    coinbaseTransfers: Array.from(squareMonthsSet).sort((a, b) =>
       a < b ? 1 : -1
     ), // Sort in descending order
   };

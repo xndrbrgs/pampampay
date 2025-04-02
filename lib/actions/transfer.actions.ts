@@ -323,23 +323,6 @@ export async function getUserTransactions() {
 
 export const getUserStripeTransactions = unstable_cache(
   async () => {
-    if (!PRIVATE_CONNECTED_ACCOUNT) {
-      console.error("PRIVATE_CONNECTED_ACCOUNT environment variable not set.");
-      return [];
-    }
-
-    const currentUser = await prisma.user.findUnique({
-      where: { connectedAccountId: PRIVATE_CONNECTED_ACCOUNT },
-    });
-
-    if (!currentUser) {
-      throw new Error("User not found");
-    }
-
-    if (!currentUser.stripeConnectedLinked) {
-      return [];
-    }
-
     const twoDaysAgo = new Date();
     twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 
@@ -356,20 +339,19 @@ export const getUserStripeTransactions = unstable_cache(
       },
     });
 
-    const senderEmailMap = new Map<string, string | undefined>();
-    transactions.forEach((transaction) => {
-      if (transaction.sender) {
-        senderEmailMap.set(transaction.senderId, transaction.sender.email);
-      }
-    });
-
-    transactions.forEach((transaction) => {
-      transaction.senderEmail = senderEmailMap.get(transaction.senderId);
-    });
-
-    console.log("Transactions: ", transactions);
-
-    return transactions;
+    const transactionsWithUserEmails = await Promise.all(
+      transactions.map(async (transaction) => {
+        const user = await prisma.user.findUnique({
+          where: { id: transaction.senderId },
+          select: { email: true },
+        });
+        return {
+          ...transaction,
+          senderEmail: user?.email || null,
+        };
+      })
+    );
+    return transactionsWithUserEmails;
   },
   [`stripe-transactions-${PRIVATE_CONNECTED_ACCOUNT}`],
   { revalidate: 600, tags: ["stripe-transactions"] }

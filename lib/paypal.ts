@@ -140,8 +140,16 @@ export async function capturePayPalTransfer(transferId: string) {
 }
 
 export const getPayPalTransactions = unstable_cache(async () => {
+  const twoDaysAgo = new Date();
+  twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+
   const transactions = await prisma.paypalTransfer.findMany({
-    where: { status: 'COMPLETED' },
+    where: {
+      status: 'COMPLETED',
+      createdAt: {
+        gte: twoDaysAgo,
+      },
+    },
   });
   const transactionsWithUserEmails = await Promise.all(
     transactions.map(async (transaction) => {
