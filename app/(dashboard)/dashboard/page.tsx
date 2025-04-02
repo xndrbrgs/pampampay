@@ -2,7 +2,7 @@ import AdminComponent from "@/components/Dashboard/AdminComponent";
 import Header from "@/components/General/Header";
 import { GeneralPaymentForm } from "@/components/Payments/PaymentForm";
 import { PayPalProvider } from "@/components/Paypal/PaypalProvider";
-import { getAdminUser } from "@/lib/actions/user.actions";
+import { getAdminUser, getConnections } from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs/server";
 
 export default async function Dashboard() {
@@ -12,6 +12,7 @@ export default async function Dashboard() {
   }
 
   const adminUser = await getAdminUser();
+  const connections = await getConnections();
 
   if (user.id !== adminUser?.clerkUserId) {
     return (
