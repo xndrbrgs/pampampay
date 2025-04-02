@@ -91,7 +91,7 @@ export async function GET() {
             data: userData,
         });
 
-        await addConnection(admin);
+        // await addConnection(admin);
     }
 
     // Perform redirect with returned user object

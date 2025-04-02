@@ -7,6 +7,8 @@ import PaypalDataTable from "@/components/Paypal/DataTable/connected-table";
 import { getPayPalTransactions } from "@/lib/paypal";
 import SquareDataTable from "@/components/Square/DataTable/connected-table";
 import { getSquareTransactions } from "@/lib/actions/square.actions";
+import CoinbaseDataTable from "@/components/Coinbase/DataTable/connected-table";
+import { getCoinbaseCharges } from "@/lib/coinbase";
 
 const TransactionsPage = async () => {
   const user = await createOrGetUser();
@@ -17,6 +19,7 @@ const TransactionsPage = async () => {
   const stripeTransfers = await getUserStripeTransactions();
   const paypalTransfers = await getPayPalTransactions();
   const squareTransfers = await getSquareTransactions();
+  const coinbaseTransfers = await getCoinbaseCharges();
 
   return (
     <section className="p-6 h-full gap-y-4">
@@ -28,6 +31,7 @@ const TransactionsPage = async () => {
         <ConnectedDataTable transfers={stripeTransfers} />
         <PaypalDataTable transfers={paypalTransfers} />
         <SquareDataTable transfers={squareTransfers} />
+        <CoinbaseDataTable transfers={coinbaseTransfers} />
       </div>
     </section>
   );

@@ -21,7 +21,13 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import {
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
 import { motion } from "framer-motion";
 import {
   BadgeDollarSign,
@@ -157,15 +163,14 @@ export function GeneralPaymentForm({ connections }: UnifiedPaymentFormProps) {
       case "buttons":
         return (
           <div className="my-6">
-            <FormLabel className="mb-4">Initiate Transfer</FormLabel>
-            <div className="grid grid-cols-1 lg:grid-cols-2 space-y-3 lg:space-y-0 space-x-0 lg:space-x-5 mt-2 w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-3 space-y-3 lg:space-y-0 space-x-0 lg:space-x-5 mt-2 w-full">
               <Button
                 type="button"
                 variant={paymentMethod === "stripe" ? "chosen" : "unchosen"}
-                className="flex-1"
+                className="flex-1 items-center"
                 onClick={() => handlePaymentMethodChange("stripe")}
               >
-                <CreditCard className="w-4 h-4 mr-2" />
+                <CreditCard className="w-4 h-4" />
                 Amazon Pay, Cash App
               </Button>
               {/* <Button
@@ -180,19 +185,19 @@ export function GeneralPaymentForm({ connections }: UnifiedPaymentFormProps) {
               <Button
                 type="button"
                 variant={paymentMethod === "square" ? "chosen" : "unchosen"}
-                className="flex-1 mt-3 lg:mt-0"
+                className="flex-1 mt-3 lg:mt-0 items-center"
                 onClick={() => handlePaymentMethodChange("square")}
               >
-                <Construction className="w-4 h-4 mr-2" />
+                <Construction className="w-4 h-4" />
                 Google Pay, Card
               </Button>
               <Button
                 type="button"
                 variant={paymentMethod === "coinbase" ? "chosen" : "unchosen"}
-                className="flex-1 mt-3 lg:mt-0"
+                className="flex-1 mt-3 lg:mt-0 items-center"
                 onClick={() => handlePaymentMethodChange("coinbase")}
               >
-                <Construction className="w-4 h-4 mr-2" />
+                <BadgeDollarSign className="w-4 h-4" />
                 Coinbase
               </Button>
             </div>
@@ -208,7 +213,7 @@ export function GeneralPaymentForm({ connections }: UnifiedPaymentFormProps) {
   };
 
   return (
-    <Card className="border bg-background border-gray-600 rounded-xl shadow-lg mt-3 max-w-7xl">
+    <Card className="border bg-white/10 border-gray-600 rounded-xl shadow-lg mt-3 max-w-7xl">
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -216,9 +221,11 @@ export function GeneralPaymentForm({ connections }: UnifiedPaymentFormProps) {
       >
         <CardHeader className="border-b border-gray-600">
           <CardTitle className="text-2xl md:text-3xl flex items-center space-x-3">
-            <BadgeDollarSign size={30} />
-            <span>Perform Transfer</span>
+            <span>Initiate Transfer</span>
           </CardTitle>
+          <CardDescription className="text-sm text-gray-400">
+            Select a payment method to initiate a transfer.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -229,7 +236,7 @@ export function GeneralPaymentForm({ connections }: UnifiedPaymentFormProps) {
               {/* Payment Method Selector */}
               {renderPaymentMethodSelector()}
 
-              <div className="grid grid-cols-12 space-y-6 lg:space-y-0">
+              <div className="grid grid-cols-12 gap-x-5 space-y-6 lg:space-y-0">
                 <div className="col-span-12 lg:col-span-6">
                   <FormField
                     control={form.control}
@@ -248,25 +255,25 @@ export function GeneralPaymentForm({ connections }: UnifiedPaymentFormProps) {
                             <SelectContent>
                               <SelectItem
                                 value="GV"
-                                className="border-b border-red-700"
+                                className="border-b border-gray-200"
                               >
                                 GV
                               </SelectItem>
                               <SelectItem
                                 value="PR"
-                                className="border-b border-red-700"
+                                className="border-b border-gray-200"
                               >
                                 PR
                               </SelectItem>
                               <SelectItem
                                 value="JW"
-                                className="border-b border-red-700"
+                                className="border-b border-gray-200"
                               >
                                 JW
                               </SelectItem>
                               <SelectItem
                                 value="OS"
-                                className="border-b border-red-700"
+                                className="border-b border-gray-200"
                               >
                                 OS
                               </SelectItem>
@@ -306,7 +313,7 @@ export function GeneralPaymentForm({ connections }: UnifiedPaymentFormProps) {
                                 <SelectItem
                                   key={value}
                                   value={value.toString()}
-                                  className="py-2 border-b border-red-700"
+                                  className="py-2 border-b border-gray-200"
                                 >
                                   ${value}
                                 </SelectItem>
@@ -323,7 +330,7 @@ export function GeneralPaymentForm({ connections }: UnifiedPaymentFormProps) {
                   />
                 </div>
 
-                <div className="grid-cols-12 mt-3">
+                <div className="col-span-12 mt-3">
                   <FormField
                     control={form.control}
                     name="recipientId"

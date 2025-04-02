@@ -20,14 +20,14 @@ const buttonVariants = cva(
         ghost: "hover:bg-accent hover:text-accent-foreground",
         link: "text-primary underline-offset-4 hover:underline",
         black:
-          "bg-foreground text-background border border-none shadow-md hover:bg-gold hover:text-foreground transition duration-300 px-5 py-2 rounded-full cursor-pointer",
+          "bg-foreground text-background border border-none shadow-md hover:bg-black hover:text-foreground transition duration-300 px-5 py-2 rounded-full cursor-pointer",
         white:
           "rounded-full bg-background hover:bg-foreground hover:text-background border border-none shadow-md px-2 py-1 transition duration-300 cursor-pointer",
         unchosen:
-          "text-black rounded-xl text-lg border transition duration-150 cursor-pointer bg-white hover:bg-gray-100  hover:border-gray-200 focus:outline-2 focus:outline-offset-2 focus:outline-brownish active:bg-brownish shadow-sm",
+          "text-white text-md border transition duration-150 cursor-pointer bg-black hover:border-gray-600 focus:outline-2 focus:outline-offset-2 focus:outline-brownish active:bg-brownish shadow-sm",
 
         chosen:
-          "text-black rounded-xl text-lg bg-green-500 border hover:border-black/10 cursor-pointer shadow-sm",
+          "text-black text-md bg-white border hover:border-black/10 cursor-pointer shadow-sm",
       },
       size: {
         default: "h-9 px-4 py-2",
