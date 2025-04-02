@@ -16,10 +16,12 @@ const TransactionsPage = async () => {
     redirect("/dashboard");
   }
 
-  const stripeTransfers = await getUserStripeTransactions();
-  const paypalTransfers = await getPayPalTransactions();
-  const squareTransfers = await getSquareTransactions();
-  const coinbaseTransfers = await getCoinbaseCharges();
+  const [stripeTransfers, paypalTransfers, squareTransfers, coinbaseTransfers] = await Promise.all([
+    getUserStripeTransactions(),
+    getPayPalTransactions(),
+    getSquareTransactions(),
+    getCoinbaseCharges(),
+  ]);
 
   return (
     <section className="p-6 h-full gap-y-4">
