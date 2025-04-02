@@ -25,7 +25,10 @@ export async function processSquarePayment({
     // Initialize Square client
     const client = new SquareClient({
       token: process.env.SQUARE_ACCESS_TOKEN!,
-      environment: SquareEnvironment.Sandbox,
+      environment:
+      process.env.NODE_ENV === "production"
+        ? SquareEnvironment.Production
+        : SquareEnvironment.Sandbox,
     });
 
     const user = await createOrGetUser();
