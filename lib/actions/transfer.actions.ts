@@ -321,38 +321,70 @@ export async function getUserTransactions() {
 //   { revalidate: 600, tags: ["stripe-transactions"] }
 // );
 
-export const getUserStripeTransactions = unstable_cache(
-  async () => {
-    const twoDaysAgo = new Date();
-    twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+// export const getUserStripeTransactions = unstable_cache(
+//   async () => {
+//     const twoDaysAgo = new Date();
+//     twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
 
-    const transactions = await prisma.transfer.findMany({
-      where: {
-        status: "COMPLETED",
-        createdAt: {
-          gte: twoDaysAgo, // Filter transactions created in the last 48 hours
-        },
-      },
-      include: {
-        sender: true, // Include sender details if needed
-        receiver: true, // Include receiver details if needed
-      },
-    });
+//     const transactions = await prisma.transfer.findMany({
+//       where: {
+//         status: "COMPLETED",
+//         createdAt: {
+//           gte: twoDaysAgo, // Filter transactions created in the last 48 hours
+//         },
+//       },
+//       include: {
+//         sender: true, // Include sender details if needed
+//         receiver: true, // Include receiver details if needed
+//       },
+//     });
 
-    const transactionsWithUserEmails = await Promise.all(
-      transactions.map(async (transaction) => {
-        const user = await prisma.user.findUnique({
-          where: { id: transaction.senderId },
-          select: { email: true },
-        });
-        return {
-          ...transaction,
-          senderEmail: user?.email || null,
-        };
-      })
-    );
-    return transactionsWithUserEmails;
-  },
-  [`stripe-transactions-${PRIVATE_CONNECTED_ACCOUNT}`],
-  { revalidate: 600, tags: ["stripe-transactions"] }
-);
+//     const transactionsWithUserEmails = await Promise.all(
+//       transactions.map(async (transaction) => {
+//         const user = await prisma.user.findUnique({
+//           where: { id: transaction.senderId },
+//           select: { email: true },
+//         });
+//         return {
+//           ...transaction,
+//           senderEmail: user?.email || null,
+//         };
+//       })
+//     );
+//     return transactionsWithUserEmails;
+//   },
+//   [`stripe-transactions-${PRIVATE_CONNECTED_ACCOUNT}`],
+//   { revalidate: 100, tags: ["stripe-transactions"] }
+// );
+
+export const getUserStripeTransactions = async () => {
+  const twoDaysAgo = new Date();
+  twoDaysAgo.setDate(twoDaysAgo.getDate() - 2);
+
+  const transactions = await prisma.transfer.findMany({
+    where: {
+      status: "COMPLETED",
+      createdAt: {
+        gte: twoDaysAgo, // Filter transactions created in the last 48 hours
+      },
+    },
+    include: {
+      sender: true, // Include sender details if needed
+      receiver: true, // Include receiver details if needed
+    },
+  });
+
+  const transactionsWithUserEmails = await Promise.all(
+    transactions.map(async (transaction) => {
+      const user = await prisma.user.findUnique({
+        where: { id: transaction.senderId },
+        select: { email: true },
+      });
+      return {
+        ...transaction,
+        senderEmail: user?.email || null,
+      };
+    })
+  );
+  return transactionsWithUserEmails;
+}
