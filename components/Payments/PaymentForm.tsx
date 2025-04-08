@@ -163,7 +163,7 @@ export function GeneralPaymentForm({ connections }: UnifiedPaymentFormProps) {
       case "buttons":
         return (
           <div className="my-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 space-y-3 lg:space-y-0 space-x-0 lg:space-x-5 mt-2 w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-2 space-y-3 lg:space-y-0 space-x-0 lg:space-x-5 mt-2 w-full">
               <Button
                 type="button"
                 variant={paymentMethod === "stripe" ? "chosen" : "unchosen"}
