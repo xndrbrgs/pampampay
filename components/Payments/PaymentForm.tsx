@@ -181,7 +181,7 @@ export function GeneralPaymentForm({ connections }: UnifiedPaymentFormProps) {
               >
                 <Wallet className="w-4 h-4 mr-2" />
                 PayPal, Venmo
-              </Button> */}
+              </Button>
               <Button
                 type="button"
                 variant={paymentMethod === "square" ? "chosen" : "unchosen"}
@@ -190,7 +190,7 @@ export function GeneralPaymentForm({ connections }: UnifiedPaymentFormProps) {
               >
                 <Construction className="w-4 h-4" />
                 Google Pay, Card
-              </Button>
+              </Button> */}
               <Button
                 type="button"
                 variant={paymentMethod === "coinbase" ? "chosen" : "unchosen"}
