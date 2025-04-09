@@ -3,14 +3,13 @@
 import type React from "react"
 
 import { useState, useEffect } from "react"
-import { useAcceptJs } from "react-acceptjs"
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Label } from "@/components/ui/label"
 import { CreditCard } from "lucide-react"
 import { Select, SelectContent, SelectItem, SelectTrigger, SelectValue } from "@/components/ui/select"
 
-type AuthorizeNetPaymentTabProps = {
+type DirectAcceptJsProps = {
   amount: number
   recipientId: string
   paymentDescription: string
@@ -19,15 +18,22 @@ type AuthorizeNetPaymentTabProps = {
   onError: (message: string) => void
 }
 
-export function AuthorizeNetPaymentTab({
+declare global {
+  interface Window {
+    Accept: any
+  }
+}
+
+export function DirectAcceptJs({
   amount,
   recipientId,
   paymentDescription,
   recipientEmail,
   onSuccess,
   onError,
-}: AuthorizeNetPaymentTabProps) {
+}: DirectAcceptJsProps) {
   const [isProcessing, setIsProcessing] = useState(false)
+  const [isScriptLoaded, setIsScriptLoaded] = useState(false)
   const [cardData, setCardData] = useState({
     cardNumber: "",
     month: "",
@@ -47,25 +53,30 @@ export function AuthorizeNetPaymentTab({
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 10 }, (_, i) => `${currentYear + i}`)
 
-  // Get environment variables
-  const apiLoginID = process.env.NEXT_PUBLIC_AUTHORIZE_NET_API_LOGIN_ID!
-  const clientKey = process.env.NEXT_PUBLIC_AUTHORIZE_NET_CLIENT_KEY!
-
-  const authorizenetConfig = {
-    apiLoginID: apiLoginID,
-    clientKey: clientKey,
-    environment: "sandbox", // Change to "production" for live payments
-  }
-
-  const { dispatchData, loading, error } = useAcceptJs({ authorizenetConfig })
-
-  // Monitor for errors from the useAcceptJs hook
+  // Load the Accept.js script
   useEffect(() => {
-    if (error) {
-      console.error("Accept.js Error:", error)
-      onError(error.message || "An error occurred with the payment processor")
+    if (typeof window !== "undefined" && !window.Accept && !document.getElementById("authorize-accept-js")) {
+      const script = document.createElement("script")
+      script.src = "https://js.authorize.net/v1/Accept.js"
+      script.id = "authorize-accept-js"
+      script.async = true
+      script.onload = () => {
+        console.log("Accept.js script loaded")
+        setIsScriptLoaded(true)
+      }
+      script.onerror = () => {
+        console.error("Failed to load Accept.js script")
+        onError("Failed to load payment processor script")
+      }
+      document.body.appendChild(script)
+    } else if (typeof window !== "undefined" && window.Accept) {
+      setIsScriptLoaded(true)
     }
-  }, [error, onError])
+
+    return () => {
+      // Cleanup if needed
+    }
+  }, [onError])
 
   const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
     const { name, value } = e.target
@@ -81,6 +92,10 @@ export function AuthorizeNetPaymentTab({
     setIsProcessing(true)
     setDebugInfo(null)
 
+    // Get environment variables
+    const apiLoginID = process.env.NEXT_PUBLIC_AUTHORIZE_NET_API_LOGIN_ID
+    const clientKey = process.env.NEXT_PUBLIC_AUTHORIZE_NET_CLIENT_KEY
+
     // Validate environment variables
     if (!apiLoginID || !clientKey) {
       onError("Missing Authorize.net credentials. Please check your environment variables.")
@@ -95,61 +110,76 @@ export function AuthorizeNetPaymentTab({
       return
     }
 
-    try {
-      console.log("Dispatching data to Accept.js...")
+    if (!isScriptLoaded || !window.Accept) {
+      onError("Payment processor is not loaded yet. Please try again.")
+      setIsProcessing(false)
+      return
+    }
 
-      // Format the payload exactly as required by Accept.js
-      const payload = {
+    try {
+      // Create the secureData object
+      const secureData = {
+        authData: {
+          clientKey: clientKey,
+          apiLoginID: apiLoginID,
+        },
         cardData: {
           cardNumber: cardData.cardNumber.replace(/\s/g, ""),
           month: cardData.month,
           year: cardData.year,
           cardCode: cardData.cardCode,
-          zip: cardData.zip || "12345", // Provide a default zip if empty
-          fullName: "Customer Name", // Required field
+          zip: cardData.zip || "12345",
+          fullName: "Customer Name",
         },
       }
 
-      console.log("Payload structure:", Object.keys(payload))
-      console.log("Card data structure:", Object.keys(payload.cardData))
-
-      const response = await dispatchData(payload)
-      console.log("Accept.js response received")
-
-      // For debugging
-      if (response.messages && response.messages.resultCode === "Error") {
-        setDebugInfo(response)
-        onError(response.messages.message[0]?.text || "Payment processing failed")
-        setIsProcessing(false)
-        return
-      }
-
-      // Now send the payment nonce to your server
-      console.log("Sending payment data to server...")
-      const serverResponse = await processPayment({
-        dataValue: response.opaqueData.dataValue,
-        dataDescriptor: response.opaqueData.dataDescriptor,
-        amount,
-        description: paymentDescription,
-        recipientEmail,
-        recipientId,
-      })
-
-      console.log("Server response received")
-
-      if (serverResponse.success) {
-        onSuccess()
-      } else {
-        setDebugInfo(serverResponse)
-        onError(serverResponse.message || "Payment processing failed")
-      }
+      // Call Accept.js directly
+      window.Accept.dispatchData(secureData, responseHandler)
     } catch (err: any) {
       console.error("Payment processing error:", err)
-      setDebugInfo(err.response || err)
+      setDebugInfo(err)
       onError(err.message || "Payment processing failed")
-    } finally {
       setIsProcessing(false)
     }
+  }
+
+  const responseHandler = (response: any) => {
+    if (response.messages.resultCode === "Error") {
+      let errorMessage = "Unknown error occurred"
+      if (response.messages.message && response.messages.message.length > 0) {
+        errorMessage = `${response.messages.message[0].code}: ${response.messages.message[0].text}`
+      }
+      setDebugInfo(response)
+      onError(errorMessage)
+      setIsProcessing(false)
+      return
+    }
+
+    // Process the successful tokenization
+    processPayment({
+      dataValue: response.opaqueData.dataValue,
+      dataDescriptor: response.opaqueData.dataDescriptor,
+      amount,
+      description: paymentDescription,
+      recipientEmail,
+      recipientId,
+    })
+      .then((serverResponse) => {
+        if (serverResponse.success) {
+          onSuccess()
+        } else {
+          setDebugInfo(serverResponse)
+          onError(serverResponse.message || "Payment processing failed")
+        }
+      })
+      .catch((err) => {
+        console.error("Server API error:", err)
+        setDebugInfo(err)
+        onError(err.message || "Payment processing failed")
+      })
+      .finally(() => {
+        setIsProcessing(false)
+      })
   }
 
   // This would be your actual server call
@@ -256,8 +286,8 @@ export function AuthorizeNetPaymentTab({
         </div>
 
         <div className="pt-4 space-y-2">
-          <Button type="submit" className="w-full" disabled={isProcessing || loading}>
-            {isProcessing || loading ? "Processing..." : `Pay $${amount.toFixed(2)}`}
+          <Button type="submit" className="w-full" disabled={isProcessing || !isScriptLoaded}>
+            {isProcessing ? "Processing..." : `Pay $${amount.toFixed(2)}`}
           </Button>
 
           <Button type="button" variant="outline" className="w-full" onClick={fillTestCard}>

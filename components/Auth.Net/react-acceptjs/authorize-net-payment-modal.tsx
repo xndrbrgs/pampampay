@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
-import { AuthorizeNetPaymentTab } from "./authorize-net-payment-tab"
+import { DirectAcceptJs } from "./direct-accept-js"
 
 type AuthorizeNetPaymentModalProps = {
   isOpen: boolean
@@ -100,7 +100,7 @@ export function AuthorizeNetPaymentModal({
             </div>
           </div>
 
-          <AuthorizeNetPaymentTab
+          <DirectAcceptJs
             amount={amount}
             recipientId={recipientId}
             paymentDescription={paymentDescription}
