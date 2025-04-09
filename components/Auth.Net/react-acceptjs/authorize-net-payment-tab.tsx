@@ -51,12 +51,6 @@ export function AuthorizeNetPaymentTab({
   const apiLoginID = process.env.NEXT_PUBLIC_AUTHORIZE_NET_API_LOGIN_ID!
   const clientKey = process.env.NEXT_PUBLIC_AUTHORIZE_NET_CLIENT_KEY!
 
-  // Log environment variable status (not the actual values)
-  useEffect(() => {
-    console.log("API Login ID available:", !!apiLoginID)
-    console.log("Client Key available:", !!clientKey)
-  }, [apiLoginID, clientKey])
-
   const authorizenetConfig = {
     apiLoginID: apiLoginID,
     clientKey: clientKey,
@@ -87,31 +81,6 @@ export function AuthorizeNetPaymentTab({
     setIsProcessing(true)
     setDebugInfo(null)
 
-    // For testing purposes, let's bypass the actual payment processing
-    // and simulate a successful payment
-    try {
-      console.log("Simulating successful payment...")
-
-      // Wait for 1 second to simulate processing
-      await new Promise((resolve) => setTimeout(resolve, 1000))
-
-      onSuccess()
-      return
-    } catch (err: any) {
-      console.error("Simulation error:", err)
-      onError(err.message || "Payment simulation failed")
-      setIsProcessing(false)
-      return
-    }
-
-    /* Uncomment this section when you're ready to use real payment processing
-    
-    if (error) {
-      onError(error.message || "An error occurred with the payment processor")
-      setIsProcessing(false)
-      return
-    }
-
     // Validate environment variables
     if (!apiLoginID || !clientKey) {
       onError("Missing Authorize.net credentials. Please check your environment variables.")
@@ -133,7 +102,7 @@ export function AuthorizeNetPaymentTab({
     try {
       console.log("Dispatching data to Accept.js...")
       const response = await dispatchData(payload)
-      console.log("Accept.js response received:", response)
+      console.log("Accept.js response received")
 
       // Now send the payment nonce to your server
       console.log("Sending payment data to server...")
@@ -146,7 +115,7 @@ export function AuthorizeNetPaymentTab({
         recipientId,
       })
 
-      console.log("Server response:", serverResponse)
+      console.log("Server response received")
 
       if (serverResponse.success) {
         onSuccess()
@@ -161,7 +130,6 @@ export function AuthorizeNetPaymentTab({
     } finally {
       setIsProcessing(false)
     }
-    */
   }
 
   // This would be your actual server call
@@ -256,7 +224,7 @@ export function AuthorizeNetPaymentTab({
           <Input id="zip" name="zip" placeholder="12345" value={cardData.zip} onChange={handleInputChange} required />
         </div>
 
-        <div className="pt-4">
+        <div className="pt-4 text-white">
           <Button type="submit" className="w-full" disabled={isProcessing || loading}>
             {isProcessing || loading ? "Processing..." : `Pay $${amount.toFixed(2)}`}
           </Button>

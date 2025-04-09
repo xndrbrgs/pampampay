@@ -64,7 +64,6 @@ export function AuthorizeNetPaymentModal({
     }, 3000)
     setError(null)
     onClose()
-    // You could redirect to a success page or show a success message
   }
 
   const handleError = (errorMessage: string) => {
