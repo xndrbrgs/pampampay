@@ -4,7 +4,7 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
-import { AcceptHosted } from "./AcceptHosted"
+import { AuthorizeNetHosted } from "./authorize-net-hosted"
 
 type AuthorizeNetPaymentModalProps = {
   isOpen: boolean
@@ -100,7 +100,7 @@ export function AuthorizeNetPaymentModal({
             </div>
           </div>
 
-          <AcceptHosted
+          <AuthorizeNetHosted
             amount={amount}
             recipientId={recipientId}
             paymentDescription={paymentDescription}

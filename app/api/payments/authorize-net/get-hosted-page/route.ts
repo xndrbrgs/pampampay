@@ -1,4 +1,5 @@
 import { NextResponse } from "next/server"
+import axios from "axios"
 
 export async function POST(request: Request) {
   try {
@@ -12,6 +13,7 @@ export async function POST(request: Request) {
     // Check for API credentials
     const apiLoginId = process.env.AUTHORIZE_NET_API_LOGIN_ID
     const transactionKey = process.env.AUTHORIZE_NET_TRANSACTION_KEY
+    const appUrl = process.env.NEXT_PUBLIC_APP_URL || "http://localhost:3000"
 
     if (!apiLoginId || !transactionKey) {
       return NextResponse.json(
@@ -23,89 +25,132 @@ export async function POST(request: Request) {
       )
     }
 
-    // For testing purposes, we'll return a simulated token
-    // In production, you would make an actual API call to Authorize.net
+    // Determine the API endpoint based on environment
+    const apiEndpoint =
+      process.env.NODE_ENV === "production"
+        ? "https://api.authorize.net/xml/v1/request.api"
+        : "https://apitest.authorize.net/xml/v1/request.api"
 
-    // Simulate a token response
-    const token = `SIMULATE_${Date.now()}_${Math.random().toString(36).substring(2, 15)}`
+    // Create the request payload
+    const payload = {
+      getHostedPaymentPageRequest: {
+        merchantAuthentication: {
+          name: apiLoginId,
+          transactionKey: transactionKey,
+        },
+        transactionRequest: {
+          transactionType: "authCaptureTransaction",
+          amount: amount,
+          order: {
+            description: description,
+            invoiceNumber: `INV-${Date.now()}`,
+          },
+          customer: {
+            email: recipientEmail,
+          },
+        },
+        hostedPaymentSettings: {
+          setting: [
+            {
+              settingName: "hostedPaymentButtonOptions",
+              settingValue: JSON.stringify({
+                text: "Pay Now",
+                cssClass: "btn btn-primary",
+              }),
+            },
+            {
+              settingName: "hostedPaymentOrderOptions",
+              settingValue: JSON.stringify({
+                show: true,
+                merchantName: "PamPamPay",
+              }),
+            },
+            {
+              settingName: "hostedPaymentReturnOptions",
+              settingValue: JSON.stringify({
+                showReceipt: false,
+                url: `${appUrl}/payment/complete`,
+                urlText: "Return to PamPamPay",
+                cancelUrl: `${appUrl}/payment/cancel`,
+                cancelUrlText: "Cancel Payment",
+              }),
+            },
+            {
+              settingName: "hostedPaymentStyleOptions",
+              settingValue: JSON.stringify({
+                bgColor: "#ffffff",
+                frameColor: "#333333",
+                frameHeight: "700px",
+                frameWidth: "100%",
+              }),
+            },
+            {
+              settingName: "hostedPaymentPaymentOptions",
+              settingValue: JSON.stringify({
+                showCreditCard: true,
+                showBankAccount: false,
+              }),
+            },
+            {
+              settingName: "hostedPaymentSecurityOptions",
+              settingValue: JSON.stringify({
+                captcha: false,
+              }),
+            },
+            {
+              settingName: "hostedPaymentShippingAddressOptions",
+              settingValue: JSON.stringify({
+                show: false,
+                required: false,
+              }),
+            },
+            {
+              settingName: "hostedPaymentBillingAddressOptions",
+              settingValue: JSON.stringify({
+                show: true,
+                required: true,
+              }),
+            },
+          ],
+        },
+      },
+    }
 
-    return NextResponse.json({
-      success: true,
-      token: token,
+    // Make the API request
+    const response = await axios.post(apiEndpoint, payload, {
+      headers: {
+        "Content-Type": "application/json",
+      },
     })
 
-    /* 
-    // Example of how you would get a hosted payment page token with the Authorize.net SDK:
-    // First, install the SDK: npm install authorizenet
-    
-    const ApiContracts = require('authorizenet').APIContracts;
-    const ApiControllers = require('authorizenet').APIControllers;
-    
-    const merchantAuthenticationType = new ApiContracts.MerchantAuthenticationType();
-    merchantAuthenticationType.setName(apiLoginId);
-    merchantAuthenticationType.setTransactionKey(transactionKey);
-    
-    const transactionRequestType = new ApiContracts.TransactionRequestType();
-    transactionRequestType.setTransactionType(ApiContracts.TransactionTypeEnum.AUTHCAPTURETRANSACTION);
-    transactionRequestType.setAmount(amount);
-    
-    const setting1 = new ApiContracts.SettingType();
-    setting1.setSettingName('hostedPaymentButtonOptions');
-    setting1.setSettingValue('{"text": "Pay"}');
-    
-    const setting2 = new ApiContracts.SettingType();
-    setting2.setSettingName('hostedPaymentOrderOptions');
-    setting2.setSettingValue('{"show": true}');
-    
-    const setting3 = new ApiContracts.SettingType();
-    setting3.setSettingName('hostedPaymentReturnOptions');
-    setting3.setSettingValue(
-      JSON.stringify({
-        showReceipt: false,
-        url: `${process.env.NEXT_PUBLIC_APP_URL}/payment/complete`,
-        urlText: 'Continue',
-        cancelUrl: `${process.env.NEXT_PUBLIC_APP_URL}/payment/cancel`,
-        cancelUrlText: 'Cancel'
+    // Process the response
+    if (response.data && response.data.token && response.data.messages && response.data.messages.resultCode === "Ok") {
+      return NextResponse.json({
+        success: true,
+        token: response.data.token,
       })
-    );
-    
-    const settingList = [];
-    settingList.push(setting1);
-    settingList.push(setting2);
-    settingList.push(setting3);
-    
-    const getRequest = new ApiContracts.GetHostedPaymentPageRequest();
-    getRequest.setMerchantAuthentication(merchantAuthenticationType);
-    getRequest.setTransactionRequest(transactionRequestType);
-    getRequest.setHostedPaymentSettings(settingList);
-    
-    const ctrl = new ApiControllers.GetHostedPaymentPageController(getRequest.getJSON());
-    
-    const response = await new Promise((resolve, reject) => {
-      ctrl.execute(() => {
-        const apiResponse = ctrl.getResponse();
-        const response = new ApiContracts.GetHostedPaymentPageResponse(apiResponse);
-        
-        if (response.getMessages().getResultCode() === ApiContracts.MessageTypeEnum.OK) {
-          resolve({
-            success: true,
-            token: response.getToken(),
-          });
-        } else {
-          reject({
-            success: false,
-            message: response.getMessages().getMessage()[0].getText(),
-          });
-        }
-      });
-    });
-    
-    return NextResponse.json(response);
-    */
+    } else {
+      const errorMessage =
+        response.data.messages.message && response.data.messages.message.length > 0
+          ? `${response.data.messages.message[0].code}: ${response.data.messages.message[0].text}`
+          : "Unknown error occurred"
+
+      return NextResponse.json(
+        {
+          success: false,
+          message: errorMessage,
+        },
+        { status: 400 },
+      )
+    }
   } catch (error: any) {
     console.error("Error getting hosted payment page token:", error)
     return NextResponse.json(
-      { success: false, message: error.message || "Failed to get payment page" },
+      {
+        success: false,
+        message: error.message || "Failed to get payment page",
+        details: error.response?.data || error,
+      },
       { status: 500 },
     )
   }
