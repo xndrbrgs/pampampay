@@ -26,9 +26,13 @@ export async function POST(request: Request) {
     }
 
     // Determine the API endpoint based on environment
+    // const apiEndpoint =
+    //   process.env.NODE_ENV === "production"
+    //     ? "https://api.authorize.net/xml/v1/request.api"
+    //     : "https://apitest.authorize.net/xml/v1/request.api"
     const apiEndpoint =
       process.env.NODE_ENV === "production"
-        ? "https://api.authorize.net/xml/v1/request.api"
+        ? "https://apitest.authorize.net/xml/v1/request.api"
         : "https://apitest.authorize.net/xml/v1/request.api"
 
     // Create the request payload exactly as specified in the Authorize.net documentation
