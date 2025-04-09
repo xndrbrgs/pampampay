@@ -5,6 +5,7 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { AuthorizeNetDirectIframe } from "./authorize-net-iframe"
+import { AuthorizeNetAcceptHosted } from "./AcceptHosted"
 
 type AuthorizeNetPaymentModalProps = {
   isOpen: boolean
@@ -89,7 +90,7 @@ export function AuthorizeNetPaymentModal({
             </div>
           </div>
 
-          <AuthorizeNetDirectIframe
+          <AuthorizeNetAcceptHosted
             amount={amount}
             recipientId={recipientId}
             paymentDescription={paymentDescription}
