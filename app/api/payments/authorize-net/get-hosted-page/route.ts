@@ -25,6 +25,12 @@ export async function POST(request: Request) {
       )
     }
 
+    console.log("Creating hosted payment page with credentials:", {
+      apiLoginId: apiLoginId ? "Present (masked)" : "Missing",
+      transactionKey: transactionKey ? "Present (masked)" : "Missing",
+      appUrl,
+    })
+
     // Determine the API endpoint based on environment
     // const apiEndpoint =
     //   process.env.NODE_ENV === "production"
@@ -44,14 +50,12 @@ export async function POST(request: Request) {
         },
         transactionRequest: {
           transactionType: "authCaptureTransaction",
-          amount: amount,
-          // Note: We're not including 'order' with 'invoiceNumber' as it caused an error
-          // Instead, we'll use the description field which is supported
+          amount: amount.toString(), // Ensure amount is a string
           order: {
-            description: description,
+            description: description || "Payment",
           },
           customer: {
-            email: recipientEmail,
+            email: recipientEmail || "",
           },
         },
         hostedPaymentSettings: {
@@ -66,7 +70,7 @@ export async function POST(request: Request) {
               settingName: "hostedPaymentOrderOptions",
               settingValue: JSON.stringify({
                 show: true,
-                merchantName: "PamPamPay",
+                merchantName: "Your Company",
               }),
             },
             {
@@ -74,7 +78,7 @@ export async function POST(request: Request) {
               settingValue: JSON.stringify({
                 showReceipt: false,
                 url: `${appUrl}/payment/complete`,
-                urlText: "Return to PamPamPay",
+                urlText: "Return to Merchant",
                 cancelUrl: `${appUrl}/payment/cancel`,
                 cancelUrlText: "Cancel Payment",
               }),
@@ -90,6 +94,8 @@ export async function POST(request: Request) {
       },
     }
 
+    console.log("Sending request to Authorize.net:", JSON.stringify(payload, null, 2))
+
     // Make the API request
     const response = await axios.post(apiEndpoint, payload, {
       headers: {
@@ -97,8 +103,11 @@ export async function POST(request: Request) {
       },
     })
 
+    console.log("Received response from Authorize.net:", JSON.stringify(response.data, null, 2))
+
     // Process the response
     if (response.data && response.data.token) {
+      console.log("Successfully received token:", response.data.token.substring(0, 10) + "...")
       return NextResponse.json({
         success: true,
         token: response.data.token,
@@ -109,16 +118,26 @@ export async function POST(request: Request) {
           ? `${response.data.messages.message[0].code}: ${response.data.messages.message[0].text}`
           : "Unknown error occurred"
 
+      console.error("Error in Authorize.net response:", errorMessage)
       return NextResponse.json(
         {
           success: false,
           message: errorMessage,
+          fullResponse: response.data,
         },
         { status: 400 },
       )
     }
   } catch (error: any) {
     console.error("Error getting hosted payment page token:", error)
+
+    // Log more detailed error information
+    if (error.response) {
+      console.error("Error response data:", error.response.data)
+      console.error("Error response status:", error.response.status)
+      console.error("Error response headers:", error.response.headers)
+    }
+
     return NextResponse.json(
       {
         success: false,

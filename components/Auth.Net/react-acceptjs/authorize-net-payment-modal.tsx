@@ -5,7 +5,6 @@ import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/u
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
 import { AuthorizeNetDirectIframe } from "./authorize-net-iframe"
-// import { AuthorizeNetAcceptHosted } from "./authorize-net-accept-hosted"
 
 type AuthorizeNetPaymentModalProps = {
   isOpen: boolean
@@ -30,25 +29,14 @@ export function AuthorizeNetPaymentModal({
     const successAnimation = document.createElement("div")
     successAnimation.className = "fixed inset-0 flex items-center justify-center bg-black bg-opacity-75 z-50"
     successAnimation.innerHTML = `
-        <motion.div
-            initial={{ scale: 0 }}
-            animate={{ scale: 1 }}
-            exit={{ scale: 0 }}
-            class="p-6 bg-white rounded-lg shadow-lg text-center"
-        >
-            <h2 
-                class="text-2xl font-bold text-black"
-                style="opacity: 0; animation: fadeIn 0.5s forwards 0.2s;"
-            >
+        <div class="p-6 bg-white rounded-lg shadow-lg text-center">
+            <h2 class="text-2xl font-bold text-black" style="opacity: 0; animation: fadeIn 0.5s forwards 0.2s;">
                 Payment Successful!
             </h2>
-            <p 
-                class="mt-2 text-gray-600"
-                style="opacity: 0; animation: fadeIn 0.5s forwards 0.5s;"
-            >
+            <p class="mt-2 text-gray-600" style="opacity: 0; animation: fadeIn 0.5s forwards 0.5s;">
                 Thank you for your payment.
             </p>
-        </motion.div>
+        </div>
         <style>
             @keyframes fadeIn {
                 to {
