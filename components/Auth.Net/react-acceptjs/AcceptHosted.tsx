@@ -109,7 +109,7 @@ export function AuthorizeNetAcceptHosted({
     width: "100%",
     height: "800px", // You can adjust this height
     border: "none",
-    overflow: "auto", 
+    overflow: "auto",
   };
 
   const containerStyles = {
@@ -142,19 +142,23 @@ export function AuthorizeNetAcceptHosted({
           Pay ${amount.toFixed(2)}
         </AcceptHosted.Button>
         <AcceptHosted.IFrameBackdrop className="hidden" />{" "}
-        {/* Optional, since it's no longer a modal */}
-        <div className="flex justify-center w-full px-4 mt-10">
-          <AcceptHosted.IFrameContainer
-            className="w-full max-w-5xl overflow-y-auto rounded-lg shadow-lg"
-            // style={containerStyles}
-          >
-            <div className="bg-white w-full rounded-lg overflow-y-scroll h-64">
+        {/* Backdrop hidden since no modal */}
+        {/* Full screen-height wrapper (optional but useful for layout control) */}
+        <div className="flex justify-center w-full px-4 mt-10 min-h-screen">
+          <AcceptHosted.IFrameContainer className="w-full max-w-5xl">
+            {/* Scrollable container with a visual height of 32rem (h-64 = 16rem) */}
+            <div className="bg-white w-full rounded-lg shadow-lg overflow-y-auto h-64">
               <div className="p-4 border-b border-gray-200">
                 <h3 className="text-lg font-medium">Complete Your Payment</h3>
               </div>
+
               <AcceptHosted.IFrame
-                style={{ ...iframeStyles, height: "700px" }}
                 className="w-full"
+                style={{
+                  width: "100%",
+                  height: "700px",
+                  border: "none",
+                }}
                 scrolling="yes"
               />
             </div>
