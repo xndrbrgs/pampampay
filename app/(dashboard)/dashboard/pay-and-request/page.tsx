@@ -1,26 +1,46 @@
-import { AddConnection } from "@/components/General/AddConnections";
+import { AuthPaymentForm } from "@/components/Auth.Net/AuthPayForm";
+import AdminComponent from "@/components/Dashboard/AdminComponent";
 import Header from "@/components/General/Header";
-import TransferTabs from "@/components/General/TransferTabs";
-import { addConnection } from "@/lib/actions/transfer.actions";
-import { createOrGetUser } from "@/lib/actions/user.actions";
-import { redirect } from "next/navigation";
+import { PayPalProvider } from "@/components/Paypal/PaypalProvider";
+import { getAdminUser, getConnections } from "@/lib/actions/user.actions";
+import { currentUser } from "@clerk/nextjs/server";
 
-export default async function TransferPage() {
-   const user = await createOrGetUser();
-    if (user.stripeConnectedLinked === false) {
-      redirect("/dashboard");
-    }
-  
-  return (
-    <section className="p-6 h-screen">
-      <Header
-        title="Transfer Money"
-        subtext="Manage your transfers easily and safely."
-      />
-      <div className="flex flex-col gap-4 max-w-3xl">
-        <AddConnection onAddConnection={addConnection} />
-        <TransferTabs />
-      </div>
-    </section>
-  );
+export default async function Dashboard() {
+  const user = await currentUser();
+  if (!user) {
+    return <div>User not found</div>;
+  }
+
+  const adminUser = await getAdminUser();
+  const connections = await getConnections();
+
+  if (user.id !== adminUser?.clerkUserId) {
+    return (
+      <PayPalProvider>
+        <section className="p-6 h-screen">
+          <Header
+            title="My Dashboard"
+            subtext="Access and manage your account and transactions"
+          />
+
+          <div className="pt-4 max-w-3xl flex flex-col gap-y-5">
+            <AuthPaymentForm connections={connections} />
+          </div>
+        </section>
+      </PayPalProvider>
+    );
+  } else {
+    return (
+      <section className="p-6 h-screen">
+        <Header
+          title="Admin Dashboard"
+          subtext="Manage users and system settings"
+        />
+
+        <div className="pt-4 max-w-3xl flex flex-col gap-y-5">
+          <AdminComponent />
+        </div>
+      </section>
+    );
+  }
 }
