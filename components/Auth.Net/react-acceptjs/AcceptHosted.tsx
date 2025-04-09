@@ -93,6 +93,26 @@ export function AuthorizeNetAcceptHosted({
     )
   }
 
+  // Custom styles for the iframe components
+  const iframeStyles = {
+    width: "100%",
+    height: "600px", // You can adjust this height
+    border: "none",
+  }
+
+  const containerStyles = {
+    width: "100%",
+    maxWidth: "100%",
+    height: "auto",
+    padding: "0",
+    margin: "0",
+    zIndex: 9999, // Ensure it's above other elements
+  }
+
+  const backdropStyles = {
+    zIndex: 9998, // Just below the container
+  }
+
   return (
     <div className="w-full">
       <AcceptHosted
@@ -101,15 +121,24 @@ export function AuthorizeNetAcceptHosted({
         onTransactionResponse={handleTransactionResponse}
         onCancel={() => onError("Payment was cancelled")}
         onSuccessfulSave={() => console.log("Successful save")}
-        onResize={(width, height) => console.log(`Resize: ${width}x${height}`)}
+        onResize={(width, height) => {
+          console.log(`Resize: ${width}x${height}`)
+          // You could update the iframe height here if needed
+        }}
       >
         <AcceptHosted.Button className="w-full py-2 px-4 bg-black text-white rounded-md hover:bg-gray-800">
           Pay ${amount.toFixed(2)}
         </AcceptHosted.Button>
-        <AcceptHosted.IFrameBackdrop className="fixed inset-0 bg-black bg-opacity-50 z-40" />
-        <AcceptHosted.IFrameContainer className="fixed inset-0 flex items-center justify-center z-50 p-4">
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-md overflow-hidden">
-            <AcceptHosted.IFrame className="w-[40vw] h-full z-30" />
+        <AcceptHosted.IFrameBackdrop className="fixed inset-0 bg-black bg-opacity-50" style={backdropStyles} />
+        <AcceptHosted.IFrameContainer
+          className="fixed inset-0 flex items-center justify-center p-4"
+          style={containerStyles}
+        >
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-lg overflow-hidden">
+            <div className="p-4 border-b border-gray-200">
+              <h3 className="text-lg font-medium">Complete Your Payment</h3>
+            </div>
+            <AcceptHosted.IFrame style={iframeStyles} className="w-full" />
           </div>
         </AcceptHosted.IFrameContainer>
       </AcceptHosted>

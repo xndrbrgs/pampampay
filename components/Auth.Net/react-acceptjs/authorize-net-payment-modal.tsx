@@ -4,10 +4,8 @@ import { useState } from "react"
 import { Dialog, DialogContent, DialogHeader, DialogTitle } from "@/components/ui/dialog"
 import { Alert, AlertDescription } from "@/components/ui/alert"
 import { AlertCircle } from "lucide-react"
-import { AuthorizeNetAcceptHosted } from "./AcceptHosted"
-// Alternatively, you can use one of these:
-// import { AuthorizeNetForm } from "./authorize-net-form"
-// import { AuthorizeNetHostedForm } from "./authorize-net-hosted-form"
+import { AuthorizeNetDirectIframe } from "./authorize-net-iframe"
+// import { AuthorizeNetAcceptHosted } from "./authorize-net-accept-hosted"
 
 type AuthorizeNetPaymentModalProps = {
   isOpen: boolean
@@ -75,7 +73,7 @@ export function AuthorizeNetPaymentModal({
 
   return (
     <Dialog open={isOpen} onOpenChange={(open) => !open && onClose()}>
-      <DialogContent className="sm:max-w-[500px] py-32">
+      <DialogContent className="sm:max-w-[500px]">
         <DialogHeader>
           <DialogTitle>Complete Your Payment</DialogTitle>
         </DialogHeader>
@@ -103,7 +101,7 @@ export function AuthorizeNetPaymentModal({
             </div>
           </div>
 
-          <AuthorizeNetAcceptHosted
+          <AuthorizeNetDirectIframe
             amount={amount}
             recipientId={recipientId}
             paymentDescription={paymentDescription}
