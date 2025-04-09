@@ -47,8 +47,8 @@ export function AuthorizeNetPaymentTab({
   const years = Array.from({ length: 10 }, (_, i) => `${currentYear + i}`)
 
   const authorizenetConfig = {
-    apiLoginID: process.env.NEXT_PUBLIC_AUTHORIZE_NET_API_LOGIN_ID || "",
-    clientKey: process.env.NEXT_PUBLIC_AUTHORIZE_NET_CLIENT_KEY || "",
+    apiLoginID: process.env.AUTHORIZENET_API_LOGIN_ID || "",
+    clientKey: process.env.AUTHORIZENET_TRANSACTION_KEY || "",
     environment: "sandbox", // Change to "production" for live payments
   }
 
