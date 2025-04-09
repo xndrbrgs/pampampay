@@ -53,8 +53,8 @@ export function AuthorizeNetAcceptJs({
   const years = Array.from({ length: 10 }, (_, i) => `${currentYear + i}`)
 
   const authorizenetConfig = {
-    apiLoginID: process.env.AUTHORIZENET_API_LOGIN_ID || "",
-    clientKey: process.env.AUTHORIZENET_TRANSACTION_KEY || "",
+    apiLoginID: process.env.AUTHORIZE_NET_API_LOGIN_ID || "",
+    clientKey: process.env.AUTHORIZE_NET_TRANSACTION_KEY || "",
     environment: "sandbox", // Change to "production" for live payments
   }
 
