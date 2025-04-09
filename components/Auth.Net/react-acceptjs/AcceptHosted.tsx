@@ -144,16 +144,17 @@ export function AuthorizeNetAcceptHosted({
         {/* Optional, since it's no longer a modal */}
         <div className="flex justify-center w-full px-4 mt-10">
           <AcceptHosted.IFrameContainer
-            className="w-full max-w-5xl overflow-auto rounded-lg shadow-lg"
-            style={containerStyles}
+            className="w-full max-w-5xl overflow-y-auto rounded-lg shadow-lg"
+            // style={containerStyles}
           >
-            <div className="bg-white w-full rounded-lg overflow-auto">
+            <div className="bg-white w-full rounded-lg overflow-y-scroll h-64">
               <div className="p-4 border-b border-gray-200">
                 <h3 className="text-lg font-medium">Complete Your Payment</h3>
               </div>
               <AcceptHosted.IFrame
                 style={{ ...iframeStyles, height: "700px" }}
                 className="w-full"
+                scrolling="yes"
               />
             </div>
           </AcceptHosted.IFrameContainer>
