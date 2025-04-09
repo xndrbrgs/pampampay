@@ -31,7 +31,7 @@ export async function POST(request: Request) {
         ? "https://api.authorize.net/xml/v1/request.api"
         : "https://apitest.authorize.net/xml/v1/request.api"
 
-    // Create the request payload
+    // Create the request payload exactly as specified in the Authorize.net documentation
     const payload = {
       getHostedPaymentPageRequest: {
         merchantAuthentication: {
@@ -41,9 +41,10 @@ export async function POST(request: Request) {
         transactionRequest: {
           transactionType: "authCaptureTransaction",
           amount: amount,
+          // Note: We're not including 'order' with 'invoiceNumber' as it caused an error
+          // Instead, we'll use the description field which is supported
           order: {
             description: description,
-            invoiceNumber: `INV-${Date.now()}`,
           },
           customer: {
             email: recipientEmail,
@@ -55,7 +56,6 @@ export async function POST(request: Request) {
               settingName: "hostedPaymentButtonOptions",
               settingValue: JSON.stringify({
                 text: "Pay Now",
-                cssClass: "btn btn-primary",
               }),
             },
             {
@@ -76,39 +76,9 @@ export async function POST(request: Request) {
               }),
             },
             {
-              settingName: "hostedPaymentStyleOptions",
+              settingName: "hostedPaymentIFrameCommunicatorUrl",
               settingValue: JSON.stringify({
-                bgColor: "#ffffff",
-                frameColor: "#333333",
-                frameHeight: "700px",
-                frameWidth: "100%",
-              }),
-            },
-            {
-              settingName: "hostedPaymentPaymentOptions",
-              settingValue: JSON.stringify({
-                showCreditCard: true,
-                showBankAccount: false,
-              }),
-            },
-            {
-              settingName: "hostedPaymentSecurityOptions",
-              settingValue: JSON.stringify({
-                captcha: false,
-              }),
-            },
-            {
-              settingName: "hostedPaymentShippingAddressOptions",
-              settingValue: JSON.stringify({
-                show: false,
-                required: false,
-              }),
-            },
-            {
-              settingName: "hostedPaymentBillingAddressOptions",
-              settingValue: JSON.stringify({
-                show: true,
-                required: true,
+                url: `${appUrl}/authorize-communicator.html`,
               }),
             },
           ],
@@ -124,14 +94,14 @@ export async function POST(request: Request) {
     })
 
     // Process the response
-    if (response.data && response.data.token && response.data.messages && response.data.messages.resultCode === "Ok") {
+    if (response.data && response.data.token) {
       return NextResponse.json({
         success: true,
         token: response.data.token,
       })
     } else {
       const errorMessage =
-        response.data.messages.message && response.data.messages.message.length > 0
+        response.data.messages && response.data.messages.message && response.data.messages.message.length > 0
           ? `${response.data.messages.message[0].code}: ${response.data.messages.message[0].text}`
           : "Unknown error occurred"
 

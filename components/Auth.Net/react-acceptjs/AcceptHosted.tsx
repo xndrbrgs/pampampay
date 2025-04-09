@@ -1,10 +1,10 @@
 "use client"
 
 import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
+import { AcceptHosted } from "react-acceptjs"
 import { Loader2 } from "lucide-react"
 
-type AcceptHostedProps = {
+type AuthorizeNetAcceptHostedProps = {
   amount: number
   recipientId: string
   paymentDescription: string
@@ -13,17 +13,16 @@ type AcceptHostedProps = {
   onError: (message: string) => void
 }
 
-export function AcceptHosted({
+export function AuthorizeNetAcceptHosted({
   amount,
   recipientId,
   paymentDescription,
   recipientEmail,
   onSuccess,
   onError,
-}: AcceptHostedProps) {
+}: AuthorizeNetAcceptHostedProps) {
   const [isLoading, setIsLoading] = useState(false)
   const [token, setToken] = useState<string | null>(null)
-  const [iframeHeight, setIframeHeight] = useState(600)
 
   useEffect(() => {
     const getHostedPaymentPageToken = async () => {
@@ -64,45 +63,17 @@ export function AcceptHosted({
     getHostedPaymentPageToken()
   }, [amount, paymentDescription, recipientEmail, recipientId, onError])
 
-  // Handle iframe messages from Authorize.net
-  useEffect(() => {
-    const handleMessage = (event: MessageEvent) => {
-      // Verify the origin of the message
-      if (event.origin.includes("authorize.net")) {
-        try {
-          const response = JSON.parse(event.data)
-
-          // Handle resize messages
-          if (response.height) {
-            setIframeHeight(response.height)
-          }
-
-          // Handle transaction response
-          if (response.transactionResponse) {
-            if (response.transactionResponse.responseCode === "1") {
-              // Transaction approved
-              onSuccess()
-            } else {
-              // Transaction declined or error
-              onError(response.transactionResponse.message || "Payment failed")
-            }
-          }
-        } catch (error) {
-          // Not a JSON message or other error
-          console.log("Non-JSON message received from iframe")
-        }
-      }
+  const handleTransactionResponse = (response: any) => {
+    console.log("Transaction response:", response)
+    if (response && response.transactionResponse && response.transactionResponse.responseCode === "1") {
+      onSuccess()
+    } else {
+      const errorMessage =
+        response && response.transactionResponse
+          ? response.transactionResponse.message || "Payment failed"
+          : "Payment processing failed"
+      onError(errorMessage)
     }
-
-    window.addEventListener("message", handleMessage)
-    return () => {
-      window.removeEventListener("message", handleMessage)
-    }
-  }, [onSuccess, onError])
-
-  // For demo purposes, simulate a successful payment
-  const simulateSuccessfulPayment = () => {
-    onSuccess()
   }
 
   if (isLoading) {
@@ -114,30 +85,34 @@ export function AcceptHosted({
     )
   }
 
-  // In a real implementation, this would use the actual token
-  // For now, we'll show a simulation button
-  return (
-    <div className="flex flex-col">
-      {token ? (
-        <>
-          <div className="mb-4 border rounded-md p-4 bg-gray-50">
-            <p className="text-sm text-muted-foreground mb-2">
-              In a production environment, this would display the Authorize.net hosted payment form in an iframe:
-            </p>
-            <code className="text-xs bg-gray-100 p-1 rounded">
-              {`<iframe src="https://test.authorize.net/payment/payment?token=${token}" height="${iframeHeight}" width="100%" />`}
-            </code>
-          </div>
+  if (!token) {
+    return (
+      <div className="p-4 border border-red-300 bg-red-50 rounded-md">
+        <p className="text-sm text-red-600">Unable to load the payment form. Please try again later.</p>
+      </div>
+    )
+  }
 
-          <Button onClick={simulateSuccessfulPayment} className="w-full">
-            Simulate Successful Payment
-          </Button>
-        </>
-      ) : (
-        <div className="p-4 border border-red-300 bg-red-50 rounded-md">
-          <p className="text-sm text-red-600">Unable to load the payment form. Please try again later.</p>
-        </div>
-      )}
+  return (
+    <div className="w-full">
+      <AcceptHosted
+        formToken={token}
+        integration="iframe"
+        onTransactionResponse={handleTransactionResponse}
+        onCancel={() => onError("Payment was cancelled")}
+        onSuccessfulSave={() => console.log("Successful save")}
+        onResize={(width, height) => console.log(`Resize: ${width}x${height}`)}
+      >
+        <AcceptHosted.Button className="w-full py-2 px-4 bg-black text-white rounded-md hover:bg-gray-800">
+          Pay ${amount.toFixed(2)}
+        </AcceptHosted.Button>
+        <AcceptHosted.IFrameBackdrop className="fixed inset-0 bg-black bg-opacity-50 z-40" />
+        <AcceptHosted.IFrameContainer className="fixed inset-0 flex items-center justify-center z-50 p-4">
+          <div className="bg-white rounded-lg shadow-lg w-full max-w-md overflow-hidden">
+            <AcceptHosted.IFrame className="w-full h-[700px]" />
+          </div>
+        </AcceptHosted.IFrameContainer>
+      </AcceptHosted>
     </div>
   )
 }
