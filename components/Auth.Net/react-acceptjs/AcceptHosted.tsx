@@ -141,19 +141,20 @@ export function AuthorizeNetAcceptHosted({
           Pay ${amount.toFixed(2)}
         </AcceptHosted.Button>
         <AcceptHosted.IFrameBackdrop
-          className="fixed inset-0 bg-black bg-opacity-50"
+          className="fixed top-0 left-0 right-0 bottom-0 bg-black bg-opacity-50"
           style={backdropStyles}
         />
+
         <AcceptHosted.IFrameContainer
-          className="fixed inset-0 flex items-center justify-center p-4 overflow-auto"
+          className="fixed top-10 left-1/2 transform -translate-x-1/2 overflow-auto max-h-[90vh] w-full max-w-5xl px-4"
           style={containerStyles}
         >
-          <div className="bg-white rounded-lg shadow-lg w-full max-w-5xl overflow-auto">
+          <div className="bg-white rounded-lg shadow-lg overflow-auto w-full h-full">
             <div className="p-4 border-b border-gray-200">
               <h3 className="text-lg font-medium">Complete Your Payment</h3>
             </div>
             <AcceptHosted.IFrame
-              style={{ ...iframeStyles, height: "700px" }} // increase height if needed
+              style={{ ...iframeStyles, height: "700px" }}
               className="w-full"
             />
           </div>
