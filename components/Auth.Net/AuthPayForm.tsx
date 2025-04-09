@@ -68,7 +68,7 @@ export function AuthPaymentForm({ connections }: UnifiedPaymentFormProps) {
   const [showAuthorizeNet, setShowAuthorizeNet] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<
     "stripe" | "paypal" | "coinbase" | "authorize"
-  >("stripe");
+  >("authorize");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
