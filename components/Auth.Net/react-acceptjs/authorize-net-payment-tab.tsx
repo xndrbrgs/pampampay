@@ -47,9 +47,9 @@ export function AuthorizeNetPaymentTab({
   const currentYear = new Date().getFullYear()
   const years = Array.from({ length: 10 }, (_, i) => `${currentYear + i}`)
 
-  // Check if environment variables are available
-  const apiLoginID = process.env.AUTHORIZE_NET_API_LOGIN_ID!
-  const clientKey = process.env.AUTHORIZE_NET_CLIENT_KEY!
+  // Get environment variables
+  const apiLoginID = process.env.NEXT_PUBLIC_AUTHORIZE_NET_API_LOGIN_ID!
+  const clientKey = process.env.NEXT_PUBLIC_AUTHORIZE_NET_CLIENT_KEY!
 
   // Log environment variable status (not the actual values)
   useEffect(() => {
@@ -58,8 +58,8 @@ export function AuthorizeNetPaymentTab({
   }, [apiLoginID, clientKey])
 
   const authorizenetConfig = {
-    apiLoginID: apiLoginID || "",
-    clientKey: clientKey || "",
+    apiLoginID: apiLoginID,
+    clientKey: clientKey,
     environment: "sandbox", // Change to "production" for live payments
   }
 
@@ -87,6 +87,25 @@ export function AuthorizeNetPaymentTab({
     setIsProcessing(true)
     setDebugInfo(null)
 
+    // For testing purposes, let's bypass the actual payment processing
+    // and simulate a successful payment
+    try {
+      console.log("Simulating successful payment...")
+
+      // Wait for 1 second to simulate processing
+      await new Promise((resolve) => setTimeout(resolve, 1000))
+
+      onSuccess()
+      return
+    } catch (err: any) {
+      console.error("Simulation error:", err)
+      onError(err.message || "Payment simulation failed")
+      setIsProcessing(false)
+      return
+    }
+
+    /* Uncomment this section when you're ready to use real payment processing
+    
     if (error) {
       onError(error.message || "An error occurred with the payment processor")
       setIsProcessing(false)
@@ -142,6 +161,7 @@ export function AuthorizeNetPaymentTab({
     } finally {
       setIsProcessing(false)
     }
+    */
   }
 
   // This would be your actual server call
@@ -238,7 +258,7 @@ export function AuthorizeNetPaymentTab({
 
         <div className="pt-4">
           <Button type="submit" className="w-full" disabled={isProcessing || loading}>
-            {isProcessing || loading ? "Processing..." : `Pay ${amount.toFixed(2)}`}
+            {isProcessing || loading ? "Processing..." : `Pay $${amount.toFixed(2)}`}
           </Button>
         </div>
       </form>
