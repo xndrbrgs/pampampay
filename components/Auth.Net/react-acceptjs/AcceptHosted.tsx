@@ -107,8 +107,9 @@ export function AuthorizeNetAcceptHosted({
   // Custom styles for the iframe components
   const iframeStyles = {
     width: "100%",
-    height: "600px", // You can adjust this height
+    height: "800px", // You can adjust this height
     border: "none",
+    overflow: "auto", 
   };
 
   const containerStyles = {
@@ -132,10 +133,10 @@ export function AuthorizeNetAcceptHosted({
         onTransactionResponse={handleTransactionResponse}
         onCancel={() => onError("Payment was cancelled")}
         onSuccessfulSave={() => console.log("Successful save")}
-        onResize={(width, height) => {
-          console.log(`Resize: ${width}x${height}`);
-          // You could update the iframe height here if needed
-        }}
+        // onResize={(width, height) => {
+        //   console.log(`Resize: ${width}x${height}`);
+        //   // You could update the iframe height here if needed
+        // }}
       >
         <AcceptHosted.Button className="w-full py-2 px-4 bg-black text-white rounded-md hover:bg-gray-800">
           Pay ${amount.toFixed(2)}
