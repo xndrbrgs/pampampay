@@ -6,6 +6,7 @@ import { dark } from "@clerk/themes";
 import { ReactLenis } from "@/components/General/Lenis";
 import { SpeedInsights } from '@vercel/speed-insights/next';
 import "./globals.css";
+import { GooglePayLoader } from "@/components/Auth.Net/wallets/GooglePayLoader";
 
 const BasisRegular = localFont({
   src: "../public/fonts/BasisGrotesqueArabicPro-Regular.ttf",
@@ -45,6 +46,7 @@ export default function RootLayout({
             className={`${BasisRegular.variable} ${Editorial.variable} antialiased dark font-basis`}
           >
             {children}
+            <GooglePayLoader />
             <SpeedInsights />
             <Toaster />
           </body>

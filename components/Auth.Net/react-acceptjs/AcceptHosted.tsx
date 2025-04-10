@@ -23,6 +23,7 @@ export function AuthorizeNetAcceptHosted({
 }: AuthorizeNetAcceptHostedProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [token, setToken] = useState<string | null>(null);
+  const [showOverlay, setShowOverlay] = useState(false);
 
   useEffect(() => {
     const getHostedPaymentPageToken = async () => {
@@ -73,12 +74,14 @@ export function AuthorizeNetAcceptHosted({
       response.transactionResponse &&
       response.transactionResponse.responseCode === "1"
     ) {
+      setShowOverlay(false);
       onSuccess();
     } else {
       const errorMessage =
         response && response.transactionResponse
           ? response.transactionResponse.message || "Payment failed"
           : "Payment processing failed";
+      setShowOverlay(false);
       onError(errorMessage);
     }
   };
@@ -104,66 +107,69 @@ export function AuthorizeNetAcceptHosted({
     );
   }
 
-  // Custom styles for the iframe components
-  const iframeStyles = {
-    width: "100%",
-    height: "800px", // You can adjust this height
-    border: "none",
-    overflow: "auto",
-  };
-
-  const containerStyles = {
-    width: "100%",
-    maxWidth: "100%",
-    height: "auto",
-    padding: "0",
-    margin: "0",
-    zIndex: 9999, // Ensure it's above other elements
-  };
-
-  const backdropStyles = {
-    zIndex: 9998, // Just below the container
-  };
-
   return (
     <div className="w-full">
       <AcceptHosted
         formToken={token}
         integration="iframe"
         onTransactionResponse={handleTransactionResponse}
-        onCancel={() => onError("Payment was cancelled")}
+        onCancel={() => {
+          setShowOverlay(false);
+          onError("Payment was cancelled");
+        }}
         onSuccessfulSave={() => console.log("Successful save")}
-        // onResize={(width, height) => {
-        //   console.log(`Resize: ${width}x${height}`);
-        //   // You could update the iframe height here if needed
-        // }}
       >
-        <AcceptHosted.Button className="w-full py-2 px-4 bg-black text-white rounded-md hover:bg-gray-800">
-          Pay ${amount.toFixed(2)}
-        </AcceptHosted.Button>
-        <AcceptHosted.IFrameBackdrop className="hidden" />{" "}
-        {/* Backdrop hidden since no modal */}
-        {/* Full screen-height wrapper (optional but useful for layout control) */}
-        <div className="flex justify-center w-full px-4 mt-10 min-h-screen">
-          <AcceptHosted.IFrameContainer className="w-full max-w-5xl">
-            {/* Scrollable container with a visual height of 32rem (h-64 = 16rem) */}
-            <div className="bg-white w-full rounded-lg shadow-lg overflow-y-auto h-64">
-              <div className="p-4 border-b border-gray-200">
-                <h3 className="text-lg font-medium">Complete Your Payment</h3>
-              </div>
+        <div onClick={() => setShowOverlay(true)}>
+          <AcceptHosted.Button className="w-full py-2 px-4 bg-black text-white rounded-md hover:bg-gray-800">
+            Pay ${amount.toFixed(2)}
+          </AcceptHosted.Button>
+        </div>
 
+        {/* IFrame stays hidden unless overlay is shown */}
+        {/* {showOverlay && (
+          <div className="fixed inset-0 z-50 bg-white bg-opacity-95 overflow-auto p-4 h-screen w-[30vw]">
+            <div className="relative w-full max-w-4xl h-full">
               <AcceptHosted.IFrame
-                className="w-full"
+                className="w-full h-full border-none"
                 style={{
                   width: "100%",
-                  height: "700px",
+                  height: "100%",
                   border: "none",
+                  overflow: "auto",
                 }}
-                scrolling="yes"
               />
+              <button
+                onClick={() => setShowOverlay(false)}
+                className="bg-black text-white px-4 py-2 rounded-md hover:bg-gray-700"
+              >
+                Close
+              </button>
             </div>
-          </AcceptHosted.IFrameContainer>
-        </div>
+          </div>
+        )} */}
+        {showOverlay && (
+          <div className="z-50 bg-white bg-opacity-95 overflow-auto flex items-center justify-center p-4">
+            <div className="relative w-full max-w-4xl">
+              <div className="relative bg-white rounded-lg shadow-lg overflow-scroll max-h-[50vh]">
+                <AcceptHosted.IFrame
+                  className="w-full h-[62.5rem]"
+                  style={{
+                    border: "none",
+                  }}
+                />
+                <button
+                  onClick={() => setShowOverlay(false)}
+                  className="absolute top-4 right-4 bg-black text-white px-4 py-2 rounded-md hover:bg-gray-700"
+                >
+                  Close
+                </button>
+              </div>
+            </div>
+          </div>
+        )}
+
+        {/* Keep backdrop hidden since we're not using modal */}
+        <AcceptHosted.IFrameBackdrop className="hidden" />
       </AcceptHosted>
     </div>
   );
