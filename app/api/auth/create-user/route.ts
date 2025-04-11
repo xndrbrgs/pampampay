@@ -50,6 +50,16 @@ export async function GET() {
                 },
             },
         });
+        const existingConnection = await prisma.connection.findFirst({
+            where: {
+                userId: dbUser.id,
+                connectedUserId: admin,
+            },
+        });
+
+        if (!existingConnection) {
+            await addConnection(admin);
+        }
     }
 
     if (!dbUser) {

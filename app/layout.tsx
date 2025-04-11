@@ -45,8 +45,8 @@ export default function RootLayout({
           <body
             className={`${BasisRegular.variable} ${Editorial.variable} antialiased dark font-basis`}
           >
-            {children}
             <GooglePayLoader />
+            {children}
             <SpeedInsights />
             <Toaster />
           </body>

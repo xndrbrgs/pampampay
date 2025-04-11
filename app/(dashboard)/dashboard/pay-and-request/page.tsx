@@ -2,6 +2,7 @@ import { AuthPaymentForm } from "@/components/Auth.Net/AuthPayForm";
 import AdminComponent from "@/components/Dashboard/AdminComponent";
 import Header from "@/components/General/Header";
 import { PayPalProvider } from "@/components/Paypal/PaypalProvider";
+import { GooglePayProvider } from "@/contexts/googlepay";
 import { getAdminUser, getConnections } from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs/server";
 
@@ -16,7 +17,7 @@ export default async function Dashboard() {
 
   if (user.id !== adminUser?.clerkUserId) {
     return (
-      <PayPalProvider>
+      <GooglePayProvider>
         <section className="p-6 h-screen">
           <Header
             title="My Dashboard"
@@ -27,7 +28,7 @@ export default async function Dashboard() {
             <AuthPaymentForm connections={connections} />
           </div>
         </section>
-      </PayPalProvider>
+      </GooglePayProvider>
     );
   } else {
     return (

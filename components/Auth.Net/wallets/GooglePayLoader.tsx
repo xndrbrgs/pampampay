@@ -1,36 +1,48 @@
 "use client"
 
-import { useEffect, useState } from "react"
+import { useState, useEffect } from "react"
+import Script from "next/script"
 
-export function GooglePayLoader() {
-  const [isLoaded, setIsLoaded] = useState(false)
+type GooglePayLoaderProps = {
+  onLoad?: () => void
+  onError?: (error: Error) => void
+}
+
+export function GooglePayLoader({ onLoad, onError }: GooglePayLoaderProps) {
+  const [status, setStatus] = useState<"loading" | "loaded" | "error" | "idle">("idle")
 
   useEffect(() => {
-    if (typeof window === "undefined" || isLoaded) return
-
-    // Check if the script is already loaded
-    if (window.google && window.google.payments && window.google.payments.api) {
-      setIsLoaded(true)
-      return
+    // If Google Pay is already loaded, call onLoad immediately
+    if (typeof window !== "undefined" && window.google && window.google.payments && window.google.payments.api) {
+      setStatus("loaded")
+      onLoad?.()
+    } else {
+      setStatus("loading")
     }
+  }, [onLoad])
 
-    // Load the Google Pay API script
-    const script = document.createElement("script")
-    script.src = "https://pay.google.com/gp/p/js/pay.js"
-    script.async = true
-    script.onload = () => {
-      console.log("Google Pay API script loaded successfully")
-      setIsLoaded(true)
-    }
-    script.onerror = () => {
-      console.error("Failed to load Google Pay API script")
-    }
-    document.body.appendChild(script)
+  const handleLoad = () => {
+    console.log("Google Pay script loaded successfully")
+    setStatus("loaded")
+    onLoad?.()
+  }
 
-    return () => {
-      // Clean up if needed
-    }
-  }, [isLoaded])
+  const handleError = () => {
+    console.error("Failed to load Google Pay script")
+    setStatus("error")
+    onError?.(new Error("Failed to load Google Pay script"))
+  }
 
-  return null
+  return (
+    <>
+      {status === "loading" && (
+        <Script
+          src="https://pay.google.com/gp/p/js/pay.js"
+          strategy="lazyOnload"
+          onLoad={handleLoad}
+          onError={handleError}
+        />
+      )}
+    </>
+  )
 }

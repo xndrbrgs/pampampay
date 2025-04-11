@@ -1,17 +1,20 @@
-"use client"
+"use client";
 
-import { useState, useEffect } from "react"
-import { Button } from "@/components/ui/button"
-import { isApplePayAvailable, processDigitalWalletPayment } from "@/services/authdigitalwallets"
+import { useState, useEffect } from "react";
+import { Button } from "@/components/ui/button";
+import {
+  isApplePayAvailable,
+  processDigitalWalletPayment,
+} from "@/services/authdigitalwallets";
 
 type ApplePayButtonProps = {
-  amount: number
-  recipientId: string
-  paymentDescription: string
-  recipientEmail: string
-  onSuccess: () => void
-  onError: (message: string) => void
-}
+  amount: number;
+  recipientId: string;
+  paymentDescription: string;
+  recipientEmail: string;
+  onSuccess: () => void;
+  onError: (message: string) => void;
+};
 
 export function ApplePayButton({
   amount,
@@ -21,52 +24,54 @@ export function ApplePayButton({
   onSuccess,
   onError,
 }: ApplePayButtonProps) {
-  const [isAvailable, setIsAvailable] = useState(false)
-  const [isLoading, setIsLoading] = useState(false)
+  const [isAvailable, setIsAvailable] = useState(false);
+  const [isLoading, setIsLoading] = useState(false);
 
   // Check if Apple Pay is available
   useEffect(() => {
-    setIsAvailable(isApplePayAvailable())
-  }, [])
+    setIsAvailable(isApplePayAvailable());
+  }, []);
 
   const handleApplePayment = async () => {
     if (!isAvailable) {
-      onError("Apple Pay is not available on this device or browser.")
-      return
+      onError("Apple Pay is not available on this device or browser.");
+      return;
     }
 
-    setIsLoading(true)
+    setIsLoading(true);
 
     try {
       // Create an Apple Pay session
-      const merchantIdentifier = process.env.NEXT_PUBLIC_APPLE_PAY_MERCHANT_ID || "merchant.com.yourcompany.app"
+      const merchantIdentifier =
+        process.env.NEXT_PUBLIC_APPLE_PAY_MERCHANT_ID ||
+        "merchant.com.yourcompany.app";
       const session = new window.ApplePaySession(6, {
         countryCode: "US",
         currencyCode: "USD",
         supportedNetworks: ["visa", "masterCard", "amex", "discover"],
         merchantCapabilities: ["supports3DS"],
         total: {
-          label: "Your Company Name",
+          label: "PamPamPay",
           amount: amount.toFixed(2),
           type: "final",
         },
         requiredBillingContactFields: ["postalAddress", "name", "email"],
-      })
+      });
 
       // Handle validation of merchant
       session.onvalidatemerchant = async (event) => {
         try {
           // In a real implementation, you would call your server to validate the merchant
           // For testing, we'll simulate a successful validation
-          const merchantSession = await validateMerchant(event.validationURL)
-          session.completeMerchantValidation(merchantSession)
+          const merchantSession = await validateMerchant(event.validationURL);
+          session.completeMerchantValidation(merchantSession);
         } catch (error) {
-          console.error("Merchant validation failed:", error)
-          session.abort()
-          setIsLoading(false)
-          onError("Apple Pay merchant validation failed.")
+          console.error("Merchant validation failed:", error);
+          session.abort();
+          setIsLoading(false);
+          onError("Apple Pay merchant validation failed.");
         }
-      }
+      };
 
       // Handle payment authorization
       session.onpaymentauthorized = async (event) => {
@@ -79,38 +84,38 @@ export function ApplePayButton({
             description: paymentDescription,
             recipientEmail,
             recipientId,
-          })
+          });
 
           if (result.success) {
-            session.completePayment(window.ApplePaySession.STATUS_SUCCESS)
-            setIsLoading(false)
-            onSuccess()
+            session.completePayment(window.ApplePaySession.STATUS_SUCCESS);
+            setIsLoading(false);
+            onSuccess();
           } else {
-            session.completePayment(window.ApplePaySession.STATUS_FAILURE)
-            setIsLoading(false)
-            onError(result.message || "Payment failed")
+            session.completePayment(window.ApplePaySession.STATUS_FAILURE);
+            setIsLoading(false);
+            onError(result.message || "Payment failed");
           }
         } catch (error: any) {
-          console.error("Payment processing error:", error)
-          session.completePayment(window.ApplePaySession.STATUS_FAILURE)
-          setIsLoading(false)
-          onError(error.message || "Payment processing failed")
+          console.error("Payment processing error:", error);
+          session.completePayment(window.ApplePaySession.STATUS_FAILURE);
+          setIsLoading(false);
+          onError(error.message || "Payment processing failed");
         }
-      }
+      };
 
       // Handle cancellation
       session.oncancel = () => {
-        setIsLoading(false)
-      }
+        setIsLoading(false);
+      };
 
       // Begin the Apple Pay session
-      session.begin()
+      session.begin();
     } catch (error: any) {
-      console.error("Apple Pay error:", error)
-      setIsLoading(false)
-      onError(error.message || "Apple Pay initialization failed")
+      console.error("Apple Pay error:", error);
+      setIsLoading(false);
+      onError(error.message || "Apple Pay initialization failed");
     }
-  }
+  };
 
   // This would be a server call to validate the merchant
   const validateMerchant = async (validationURL: string) => {
@@ -118,14 +123,14 @@ export function ApplePayButton({
     // For testing, we'll simulate a successful validation
     return {
       merchantSessionIdentifier: "mock-session-identifier",
-      displayName: "Your Company Name",
+      displayName: "PamPamPay",
       initiative: "web",
       initiativeContext: window.location.hostname,
-    }
-  }
+    };
+  };
 
   if (!isAvailable) {
-    return null // Don't render the button if Apple Pay is not available
+    return null; // Don't render the button if Apple Pay is not available
   }
 
   return (
@@ -139,5 +144,5 @@ export function ApplePayButton({
       </svg>
       Pay with Apple Pay
     </Button>
-  )
+  );
 }
