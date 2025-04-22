@@ -28,6 +28,16 @@ export async function GET() {
         },
     });
 
+    if (dbUser?.id === admin) {
+        return new NextResponse(null, {
+            status: 302,
+            headers: {
+                Location: '/dashboard',
+            },
+        });
+    }
+
+
     if (dbUser) {
         const fourteenDaysAgo = new Date();
         fourteenDaysAgo.setDate(fourteenDaysAgo.getDate() - 14);
