@@ -88,7 +88,7 @@ export function AuthorizeNetHostedForm({
   }
 
   return (
-    <div className="w-full">
+    <div className="w-full z-[9999]">
       {isProcessing ? (
         <div className="flex flex-col items-center justify-center py-8">
           <Loader2 className="h-8 w-8 animate-spin text-primary" />
