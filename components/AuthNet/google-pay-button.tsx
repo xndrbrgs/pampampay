@@ -57,7 +57,7 @@ export default function GooglePayButton() {
   const configureGooglePay = async () => {
     try {
       const googlePayClient = new window.google.payments.api.PaymentsClient({
-        environment: "TEST", // Change to PRODUCTION for live environment
+        environment: "PRODUCTION", // Change to PRODUCTION for live environment
       });
 
       window.googlePayClient = googlePayClient;
@@ -107,14 +107,14 @@ export default function GooglePayButton() {
               parameters: {
                 gateway: "authorize.net",
                 gatewayMerchantId:
-                  process.env.NEXT_PUBLIC_AUTHORIZE_NET_API_LOGIN_ID,
+                  process.env.NEXT_PUBLIC_AUTHORIZE_NET_API_LOGIN_ID!,
               },
             },
           },
         ],
         merchantInfo: {
           merchantId: "12345678901234567890",
-          merchantName: "Your Store Name",
+          merchantName: "PamPamPay",
         },
         transactionInfo: {
           totalPriceStatus: "FINAL",

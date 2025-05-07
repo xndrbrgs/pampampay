@@ -51,7 +51,7 @@ export default function ApplePayButton() {
         supportedNetworks: ["visa", "masterCard", "amex", "discover"],
         merchantCapabilities: ["supports3DS"],
         total: {
-          label: "Your Store Name",
+          label: "PamPamPay",
           amount: amount.toFixed(2),
         },
       }
@@ -68,7 +68,7 @@ export default function ApplePayButton() {
             nonce: "nonce",
             merchantIdentifier: "merchant_identifier",
             domainName: window.location.hostname,
-            displayName: "Your Store Name",
+            displayName: "PamPamPay",
           }
 
           session.completeMerchantValidation(merchantSession)

@@ -148,6 +148,7 @@ export default function CreditCardForm() {
             type="submit"
             className="w-full"
             disabled={loading || error || paymentStatus === "processing"}
+            variant={loading ? "outline" : "default"}
           >
             {paymentStatus === "processing" ? (
               <>

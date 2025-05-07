@@ -106,12 +106,12 @@ export default function GooglePayButton({
       }
 
       const googlePayClient = new window.google.payments.api.PaymentsClient({
-        environment: "TEST", // Change to PRODUCTION for live environment
+        environment: "PRODUCTION", // Change to PRODUCTION for live environment
       });
 
       window.googlePayClient = googlePayClient;
       logDebug("google-pay", "Google Pay client created", {
-        environment: "TEST",
+        environment: "PRODUCTION",
       });
 
       // Check if Google Pay is available
@@ -187,7 +187,7 @@ export default function GooglePayButton({
         ],
         merchantInfo: {
           merchantId: "12345678901234567890",
-          merchantName: "Your Store Name",
+          merchantName: "PamPamPay",
         },
         transactionInfo: {
           totalPriceStatus: "FINAL",
