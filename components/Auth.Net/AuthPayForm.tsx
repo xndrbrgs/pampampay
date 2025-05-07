@@ -302,7 +302,7 @@ export function AuthPaymentForm({ connections }: UnifiedPaymentFormProps) {
                             </SelectTrigger>
                             <SelectContent>
                               {[
-                                10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100,
+                                1
                               ].map((value) => (
                                 <SelectItem
                                   key={value}

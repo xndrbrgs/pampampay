@@ -4,6 +4,14 @@ import { useEffect, useState } from "react";
 import { processAuthorizeNetPayment } from "@/lib/actions/authorize-net-actions";
 import { Button } from "@/components/ui/button";
 import { Loader2 } from "lucide-react";
+// Add import for the logger
+import {
+  logInfo,
+  logWarning,
+  logError,
+  logSuccess,
+  logDebug,
+} from "@/utils/payment-logger";
 
 declare global {
   interface Window {
@@ -35,40 +43,76 @@ export default function GooglePayButton({
   const [isGooglePayAvailable, setIsGooglePayAvailable] = useState(false);
   const [isLoading, setIsLoading] = useState(true);
 
+  // Update the useEffect hook for script loading
   useEffect(() => {
+    logInfo("google-pay", "Initializing Google Pay");
     // Load Authorize.net Accept.js script
     const script = document.createElement("script");
     script.src = "https://js.authorize.net/v1/Accept.js";
     script.async = true;
-    script.onload = initializeGooglePay;
+    script.onload = () => {
+      logSuccess("google-pay", "Authorize.net Accept.js loaded successfully");
+      initializeGooglePay();
+    };
+    script.onerror = (error) => {
+      logError("google-pay", "Failed to load Authorize.net Accept.js", error);
+      setIsLoading(false);
+    };
     document.body.appendChild(script);
 
     return () => {
+      logInfo("google-pay", "Cleaning up Google Pay resources");
       document.body.removeChild(script);
     };
   }, []);
 
+  // Update the initializeGooglePay function
   const initializeGooglePay = async () => {
     try {
+      logInfo("google-pay", "Loading Google Pay API");
       // Load Google Pay API
       const googlePayScript = document.createElement("script");
       googlePayScript.src = "https://pay.google.com/gp/p/js/pay.js";
       googlePayScript.async = true;
-      googlePayScript.onload = configureGooglePay;
+      googlePayScript.onload = () => {
+        logSuccess("google-pay", "Google Pay API loaded successfully");
+        configureGooglePay();
+      };
+      googlePayScript.onerror = (error) => {
+        logError("google-pay", "Failed to load Google Pay API", error);
+        setIsLoading(false);
+      };
       document.body.appendChild(googlePayScript);
     } catch (error) {
-      console.error("Error initializing Google Pay:", error);
+      logError("google-pay", "Error initializing Google Pay", error);
       setIsLoading(false);
     }
   };
 
+  // Update the configureGooglePay function
   const configureGooglePay = async () => {
     try {
+      logInfo("google-pay", "Configuring Google Pay client");
+
+      if (
+        !window.google ||
+        !window.google.payments ||
+        !window.google.payments.api
+      ) {
+        logError("google-pay", "Google Pay API not available on window object");
+        setIsGooglePayAvailable(false);
+        setIsLoading(false);
+        return;
+      }
+
       const googlePayClient = new window.google.payments.api.PaymentsClient({
         environment: "TEST", // Change to PRODUCTION for live environment
       });
 
       window.googlePayClient = googlePayClient;
+      logDebug("google-pay", "Google Pay client created", {
+        environment: "TEST",
+      });
 
       // Check if Google Pay is available
       const isReadyToPayRequest = {
@@ -85,19 +129,40 @@ export default function GooglePayButton({
         ],
       };
 
+      logInfo(
+        "google-pay",
+        "Checking if Google Pay is available",
+        isReadyToPayRequest
+      );
       const isReadyToPayResponse = await googlePayClient.isReadyToPay(
         isReadyToPayRequest
       );
+
+      if (isReadyToPayResponse.result) {
+        logSuccess(
+          "google-pay",
+          "Google Pay is available on this device/browser"
+        );
+      } else {
+        logWarning(
+          "google-pay",
+          "Google Pay is not available on this device/browser"
+        );
+      }
+
       setIsGooglePayAvailable(isReadyToPayResponse.result);
       setIsLoading(false);
     } catch (error) {
-      console.error("Error configuring Google Pay:", error);
+      logError("google-pay", "Error configuring Google Pay", error);
+      setIsGooglePayAvailable(false);
       setIsLoading(false);
     }
   };
 
+  // Update the handleGooglePayClick function
   const handleGooglePayClick = async () => {
     try {
+      logInfo("google-pay", "Google Pay payment initiated", { amount });
       onPaymentStatusChange("processing");
 
       const paymentDataRequest = {
@@ -115,7 +180,7 @@ export default function GooglePayButton({
               parameters: {
                 gateway: "authorize.net",
                 gatewayMerchantId:
-                  process.env.NEXT_PUBLIC_AUTHORIZE_API_LOGIN_ID,
+                  process.env.NEXT_PUBLIC_AUTHORIZE_NET_API_LOGIN_ID,
               },
             },
           },
@@ -131,9 +196,23 @@ export default function GooglePayButton({
         },
       };
 
+      logDebug(
+        "google-pay",
+        "Requesting payment data from Google Pay",
+        paymentDataRequest
+      );
+
+      if (!window.googlePayClient) {
+        logError("google-pay", "Google Pay client not initialized");
+        throw new Error("Google Pay is not properly initialized");
+      }
+
       const paymentData = await window.googlePayClient.loadPaymentData(
         paymentDataRequest
       );
+      logSuccess("google-pay", "Received payment data from Google Pay", {
+        paymentMethodType: paymentData.paymentMethodData.type,
+      });
 
       // Process the payment with Authorize.net
       const formData = new FormData();
@@ -148,20 +227,38 @@ export default function GooglePayButton({
       formData.append("recipientEmail", recipientEmail);
       formData.append("paymentDescription", paymentDescription);
 
+      logInfo("google-pay", "Processing payment on server", {
+        amount,
+        recipientId,
+        paymentDescription,
+      });
+
       const paymentResponse = await processAuthorizeNetPayment(formData);
+      logDebug(
+        "google-pay",
+        "Received payment processing response",
+        paymentResponse
+      );
 
       if (paymentResponse.success) {
+        logSuccess("google-pay", "Payment processed successfully", {
+          transactionId: paymentResponse.transactionId,
+        });
         onPaymentStatusChange("success");
       } else {
+        logError("google-pay", "Payment processing failed", {
+          error: paymentResponse.error,
+        });
         throw new Error(paymentResponse.error || "Payment processing failed");
       }
     } catch (error) {
-      onPaymentStatusChange("error");
-      onError(
+      const errorMessage =
         error instanceof Error
           ? error.message
-          : "An error occurred processing your payment"
-      );
+          : "An error occurred processing your payment";
+      logError("google-pay", "Payment error", { error: errorMessage });
+      onPaymentStatusChange("error");
+      onError(errorMessage);
     }
   };
 

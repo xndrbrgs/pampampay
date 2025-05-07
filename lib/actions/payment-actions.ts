@@ -3,7 +3,7 @@
 import { z } from "zod"
 
 // Environment variables
-const API_LOGIN_ID = process.env.AUTHORIZE_API_LOGIN_ID!
+const API_LOGIN_ID = process.env.AUTHORIZE_NET_API_LOGIN_ID!
 
 // Validation schema for payment data
 const paymentDataSchema = z.object({
