@@ -55,7 +55,7 @@ export function AuthorizeNetAcceptJs({
   const authorizenetConfig = {
     apiLoginID: process.env.AUTHORIZE_NET_API_LOGIN_ID || "",
     clientKey: process.env.AUTHORIZE_NET_TRANSACTION_KEY || "",
-    environment: "sandbox", // Change to "production" for live payments
+    environment: "PRODUCTION", // Change to "production" for live payments
   }
 
   const { dispatchData, loading, error } = useAcceptJs({ authorizenetConfig })

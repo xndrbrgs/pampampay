@@ -54,7 +54,7 @@ export function AuthorizeNetPaymentTab({
   const authorizenetConfig = {
     apiLoginID: apiLoginID,
     clientKey: clientKey,
-    environment: "sandbox", // Change to "production" for live payments
+    environment: "PRODUCTION", // Change to "production" for live payments
   }
 
   const { dispatchData, loading, error } = useAcceptJs({ authorizenetConfig })
