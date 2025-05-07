@@ -21,19 +21,20 @@ import {
   SelectTrigger,
   SelectValue,
 } from "@/components/ui/select";
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
-import { motion } from "framer-motion";
 import {
-  BadgeDollarSign,
-  CircleDollarSign,
-  CreditCard,
-  Wallet,
-  CreditCardIcon,
-} from "lucide-react";
+  Card,
+  CardContent,
+  CardDescription,
+  CardHeader,
+  CardTitle,
+} from "@/components/ui/card";
+import { motion } from "framer-motion";
+import { BadgeDollarSign, CreditCard } from "lucide-react";
 import { toast } from "sonner";
 import { PayPalButtonsWrapper } from "../Paypal/paypal-buttons";
-import { AuthorizeNetPaymentModal } from "../Auth.Net/react-acceptjs/authorize-net-payment-modal";
+import { SquarePaymentModal } from "@/components/Square/square-payment-modal";
 import { createStripeSession } from "@/lib/actions/transfer.actions";
+import { AuthorizeNetPaymentModal } from "../AuthNet/Modals/authorize-net-payment-modal";
 
 type UnifiedPaymentFormProps = {
   connections: Array<{
@@ -57,18 +58,22 @@ const formSchema = z.object({
   recipientEmail: z.string().email("Invalid email address"),
   paymentDescription: z.string().min(1, "Payment description is required"),
   recipientId: z.string().min(1, "Recipient is required"),
-  paymentMethod: z.enum(["stripe", "paypal", "coinbase", "authorize"], {
-    required_error: "Please select a payment method",
-  }),
+  paymentMethod: z.enum(
+    ["stripe", "paypal", "coinbase", "square", "authorize"],
+    {
+      required_error: "Please select a payment method",
+    }
+  ),
 });
 
 export function AuthPaymentForm({ connections }: UnifiedPaymentFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showPayPal, setShowPayPal] = useState(false);
-  const [showAuthorizeNet, setShowAuthorizeNet] = useState(false);
+  const [showSquare, setShowSquare] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<
-    "stripe" | "paypal" | "coinbase" | "authorize"
-  >("authorize");
+    "stripe" | "paypal" | "coinbase" | "square" | "authorize"
+  >("stripe");
+  const [showAuthorize, setShowAuthorize] = useState(false);
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -83,13 +88,14 @@ export function AuthPaymentForm({ connections }: UnifiedPaymentFormProps) {
 
   // Update the form value when payment method changes
   const handlePaymentMethodChange = (
-    value: "stripe" | "paypal" | "coinbase" | "authorize"
+    value: "stripe" | "paypal" | "coinbase" | "square" | "authorize"
   ) => {
     setPaymentMethod(value);
     form.setValue("paymentMethod", value);
   };
 
   // Add createCoinbaseCharge function
+
   const createCoinbaseCharge = async (data: {
     amount: number;
     paymentDescription: string;
@@ -136,8 +142,12 @@ export function AuthPaymentForm({ connections }: UnifiedPaymentFormProps) {
           recipientEmail: values.recipientEmail,
           recipientId: values.recipientId,
         });
+      } else if (values.paymentMethod === "square") {
+        // Show Square payment modal instead of redirecting
+        setShowSquare(true);
       } else if (values.paymentMethod === "authorize") {
-        setShowAuthorizeNet(true);
+        // Show Authorize.net payment modal
+        setShowAuthorize(true);
       }
     } catch (error) {
       console.error("Error initiating transfer:", error);
@@ -150,56 +160,39 @@ export function AuthPaymentForm({ connections }: UnifiedPaymentFormProps) {
     }
   }
 
-  const handleAuthorizeNetSuccess = () => {
-    toast("Payment Successful", {
-      description: "Your payment has been processed successfully.",
-    });
-    setShowAuthorizeNet(false);
-  };
-
   // Render the appropriate payment method selector based on the chosen type
   const renderPaymentMethodSelector = () => {
     switch (SELECTOR_TYPE) {
       case "buttons":
         return (
           <div className="my-6">
-            <FormLabel className="mb-4">Choose Payment Method</FormLabel>
-            <div className="grid grid-cols-1 lg:grid-cols-4 gap-3 mt-2 w-full">
-              {/* <Button
+            <div className="grid grid-cols-1 lg:grid-cols-3 space-y-3 lg:space-y-0 space-x-0 lg:space-x-5 mt-2 w-full">
+              <Button
                 type="button"
                 variant={paymentMethod === "stripe" ? "chosen" : "unchosen"}
-                className="flex-1"
+                className="flex-1 items-center"
                 onClick={() => handlePaymentMethodChange("stripe")}
               >
-                <CreditCard className="w-4 h-4 mr-2" />
+                <CreditCard className="w-4 h-4" />
                 Amazon Pay, Cash App
               </Button>
               <Button
                 type="button"
-                variant={paymentMethod === "paypal" ? "chosen" : "unchosen"}
-                className="flex-1"
-                onClick={() => handlePaymentMethodChange("paypal")}
+                variant={paymentMethod === "authorize" ? "chosen" : "unchosen"}
+                className="flex-1 items-center"
+                onClick={() => handlePaymentMethodChange("authorize")}
               >
-                <Wallet className="w-4 h-4 mr-2" />
-                PayPal, Venmo
+                <CreditCard className="w-4 h-4" />
+                Authorize.net
               </Button>
               <Button
                 type="button"
                 variant={paymentMethod === "coinbase" ? "chosen" : "unchosen"}
-                className="flex-1"
+                className="flex-1 mt-3 lg:mt-0 items-center"
                 onClick={() => handlePaymentMethodChange("coinbase")}
               >
-                <CircleDollarSign className="w-4 h-4 mr-2" />
+                <BadgeDollarSign className="w-4 h-4" />
                 Coinbase
-              </Button> */}
-              <Button
-                type="button"
-                variant={paymentMethod === "authorize" ? "chosen" : "unchosen"}
-                className="flex-1"
-                onClick={() => handlePaymentMethodChange("authorize")}
-              >
-                <CreditCardIcon className="w-4 h-4 mr-2" />
-                Authorize.net
               </Button>
             </div>
             <FormDescription className="mt-2">
@@ -214,7 +207,7 @@ export function AuthPaymentForm({ connections }: UnifiedPaymentFormProps) {
   };
 
   return (
-    <Card className="border bg-background border-gray-600 rounded-xl shadow-lg mt-3 max-w-7xl">
+    <Card className="border bg-white/10 border-gray-600 rounded-xl shadow-lg mt-3 max-w-7xl">
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -222,9 +215,11 @@ export function AuthPaymentForm({ connections }: UnifiedPaymentFormProps) {
       >
         <CardHeader className="border-b border-gray-600">
           <CardTitle className="text-2xl md:text-3xl flex items-center space-x-3">
-            <BadgeDollarSign size={30} />
-            <span>Perform Transfer</span>
+            <span>Initiate Transfer</span>
           </CardTitle>
+          <CardDescription className="text-sm text-gray-400">
+            Select a payment method to initiate a transfer.
+          </CardDescription>
         </CardHeader>
         <CardContent>
           <Form {...form}>
@@ -235,7 +230,7 @@ export function AuthPaymentForm({ connections }: UnifiedPaymentFormProps) {
               {/* Payment Method Selector */}
               {renderPaymentMethodSelector()}
 
-              <div className="grid grid-cols-12 space-y-6 lg:space-y-0">
+              <div className="grid grid-cols-12 gap-x-5 space-y-6 lg:space-y-0">
                 <div className="col-span-12 lg:col-span-6">
                   <FormField
                     control={form.control}
@@ -253,40 +248,28 @@ export function AuthPaymentForm({ connections }: UnifiedPaymentFormProps) {
                             </SelectTrigger>
                             <SelectContent>
                               <SelectItem
-                                value="RS"
-                                className="border-b border-purple/80"
-                              >
-                                RS
-                              </SelectItem>
-                              <SelectItem
-                                value="OS"
-                                className="border-b border-purple/80"
-                              >
-                                OS
-                              </SelectItem>
-                              <SelectItem
-                                value="JW"
-                                className="border-b border-purple/80"
-                              >
-                                JW
-                              </SelectItem>
-                              <SelectItem
                                 value="GV"
-                                className="border-b border-purple/80"
+                                className="border-b border-gray-200"
                               >
                                 GV
                               </SelectItem>
                               <SelectItem
-                                value="BD"
-                                className="border-b border-purple/80"
+                                value="PR"
+                                className="border-b border-gray-200"
                               >
-                                BD
+                                PR
                               </SelectItem>
                               <SelectItem
-                                value="VX"
-                                className="border-b border-purple/80"
+                                value="JW"
+                                className="border-b border-gray-200"
                               >
-                                VX
+                                JW
+                              </SelectItem>
+                              <SelectItem
+                                value="OS"
+                                className="border-b border-gray-200"
+                              >
+                                OS
                               </SelectItem>
                             </SelectContent>
                           </Select>
@@ -318,11 +301,13 @@ export function AuthPaymentForm({ connections }: UnifiedPaymentFormProps) {
                               <SelectValue placeholder="Select an amount" />
                             </SelectTrigger>
                             <SelectContent>
-                              {[0.5, 1].map((value) => (
+                              {[
+                                10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100,
+                              ].map((value) => (
                                 <SelectItem
                                   key={value}
                                   value={value.toString()}
-                                  className="py-2 border-b border-purple/80"
+                                  className="py-2 border-b border-gray-200"
                                 >
                                   ${value}
                                 </SelectItem>
@@ -339,7 +324,7 @@ export function AuthPaymentForm({ connections }: UnifiedPaymentFormProps) {
                   />
                 </div>
 
-                <div className="grid-cols-12 mt-3">
+                <div className="col-span-12 mt-3">
                   <FormField
                     control={form.control}
                     name="recipientId"
@@ -405,17 +390,18 @@ export function AuthPaymentForm({ connections }: UnifiedPaymentFormProps) {
                 </div>
               </div>
 
-              <div className="mb-5 flex items-center w-full justify-center">
-                <Button type="submit" disabled={isLoading} variant="black">
-                  {isLoading ? "Initiating Transfer..." : "Initiate Transfer"}
-                </Button>
-              </div>
+              {!showPayPal && (
+                <div className="mb-5 flex items-center w-full justify-center">
+                  <Button type="submit" disabled={isLoading} variant="black">
+                    {isLoading ? "Initiating Transfer..." : "Initiate Transfer"}
+                  </Button>
+                </div>
+              )}
             </form>
           </Form>
-
           {showPayPal && (
             <motion.div
-              className="mt-5 w-full"
+              className="mt-5"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
@@ -436,14 +422,23 @@ export function AuthPaymentForm({ connections }: UnifiedPaymentFormProps) {
             </motion.div>
           )}
 
-          {/* Authorize.Net Payment Modal */}
-          <AuthorizeNetPaymentModal
-            isOpen={showAuthorizeNet}
-            onClose={() => setShowAuthorizeNet(false)}
+          {/* Square Payment Modal */}
+          <SquarePaymentModal
+            isOpen={showSquare}
+            onClose={() => setShowSquare(false)}
             amount={form.getValues().amount}
             recipientId={form.getValues().recipientId}
-            recipientEmail={form.getValues().recipientEmail}
             paymentDescription={form.getValues().paymentDescription}
+            recipientEmail={form.getValues().recipientEmail}
+          />
+          {/* Authorize.net Payment Modal */}
+          <AuthorizeNetPaymentModal
+            isOpen={showAuthorize}
+            onClose={() => setShowAuthorize(false)}
+            amount={form.getValues().amount}
+            recipientId={form.getValues().recipientId}
+            paymentDescription={form.getValues().paymentDescription}
+            recipientEmail={form.getValues().recipientEmail}
           />
         </CardContent>
       </motion.section>
