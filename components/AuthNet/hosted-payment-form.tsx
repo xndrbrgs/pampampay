@@ -9,7 +9,7 @@ export default function HostedPaymentForm() {
 
   const authData = {
     apiLoginID: process.env.NEXT_PUBLIC_AUTHORIZE_NET_API_LOGIN_ID || "",
-    clientKey: process.env.NEXT_PUBLIC_AUTHORIZE_CLIENT_KEY || "",
+    clientKey: process.env.NEXT_PUBLIC_AUTHORIZE_NET_CLIENT_KEY || "",
   };
 
   const handleSubmit = async (response: any) => {
