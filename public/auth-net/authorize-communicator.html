@@ -14,7 +14,9 @@
           window.parent.parent.AuthorizeNetIFrame.onReceiveCommunication
         ) {
           // Errors indicate a mismatch in domain between the page containing the iframe and this page.
-          window.parent.parent.AuthorizeNetIFrame.onReceiveCommunication(str);
+          window.parent.parent.AuthorizeNetIFrame.onReceiveCommunication(
+            str
+          );
         }
       }
 
@@ -25,9 +27,9 @@
       }
 
       if (window.addEventListener) {
-        window.addEventListener("message", receiveMessage, false);
+        window.addEventListener('message', receiveMessage, false);
       } else if (window.attachEvent) {
-        window.attachEvent("onmessage", receiveMessage);
+        window.attachEvent('onmessage', receiveMessage);
       }
 
       if (window.location.hash && window.location.hash.length > 1) {
