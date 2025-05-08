@@ -112,8 +112,8 @@ export function AuthorizeNetHostedForm({
             borderRadius: "4px",
             backgroundColor: "#000",
             color: "#fff",
-            zIndex: 9999,
           }}
+          environment="PRODUCTION"
         />
       )}
     </div>
