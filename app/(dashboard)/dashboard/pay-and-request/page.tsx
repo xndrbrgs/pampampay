@@ -1,6 +1,4 @@
 import { AuthPaymentForm } from "@/components/Auth.Net/AuthPayForm";
-import PaymentClient from "@/components/Authorize/payment-client";
-import { TestAuthForm } from "@/components/Authorize/TextAuthForm";
 import AdminComponent from "@/components/Dashboard/AdminComponent";
 import Header from "@/components/General/Header";
 import { PayPalProvider } from "@/components/Paypal/PaypalProvider";
