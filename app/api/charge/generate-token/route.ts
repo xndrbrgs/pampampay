@@ -7,8 +7,8 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
     }
 
     const merchantAuthenticationType = new APIContracts.MerchantAuthenticationType();
-    merchantAuthenticationType.setName(process.env.AUTHORIZE_API_LOGIN_ID!);
-    merchantAuthenticationType.setTransactionKey(process.env.AUTHORIZE_TRANSACTION_KEY!);
+    merchantAuthenticationType.setName(process.env.AUTHORIZE_NET_API_LOGIN_ID!);
+    merchantAuthenticationType.setTransactionKey(process.env.AUTHORIZE_NET_TRANSACTION_KEY!);
 
     const transactionRequestType = new APIContracts.TransactionRequestType();
     transactionRequestType.setTransactionType('authCaptureTransaction');
