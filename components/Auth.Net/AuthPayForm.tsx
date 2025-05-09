@@ -36,6 +36,7 @@ import { AuthorizeNetPaymentModal } from "../Auth.Net/react-acceptjs/authorize-n
 import { createStripeSession } from "@/lib/actions/transfer.actions";
 import ReactAuthNetForm from "./react-auth-net/ReactAuthForm";
 import ChatForm from "./chat-net/ChatForm";
+import AcceptFormHosted from "./chat-net/AcceptFormHosted";
 
 type UnifiedPaymentFormProps = {
   connections: Array<{
@@ -448,7 +449,7 @@ export function AuthPaymentForm({ connections }: UnifiedPaymentFormProps) {
             paymentDescription={form.getValues().paymentDescription}
           /> */}
           {/* <ReactAuthNetForm amount={form.getValues().amount} /> */}
-          <ChatForm />
+          <AcceptFormHosted />
         </CardContent>
       </motion.section>
     </Card>

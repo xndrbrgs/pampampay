@@ -100,7 +100,7 @@ export default function ChatForm() {
                 type="submit"
                 className="w-full bg-blue-600 text-white p-2 rounded"
               >
-                Pay $`{amount}`
+                Pay ${amount}
               </button>
 
               {apiErrors.length > 0 &&
