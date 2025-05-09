@@ -8,8 +8,8 @@ type StyledAuthorizeFormProps = {
   environment?: "sandbox" | "production";
 };
 
-const apiLoginID = process.env.AUTHORIZE_NET_API_LOGIN_ID!;
-const clientKey = process.env.AUTHORIZE_NET_CLIENT_KEY!;
+const apiLoginID = process.env.NEXT_PUBLIC_AUTHORIZE_NET_API_LOGIN_ID!;
+const clientKey = process.env.NEXT_PUBLIC_AUTHORIZE_NET_CLIENT_KEY!;
 
 const ReactAuthNetForm = ({
   amount,
