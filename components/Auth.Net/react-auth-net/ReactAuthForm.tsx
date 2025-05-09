@@ -9,7 +9,7 @@ type StyledAuthorizeFormProps = {
 };
 
 const apiLoginID = process.env.AUTHORIZE_NET_API_LOGIN_ID!;
-const clientKey = process.env.AUTHORIZE_NET_TRANSACTION_KEY!;
+const clientKey = process.env.AUTHORIZE_NET_CLIENT_KEY!;
 
 const ReactAuthNetForm = ({
   amount,
