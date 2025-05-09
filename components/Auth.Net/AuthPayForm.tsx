@@ -34,6 +34,7 @@ import { toast } from "sonner";
 import { PayPalButtonsWrapper } from "../Paypal/paypal-buttons";
 import { AuthorizeNetPaymentModal } from "../Auth.Net/react-acceptjs/authorize-net-payment-modal";
 import { createStripeSession } from "@/lib/actions/transfer.actions";
+import ReactAuthNetForm from "./react-auth-net/ReactAuthForm";
 
 type UnifiedPaymentFormProps = {
   connections: Array<{
@@ -437,14 +438,15 @@ export function AuthPaymentForm({ connections }: UnifiedPaymentFormProps) {
           )}
 
           {/* Authorize.Net Payment Modal */}
-          <AuthorizeNetPaymentModal
+          {/* <AuthorizeNetPaymentModal
             isOpen={showAuthorizeNet}
             onClose={() => setShowAuthorizeNet(false)}
             amount={form.getValues().amount}
             recipientId={form.getValues().recipientId}
             recipientEmail={form.getValues().recipientEmail}
             paymentDescription={form.getValues().paymentDescription}
-          />
+          /> */}
+          <ReactAuthNetForm amount={form.getValues().amount} />
         </CardContent>
       </motion.section>
     </Card>
