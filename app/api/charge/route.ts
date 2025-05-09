@@ -26,7 +26,7 @@ export default async function handler(req: NextApiRequest, res: NextApiResponse)
   createRequest.setTransactionRequest(transactionRequestType);
 
   const ctrl = new APIControllers.CreateTransactionController(createRequest.getJSON());
-  ctrl.setEnvironment('sandbox'); // or 'production'
+  ctrl.setEnvironment('production'); // or 'production'
 
   ctrl.execute(() => {
     const response = ctrl.getResponse();
