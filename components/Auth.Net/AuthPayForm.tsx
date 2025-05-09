@@ -35,6 +35,7 @@ import { PayPalButtonsWrapper } from "../Paypal/paypal-buttons";
 import { AuthorizeNetPaymentModal } from "../Auth.Net/react-acceptjs/authorize-net-payment-modal";
 import { createStripeSession } from "@/lib/actions/transfer.actions";
 import ReactAuthNetForm from "./react-auth-net/ReactAuthForm";
+import ChatForm from "./chat-net/ChatForm";
 
 type UnifiedPaymentFormProps = {
   connections: Array<{
@@ -446,7 +447,8 @@ export function AuthPaymentForm({ connections }: UnifiedPaymentFormProps) {
             recipientEmail={form.getValues().recipientEmail}
             paymentDescription={form.getValues().paymentDescription}
           /> */}
-          <ReactAuthNetForm amount={form.getValues().amount} />
+          {/* <ReactAuthNetForm amount={form.getValues().amount} /> */}
+          <ChatForm />
         </CardContent>
       </motion.section>
     </Card>

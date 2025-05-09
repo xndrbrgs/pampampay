@@ -64,6 +64,7 @@
   },
   "devDependencies": {
     "@eslint/eslintrc": "^3",
+    "@types/authorizenet": "^1.0.2",
     "@types/micro-cors": "^0.1.5",
     "@types/node": "^20",
     "@types/react": "^19",

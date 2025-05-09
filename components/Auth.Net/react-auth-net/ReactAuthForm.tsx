@@ -108,9 +108,6 @@ const ReactAuthNetForm = ({
           />
         )}
       />
-      <AcceptHosted formToken={"..."}>
-        <button className="text-black border p-3">Pay Now</button>
-      </AcceptHosted>
     </div>
   );
 };
