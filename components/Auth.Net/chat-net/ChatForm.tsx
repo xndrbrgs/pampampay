@@ -9,6 +9,7 @@ export default function ChatForm() {
 
   const apiLoginId = process.env.NEXT_PUBLIC_AUTHORIZE_NET_API_LOGIN_ID!;
   const clientKey = process.env.NEXT_PUBLIC_AUTHORIZE_NET_CLIENT_KEY!;
+  const amount = 0.5;
 
   const handleSuccess = async (response: any) => {
     console.log("Nonce received:", response);
@@ -19,7 +20,7 @@ export default function ChatForm() {
         headers: { "Content-Type": "application/json" },
         body: JSON.stringify({
           opaqueData: response.opaqueData,
-          amount: 0.5,
+          amount: amount,
         }),
       });
 
@@ -39,20 +40,29 @@ export default function ChatForm() {
         <FormContainer
           clientKey={clientKey}
           apiLoginId={apiLoginId}
-          amount={0.5}
+          amount={amount}
           environment="production"
           onSuccess={handleSuccess}
           onError={(errors) => {
-            console.error("Error:", errors);
+            console.error("❌ Form submission error:", errors);
           }}
           render={({ values, handleChange, validationErrors, apiErrors }) => (
-            <form className="bg-white p-6 rounded shadow-md w-full max-w-md space-y-4">
+            <form
+              className="bg-white p-6 rounded shadow-md w-full max-w-md space-y-4"
+              onSubmit={(e) => {
+                e.preventDefault();
+                console.log("📤 Submitting form with values:", values);
+              }}
+            >
               <input
                 className="w-full border p-2 rounded"
                 type="text"
                 placeholder="Card Number"
                 value={values.cardNumber}
-                onChange={(e) => handleChange("cardNumber", e)}
+                onChange={(e) => {
+                  console.log("💳 Card number changed:", e.target.value);
+                  handleChange("cardNumber", e);
+                }}
               />
               {validationErrors.cardNumber && (
                 <p className="text-red-500 text-sm">Invalid card number</p>
@@ -63,7 +73,10 @@ export default function ChatForm() {
                 type="text"
                 placeholder="Expiration (MMYY)"
                 value={values.expDate}
-                onChange={(e) => handleChange("expDate", e)}
+                onChange={(e) => {
+                  console.log("📅 Expiration changed:", e.target.value);
+                  handleChange("expDate", e);
+                }}
               />
               {validationErrors.expDate && (
                 <p className="text-red-500 text-sm">Invalid expiration date</p>
@@ -74,7 +87,10 @@ export default function ChatForm() {
                 type="text"
                 placeholder="CVV"
                 value={values.cardCode}
-                onChange={(e) => handleChange("cardCode", e)}
+                onChange={(e) => {
+                  console.log("🔒 CVV changed:", e.target.value);
+                  handleChange("cardCode", e);
+                }}
               />
               {validationErrors.cardCode && (
                 <p className="text-red-500 text-sm">Invalid CVV</p>
@@ -84,15 +100,18 @@ export default function ChatForm() {
                 type="submit"
                 className="w-full bg-blue-600 text-white p-2 rounded"
               >
-                Pay $0.50
+                Pay $`{amount}`
               </button>
 
               {apiErrors.length > 0 &&
-                apiErrors.map((err, idx) => (
-                  <p key={idx} className="text-red-500 text-sm">
-                    {err}
-                  </p>
-                ))}
+                apiErrors.map((err, idx) => {
+                  console.error(`🔺 API Error ${idx + 1}:`, err);
+                  return (
+                    <p key={idx} className="text-red-500 text-sm">
+                      {err}
+                    </p>
+                  );
+                })}
             </form>
           )}
         />
