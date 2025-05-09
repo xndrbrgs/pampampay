@@ -1,7 +1,11 @@
 "use client";
 
 import { useState } from "react";
-import { FormContainer, FormComponent } from "react-authorize-net";
+import {
+  FormContainer,
+  FormComponent,
+  AcceptHosted,
+} from "react-authorize-net";
 
 type StyledAuthorizeFormProps = {
   amount: number;
@@ -66,7 +70,7 @@ const ReactAuthNetForm = ({
   }
 
   return (
-    <div>
+    <div className="flex flex-col items-center bg-white">
       <FormContainer
         environment={environment}
         onError={onErrorHandler}
@@ -104,6 +108,9 @@ const ReactAuthNetForm = ({
           />
         )}
       />
+      <AcceptHosted formToken={"..."}>
+        <button className="text-black border p-3">Pay Now</button>
+      </AcceptHosted>
     </div>
   );
 };
