@@ -6,6 +6,7 @@ const publicPaths = [
   "/api/stripe",
   "/api/stripe/connect",
   "/api/webhooks",
+  "/api/charge",
   "/api/payments",
   "/api/payments/coinbase",
   "/api/payments/coinbase/success",
