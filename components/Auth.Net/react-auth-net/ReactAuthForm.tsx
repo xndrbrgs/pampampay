@@ -13,7 +13,7 @@ const clientKey = process.env.NEXT_PUBLIC_AUTHORIZE_NET_CLIENT_KEY!;
 
 const ReactAuthNetForm = ({
   amount,
-  environment = "sandbox",
+  environment = "production",
 }: StyledAuthorizeFormProps) => {
   const [isPaid, setIsPaid] = useState(false);
   const [errors, setErrors] = useState<string[]>([]);
