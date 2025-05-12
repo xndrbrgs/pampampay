@@ -1,189 +1,241 @@
-"use client";
+"use client"
 
-import { useState, type FormEvent } from "react";
-import Script from "next/script";
+import type React from "react"
+
+import { useState } from "react"
+import { useRouter } from "next/navigation"
+import Script from "next/script"
 
 interface AcceptPaymentFormProps {
-  onSubmit: (dataDescriptor: string, dataValue: string, amount: string) => void;
-  isProcessing: boolean;
+  onPaymentComplete: (result: any) => void
+  onPaymentError: (error: string) => void
 }
 
-declare global {
-  interface Window {
-    Accept: {
-      dispatch: (callback: () => void) => void;
-      dispatchData: (data: any, callback: (response: any) => void) => void;
-    };
+export default function AcceptPaymentForm({ onPaymentComplete, onPaymentError }: AcceptPaymentFormProps) {
+  const [cardNumber, setCardNumber] = useState("")
+  const [expirationDate, setExpirationDate] = useState("")
+  const [cardCode, setCardCode] = useState("")
+  const [amount, setAmount] = useState("")
+  const [isLoading, setIsLoading] = useState(false)
+  const [scriptLoaded, setScriptLoaded] = useState(false)
+  const [scriptError, setScriptError] = useState<string | null>(null)
+
+  const router = useRouter()
+
+  // Function to handle the Accept.js script loading
+  const handleScriptLoad = () => {
+    setScriptLoaded(true)
+    console.log("Accept.js script loaded successfully")
   }
-}
 
-export default function AcceptPaymentForm({
-  onSubmit,
-  isProcessing,
-}: AcceptPaymentFormProps) {
-  const [amount, setAmount] = useState("");
-  const [cardNumber, setCardNumber] = useState("");
-  const [expirationDate, setExpirationDate] = useState("");
-  const [cardCode, setCardCode] = useState("");
-  const [scriptLoaded, setScriptLoaded] = useState(false);
-  const [errorMessage, setErrorMessage] = useState("");
+  const handleScriptError = () => {
+    setScriptError("Failed to load payment processing script. Please try again later.")
+    console.error("Failed to load Accept.js script")
+  }
 
-  const handleSubmit = (e: FormEvent) => {
-    e.preventDefault();
-    setErrorMessage("");
+  // Function to send payment data to Authorize.Net for tokenization
+  const sendPaymentDataToAnet = async (e: React.FormEvent) => {
+    e.preventDefault()
 
     if (!scriptLoaded) {
-      setErrorMessage(
-        "Payment processing is not ready yet. Please try again in a moment."
-      );
-      return;
+      onPaymentError("Payment system is not fully loaded. Please try again.")
+      return
     }
 
-    // Validate amount format
-    const amountValue = Number.parseFloat(amount);
-    if (isNaN(amountValue) || amountValue <= 0) {
-      setErrorMessage("Please enter a valid amount");
-      return;
+    // Basic validation
+    if (!cardNumber || !expirationDate || !cardCode || !amount) {
+      onPaymentError("Please fill in all required fields")
+      return
     }
 
-    // Create the payment data object for tokenization
-    const secureData = {
-      authData: {
-        clientKey: process.env.NEXT_PUBLIC_AUTHORIZE_NET_CLIENT_KEY!,
-        apiLoginID: process.env.NEXT_PUBLIC_AUTHORIZE_NET_API_LOGIN_ID!,
-      },
-      cardData: {
-        cardNumber,
-        month: expirationDate.substring(0, 2),
-        year: expirationDate.substring(2),
-        cardCode,
-      },
-    };
+    // Validate amount is a number
+    const amountNum = Number.parseFloat(amount)
+    if (isNaN(amountNum) || amountNum <= 0) {
+      onPaymentError("Please enter a valid amount")
+      return
+    }
 
-    // Send the payment data to Accept.js for tokenization
-    window.Accept.dispatchData(secureData, (response) => {
-      if (response.messages.resultCode === "Error") {
-        let errorMessage = "Payment Error: ";
-        for (let i = 0; i < response.messages.message.length; i++) {
-          errorMessage += `${response.messages.message[i].text} `;
-        }
-        setErrorMessage(errorMessage);
-      } else {
-        // If successful, submit the payment nonce to your server
-        // Ensure we're passing the dataDescriptor, dataValue, and amount as separate values
-        onSubmit(
-          response.opaqueData.dataDescriptor,
-          response.opaqueData.dataValue,
-          amount
-        );
+    setIsLoading(true)
+
+    try {
+      // Create the card data object
+      const secureData = {
+        authData: {
+          clientKey: process.env.NEXT_PUBLIC_AUTHORIZE_CLIENT_KEY,
+          apiLoginID: process.env.NEXT_PUBLIC_AUTHORIZE_API_LOGIN_ID,
+        },
+        cardData: {
+          cardNumber,
+          month: expirationDate.split("/")[0]?.trim(),
+          year: expirationDate.split("/")[1]?.trim(),
+          cardCode,
+        },
       }
-    });
-  };
+
+      // Check if Accept.js is available
+      if (typeof window.Accept === "undefined") {
+        throw new Error("Payment system is not available. Please try again later.")
+      }
+
+      // Send payment data to Authorize.Net
+      window.Accept.dispatchData(secureData, responseHandler)
+    } catch (error) {
+      setIsLoading(false)
+      onPaymentError(error instanceof Error ? error.message : "An unexpected error occurred")
+      console.error("Payment error:", error)
+    }
+  }
+
+  // Handle the response from Authorize.Net
+  const responseHandler = async (response: any) => {
+    try {
+      if (response.messages.resultCode === "Error") {
+        let errorMessage = "Payment processing failed"
+        if (response.messages.message && response.messages.message.length > 0) {
+          errorMessage = `${response.messages.message[0].code}: ${response.messages.message[0].text}`
+        }
+        throw new Error(errorMessage)
+      }
+
+      // Send the payment nonce to your server
+      const paymentData = {
+        dataDescriptor: response.opaqueData.dataDescriptor,
+        dataValue: response.opaqueData.dataValue,
+        amount: amount,
+      }
+
+      console.log("Sending to server:", {
+        dataDescriptor: paymentData.dataDescriptor ? "Present" : "Missing",
+        dataValue: paymentData.dataValue ? "Present" : "Missing",
+        amount: paymentData.amount,
+      })
+
+      // Process the payment on your server
+      const serverResponse = await fetch("/api/process-payment", {
+        method: "POST",
+        headers: {
+          "Content-Type": "application/json",
+        },
+        body: JSON.stringify(paymentData),
+      })
+
+      // Check if the response is JSON
+      const contentType = serverResponse.headers.get("content-type")
+      if (!contentType || !contentType.includes("application/json")) {
+        const textResponse = await serverResponse.text()
+        throw new Error(`Server returned non-JSON response: ${textResponse}`)
+      }
+
+      const result = await serverResponse.json()
+
+      if (!result.success) {
+        throw new Error(result.error || "Payment processing failed")
+      }
+
+      // Payment successful
+      onPaymentComplete(result)
+    } catch (error) {
+      onPaymentError(error instanceof Error ? error.message : "An unexpected error occurred")
+      console.error("Payment error:", error)
+    } finally {
+      setIsLoading(false)
+    }
+  }
 
   return (
-    <>
+    <div className="w-full max-w-md mx-auto">
+      {/* Load the Accept.js script */}
       <Script
         src="https://js.authorize.net/v1/Accept.js"
-        onLoad={() => setScriptLoaded(true)}
+        onLoad={handleScriptLoad}
+        onError={handleScriptError}
         strategy="lazyOnload"
       />
 
-      <form onSubmit={handleSubmit} className="space-y-4">
-        {errorMessage && (
-          <div className="p-3 bg-red-50 border border-red-200 rounded-md text-red-600 text-sm">
-            {errorMessage}
-          </div>
-        )}
+      {scriptError && <div className="mb-4 p-3 bg-red-100 text-red-700 rounded">{scriptError}</div>}
 
+      <form onSubmit={sendPaymentDataToAnet} className="space-y-4">
         <div>
-          <label
-            htmlFor="cardNumber"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="cardNumber" className="block text-sm font-medium text-gray-700">
             Card Number
           </label>
           <input
             type="text"
             id="cardNumber"
-            placeholder="4111111111111111"
             value={cardNumber}
             onChange={(e) => setCardNumber(e.target.value)}
+            placeholder="4111111111111111"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            disabled={isLoading}
             required
           />
-          <p className="mt-1 text-xs text-gray-500">
-            For testing, use 4111111111111111
-          </p>
-        </div>
-
-        <div className="grid grid-cols-2 gap-4">
-          <div>
-            <label
-              htmlFor="expirationDate"
-              className="block text-sm font-medium text-gray-700"
-            >
-              Expiration Date (MMYY)
-            </label>
-            <input
-              type="text"
-              id="expirationDate"
-              placeholder="1225"
-              value={expirationDate}
-              onChange={(e) => setExpirationDate(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              required
-            />
-          </div>
-
-          <div>
-            <label
-              htmlFor="cardCode"
-              className="block text-sm font-medium text-gray-700"
-            >
-              CVV
-            </label>
-            <input
-              type="text"
-              id="cardCode"
-              placeholder="123"
-              value={cardCode}
-              onChange={(e) => setCardCode(e.target.value)}
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
-              required
-            />
-          </div>
         </div>
 
         <div>
-          <label
-            htmlFor="amount"
-            className="block text-sm font-medium text-gray-700"
-          >
+          <label htmlFor="expirationDate" className="block text-sm font-medium text-gray-700">
+            Expiration Date (MM/YYYY)
+          </label>
+          <input
+            type="text"
+            id="expirationDate"
+            value={expirationDate}
+            onChange={(e) => setExpirationDate(e.target.value)}
+            placeholder="12/2025"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            disabled={isLoading}
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="cardCode" className="block text-sm font-medium text-gray-700">
+            CVV
+          </label>
+          <input
+            type="text"
+            id="cardCode"
+            value={cardCode}
+            onChange={(e) => setCardCode(e.target.value)}
+            placeholder="123"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            disabled={isLoading}
+            required
+          />
+        </div>
+
+        <div>
+          <label htmlFor="amount" className="block text-sm font-medium text-gray-700">
             Amount ($)
           </label>
           <input
             type="text"
             id="amount"
-            placeholder="10.00"
             value={amount}
             onChange={(e) => setAmount(e.target.value)}
+            placeholder="10.00"
             className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500"
+            disabled={isLoading}
             required
           />
         </div>
 
         <button
           type="submit"
-          disabled={isProcessing || !scriptLoaded}
-          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:bg-indigo-300"
+          className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-sm font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
+          disabled={isLoading || !scriptLoaded}
         >
-          {isProcessing
-            ? "Processing..."
-            : scriptLoaded
-            ? "Pay Now"
-            : "Loading Payment System..."}
+          {isLoading ? "Processing..." : "Pay Now"}
         </button>
       </form>
-    </>
-  );
+    </div>
+  )
+}
+
+// Add TypeScript declaration for Accept.js
+declare global {
+  interface Window {
+    Accept: {
+      dispatchData: (data: any, callback: (response: any) => void) => void
+    }
+  }
 }
