@@ -8,6 +8,7 @@ const publicPaths = [
   "/api/webhooks",
   "/api/charge",
   "/api/charge/generate-token",
+  "/api/process-payment",
   "/api/payments",
   "/api/payments/coinbase",
   "/api/payments/coinbase/success",
