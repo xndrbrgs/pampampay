@@ -76,7 +76,14 @@ declare module "authorizenet/lib/apicontracts" {
         getProfileResponse(): any;
     }
 
-
+    export class GetTransactionDetailsRequest extends ANetApiRequest {
+        getJSON(): {
+            getTransactionDetailsRequest: GetTransactionDetailsRequest;
+        };
+        setTransId(p_transId: any): void;
+        transId: any;
+        getTransId(): any;
+    }
 
     export class TransactionRequestType {
 

@@ -81,10 +81,11 @@ export async function POST(request: Request) {
     createController.setEnvironment(environment)
 
     const transDetails = new ApiContracts.CreateTransactionResponse()
+    const getTransId = new ApiContracts.GetTransactionDetailsRequest()
 
     // Execute the payment with a timeout
     try {
-      const result = await executeWithTimeout(createController, API_TIMEOUT, transDetails)
+      const result = await executeWithTimeout(createController, API_TIMEOUT, transDetails, getTransId)
       return NextResponse.json(result)
     } catch (apiError) {
       console.error("API execution error:", apiError)
@@ -111,7 +112,7 @@ export async function POST(request: Request) {
 }
 
 // Helper function to execute the payment with a timeout
-async function executeWithTimeout(controller: any, timeout: number, transDetails: ApiContracts.CreateTransactionResponse) {
+async function executeWithTimeout(controller: any, timeout: number, transDetails: ApiContracts.CreateTransactionResponse, getTransId: ApiContracts.GetTransactionDetailsRequest) {
   return new Promise((resolve, reject) => {
     // Set a timeout to prevent function from hanging
     const timeoutId = setTimeout(() => {
@@ -140,7 +141,7 @@ async function executeWithTimeout(controller: any, timeout: number, transDetails
             // Successful transaction
             resolve({
               success: true,
-              transactionId: result.getTransId(),
+              transactionId: getTransId.getTransId(),
               message: "Transaction approved",
             })
           } else {
