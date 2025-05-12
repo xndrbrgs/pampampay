@@ -61,8 +61,8 @@ export default function AcceptPaymentForm({ onPaymentComplete, onPaymentError }:
       // Create the card data object
       const secureData = {
         authData: {
-          clientKey: process.env.NEXT_PUBLIC_AUTHORIZE_CLIENT_KEY,
-          apiLoginID: process.env.NEXT_PUBLIC_AUTHORIZE_API_LOGIN_ID,
+          clientKey: process.env.NEXT_PUBLIC_AUTHORIZE_NET_CLIENT_KEY!,
+          apiLoginID: process.env.NEXT_PUBLIC_AUTHORIZE_NET_API_LOGIN_ID!,
         },
         cardData: {
           cardNumber,
