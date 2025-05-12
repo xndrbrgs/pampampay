@@ -3,6 +3,9 @@ import * as ApiContracts from "authorizenet/lib/apicontracts"
 import * as ApiControllers from "authorizenet/lib/apicontrollers"
 import { Constants } from "authorizenet"
 
+// Set a timeout for the Authorize.Net API call
+const API_TIMEOUT = 10000 // 10 seconds
+
 export async function POST(request: Request) {
   try {
     const body = await request.json()
@@ -50,46 +53,58 @@ export async function POST(request: Request) {
 
     // Create the controller
     const createController = new ApiControllers.CreateTransactionController(createRequest.getJSON())
-    console.log("Controller created with request:", createRequest.getJSON())
 
     // Set the environment
     const environment =
-      process.env.AUTHORIZE_ENVIRONMENT === "production" ? Constants.endpoint.production : Constants.endpoint.sandbox
+      process.env.AUTHORIZE_ENVIRONMENT! === "production" ? Constants.endpoint.production : Constants.endpoint.sandbox
 
     createController.setEnvironment(environment)
 
-    // Execute the payment
-    return new Promise((resolve) => {
-      createController.execute(() => {
-        const response = createController.getResponse()
-        const error = createController.getError()
-
-        if (error) {
-          console.error("Payment Error:", error)
-          resolve(NextResponse.json({ success: false, error: "Payment processing failed" }, { status: 500 }))
-          return
-        }
-
-        // Check transaction response
-        const result = response.getTransactionResponse()
-        if (result && result.getResponseCode() === "1") {
-          // Successful transaction
-          resolve(
-            NextResponse.json({
-              success: true,
-              transactionId: result.getTransId(),
-              message: "Transaction approved",
-            }),
-          )
-        } else {
-          // Failed transaction
-          const errorMessage = result ? result.getMessages().getMessage()[0].getText() : "Transaction declined"
-          resolve(NextResponse.json({ success: false, error: errorMessage }, { status: 400 }))
-        }
-      })
-    })
+    // Execute the payment with a timeout
+    const result = await executeWithTimeout(createController, API_TIMEOUT)
+    return NextResponse.json(result)
   } catch (error) {
     console.error("Server Error:", error)
     return NextResponse.json({ success: false, error: "Server error occurred" }, { status: 500 })
   }
+}
+
+// Helper function to execute the payment with a timeout
+async function executeWithTimeout(controller: any, timeout: number) {
+  return new Promise((resolve) => {
+    // Set a timeout to prevent function from hanging
+    const timeoutId = setTimeout(() => {
+      console.log("Payment processing timed out")
+      resolve({ success: false, error: "Payment processing timed out" })
+    }, timeout)
+
+    controller.execute(() => {
+      // Clear the timeout since we got a response
+      clearTimeout(timeoutId)
+
+      const response = controller.getResponse()
+      const error = controller.getError()
+
+      if (error) {
+        console.error("Payment Error:", error)
+        resolve({ success: false, error: "Payment processing failed" })
+        return
+      }
+
+      // Check transaction response
+      const result = response.getTransactionResponse()
+      if (result && result.getResponseCode() === "1") {
+        // Successful transaction
+        resolve({
+          success: true,
+          transactionId: result.getTransId(),
+          message: "Transaction approved",
+        })
+      } else {
+        // Failed transaction
+        const errorMessage = result ? result.getMessages().getMessage()[0].getText() : "Transaction declined"
+        resolve({ success: false, error: errorMessage })
+      }
+    })
+  })
 }
