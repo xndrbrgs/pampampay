@@ -51,6 +51,31 @@ declare module "authorizenet/lib/apicontracts" {
         getDataSource(): any;
     }
 
+    export class ANetApiResponse {
+        constructor(obj?: any, ...args: any[]);
+        getJSON(): {
+            ErrorResponse: ANetApiResponse;
+        };
+        setRefId(p_refId: any): void;
+        refId: any;
+        getRefId(): any;
+        setMessages(p_messages: any): void;
+        messages: any;
+        getMessages(): any;
+        setSessionToken(p_sessionToken: any): void;
+        sessionToken: any;
+        getSessionToken(): any;
+    }
+
+    export class CreateTransactionResponse extends ANetApiResponse {
+        setTransactionResponse(p_transactionResponse: any): void;
+        transactionResponse: any;
+        getTransactionResponse(): any;
+        setProfileResponse(p_profileResponse: any): void;
+        profileResponse: any;
+        getProfileResponse(): any;
+    }
+
 
 
     export class TransactionRequestType {
