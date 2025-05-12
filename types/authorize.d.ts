@@ -21,6 +21,64 @@ declare module "authorizenet/lib/apicontracts" {
 
     }
 
+    class OrderType {
+        constructor(obj?: any, ...args: any[]);
+        setInvoiceNumber(p_invoiceNumber: any): void;
+        invoiceNumber: any;
+        getInvoiceNumber(): any;
+        setDescription(p_description: any): void;
+        description: any;
+        getDescription(): any;
+        setDiscountAmount(p_discountAmount: any): void;
+        discountAmount: any;
+        getDiscountAmount(): any;
+        setTaxIsAfterDiscount(p_taxIsAfterDiscount: any): void;
+        taxIsAfterDiscount: any;
+        getTaxIsAfterDiscount(): any;
+        setTotalTaxTypeCode(p_totalTaxTypeCode: any): void;
+        totalTaxTypeCode: any;
+        getTotalTaxTypeCode(): any;
+        setPurchaserVATRegistrationNumber(p_purchaserVATRegistrationNumber: any): void;
+        purchaserVATRegistrationNumber: any;
+        getPurchaserVATRegistrationNumber(): any;
+        setMerchantVATRegistrationNumber(p_merchantVATRegistrationNumber: any): void;
+        merchantVATRegistrationNumber: any;
+        getMerchantVATRegistrationNumber(): any;
+        setVatInvoiceReferenceNumber(p_vatInvoiceReferenceNumber: any): void;
+        vatInvoiceReferenceNumber: any;
+        getVatInvoiceReferenceNumber(): any;
+        setPurchaserCode(p_purchaserCode: any): void;
+        purchaserCode: any;
+        getPurchaserCode(): any;
+        setSummaryCommodityCode(p_summaryCommodityCode: any): void;
+        summaryCommodityCode: any;
+        getSummaryCommodityCode(): any;
+        setPurchaseOrderDateUTC(p_purchaseOrderDateUTC: any): void;
+        purchaseOrderDateUTC: any;
+        getPurchaseOrderDateUTC(): any;
+        setSupplierOrderReference(p_supplierOrderReference: any): void;
+        supplierOrderReference: any;
+        getSupplierOrderReference(): any;
+        setAuthorizedContactName(p_authorizedContactName: any): void;
+        authorizedContactName: any;
+        getAuthorizedContactName(): any;
+        setCardAcceptorRefNumber(p_cardAcceptorRefNumber: any): void;
+        cardAcceptorRefNumber: any;
+        getCardAcceptorRefNumber(): any;
+        setAmexDataTAA1(p_amexDataTAA1: any): void;
+        amexDataTAA1: any;
+        getAmexDataTAA1(): any;
+        setAmexDataTAA2(p_amexDataTAA2: any): void;
+        amexDataTAA2: any;
+        getAmexDataTAA2(): any;
+        setAmexDataTAA3(p_amexDataTAA3: any): void;
+        amexDataTAA3: any;
+        getAmexDataTAA3(): any;
+        setAmexDataTAA4(p_amexDataTAA4: any): void;
+        amexDataTAA4: any;
+        getAmexDataTAA4(): any;
+    }
+
 
 
     export class PaymentType {
