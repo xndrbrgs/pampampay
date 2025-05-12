@@ -90,7 +90,7 @@ export async function POST(request: Request) {
         {
           success: false,
           error: "Payment processing failed",
-          details: apiError.message,
+          details: apiError instanceof Error ? apiError.message : String(apiError),
         },
         { status: 500 },
       )
