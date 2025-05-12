@@ -67,6 +67,20 @@ export async function POST(request: Request) {
     transactionRequestType.setPayment(paymentType)
     transactionRequestType.setAmount(amount)
 
+    // Add order information
+    const orderDetails = new ApiContracts.OrderType()
+    orderDetails.setInvoiceNumber(`INV-${Date.now()}`)
+    orderDetails.setDescription("Online Payment")
+    transactionRequestType.setOrder(orderDetails)
+
+    // Add customer information
+    const customerData = new ApiContracts.CustomerDataType()
+    customerData.setType(ApiContracts.CustomerTypeEnum.INDIVIDUAL)
+    customerData.setId(`CUST-${Date.now()}`)
+    customerData.setEmail("testing@example.com") // You might want to collect this from the user
+    transactionRequestType.setCustomer(customerData)
+
+    // Create the main request
     const createRequest = new ApiContracts.CreateTransactionRequest()
     createRequest.setMerchantAuthentication(merchantAuthenticationType)
     createRequest.setTransactionRequest(transactionRequestType)
@@ -80,12 +94,9 @@ export async function POST(request: Request) {
 
     createController.setEnvironment(environment)
 
-    const transDetails = new ApiContracts.CreateTransactionResponse()
-    const getTransId = new ApiContracts.GetTransactionDetailsRequest()
-
     // Execute the payment with a timeout
     try {
-      const result = await executeWithTimeout(createController, API_TIMEOUT, transDetails, getTransId)
+      const result = await executeWithTimeout(createController, API_TIMEOUT)
       return NextResponse.json(result)
     } catch (apiError) {
       console.error("API execution error:", apiError)
@@ -112,7 +123,7 @@ export async function POST(request: Request) {
 }
 
 // Helper function to execute the payment with a timeout
-async function executeWithTimeout(controller: any, timeout: number, transDetails: ApiContracts.CreateTransactionResponse, getTransId: ApiContracts.GetTransactionDetailsRequest) {
+async function executeWithTimeout(controller: any, timeout: number) {
   return new Promise((resolve, reject) => {
     // Set a timeout to prevent function from hanging
     const timeoutId = setTimeout(() => {
@@ -126,7 +137,7 @@ async function executeWithTimeout(controller: any, timeout: number, transDetails
         clearTimeout(timeoutId)
 
         try {
-          const response = controller.getResponse()
+          const apiResponse = controller.getResponse()
           const error = controller.getError()
 
           if (error) {
@@ -135,26 +146,64 @@ async function executeWithTimeout(controller: any, timeout: number, transDetails
             return
           }
 
-          // Check transaction response
-          const result = transDetails.getTransactionResponse()
-          if (result && result.getResponseCode() === "1") {
+          console.log("Full API Response:", JSON.stringify(apiResponse, null, 2))
+
+          // Check if we have a valid response
+          if (!apiResponse) {
+            resolve({ success: false, error: "No response from payment gateway" })
+            return
+          }
+
+          // Get the transaction response
+          const transactionResponse = apiResponse.getTransactionResponse()
+
+          if (!transactionResponse) {
+            resolve({
+              success: false,
+              error: "Invalid transaction response",
+              responseCode: apiResponse.getMessages().getResultCode(),
+            })
+            return
+          }
+
+          const responseCode = transactionResponse.getResponseCode()
+          console.log("Response Code:", responseCode)
+
+          // Check response code - "1" means approved
+          if (responseCode === "1") {
             // Successful transaction
             resolve({
               success: true,
-              transactionId: getTransId.getTransId(),
+              transactionId: transactionResponse.getTransId(),
+              authCode: transactionResponse.getAuthCode(),
               message: "Transaction approved",
+              avsResultCode: transactionResponse.getAvsResultCode(),
+              cvvResultCode: transactionResponse.getCvvResultCode(),
+              accountNumber: transactionResponse.getAccountNumber(),
+              accountType: transactionResponse.getAccountType(),
             })
           } else {
-            // Failed transaction
+            // Get detailed error message
             let errorMessage = "Transaction declined"
+            let errorCode = ""
+
             try {
-              if (result && result.getMessages() && result.getMessages().getMessage()) {
-                errorMessage = result.getMessages().getMessage()[0].getText()
+              if (transactionResponse.getErrors() && transactionResponse.getErrors().getError().length > 0) {
+                const error = transactionResponse.getErrors().getError()[0]
+                errorCode = error.getErrorCode()
+                errorMessage = error.getErrorText()
               }
             } catch (msgError) {
-              console.error("Error getting error message:", msgError)
+              console.error("Error getting error details:", msgError)
             }
-            resolve({ success: false, error: errorMessage })
+
+            resolve({
+              success: false,
+              error: errorMessage,
+              errorCode: errorCode,
+              responseCode: responseCode,
+              transactionId: transactionResponse.getTransId(), // Include transaction ID even for declined transactions
+            })
           }
         } catch (responseError) {
           console.error("Error processing response:", responseError)

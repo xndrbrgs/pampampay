@@ -21,7 +21,7 @@ declare module "authorizenet/lib/apicontracts" {
 
     }
 
-    class OrderType {
+    export class OrderType {
         constructor(obj?: any, ...args: any[]);
         setInvoiceNumber(p_invoiceNumber: any): void;
         invoiceNumber: any;
@@ -79,6 +79,147 @@ declare module "authorizenet/lib/apicontracts" {
         getAmexDataTAA4(): any;
     }
 
+    export class CustomerDataType {
+        constructor(obj?: any, ...args: any[]);
+        setType(p_type: any): void;
+        type: any;
+        getType(): any;
+        setId(p_id: any): void;
+        id: any;
+        getId(): any;
+        setEmail(p_email: any): void;
+        email: any;
+        getEmail(): any;
+        setDriversLicense(p_driversLicense: any): void;
+        driversLicense: any;
+        getDriversLicense(): any;
+        setTaxId(p_taxId: any): void;
+        taxId: any;
+        getTaxId(): any;
+    }
+    namespace CustomerTypeEnum {
+        const INDIVIDUAL: string;
+        const BUSINESS: string;
+    }
+    export class TransactionRequestType {
+        constructor(obj?: any, ...args: any[]);
+        setTransactionType(p_transactionType: any): void;
+        transactionType: any;
+        getTransactionType(): any;
+        setAmount(p_amount: any): void;
+        amount: any;
+        getAmount(): any;
+        setCurrencyCode(p_currencyCode: any): void;
+        currencyCode: any;
+        getCurrencyCode(): any;
+        setPayment(p_payment: any): void;
+        payment: any;
+        getPayment(): any;
+        setProfile(p_profile: any): void;
+        profile: any;
+        getProfile(): any;
+        setSolution(p_solution: any): void;
+        solution: any;
+        getSolution(): any;
+        setCallId(p_callId: any): void;
+        callId: any;
+        getCallId(): any;
+        setTerminalNumber(p_terminalNumber: any): void;
+        terminalNumber: any;
+        getTerminalNumber(): any;
+        setAuthCode(p_authCode: any): void;
+        authCode: any;
+        getAuthCode(): any;
+        setRefTransId(p_refTransId: any): void;
+        refTransId: any;
+        getRefTransId(): any;
+        setSplitTenderId(p_splitTenderId: any): void;
+        splitTenderId: any;
+        getSplitTenderId(): any;
+        setOrder(p_order: any): void;
+        order: any;
+        getOrder(): any;
+        setLineItems(p_lineItems: any): void;
+        lineItems: any;
+        getLineItems(): any;
+        setTax(p_tax: any): void;
+        tax: any;
+        getTax(): any;
+        setDuty(p_duty: any): void;
+        duty: any;
+        getDuty(): any;
+        setShipping(p_shipping: any): void;
+        shipping: any;
+        getShipping(): any;
+        setTaxExempt(p_taxExempt: any): void;
+        taxExempt: any;
+        getTaxExempt(): any;
+        setPoNumber(p_poNumber: any): void;
+        poNumber: any;
+        getPoNumber(): any;
+        setCustomer(p_customer: any): void;
+        customer: any;
+        getCustomer(): any;
+        setBillTo(p_billTo: any): void;
+        billTo: any;
+        getBillTo(): any;
+        setShipTo(p_shipTo: any): void;
+        shipTo: any;
+        getShipTo(): any;
+        setCustomerIP(p_customerIP: any): void;
+        customerIP: any;
+        getCustomerIP(): any;
+        setCardholderAuthentication(p_cardholderAuthentication: any): void;
+        cardholderAuthentication: any;
+        getCardholderAuthentication(): any;
+        setRetail(p_retail: any): void;
+        retail: any;
+        getRetail(): any;
+        setEmployeeId(p_employeeId: any): void;
+        employeeId: any;
+        getEmployeeId(): any;
+        setTransactionSettings(p_transactionSettings: any): void;
+        transactionSettings: any;
+        getTransactionSettings(): any;
+        setUserFields(p_userFields: any): void;
+        userFields: any;
+        getUserFields(): any;
+        setSurcharge(p_surcharge: any): void;
+        surcharge: any;
+        getSurcharge(): any;
+        setMerchantDescriptor(p_merchantDescriptor: any): void;
+        merchantDescriptor: any;
+        getMerchantDescriptor(): any;
+        setSubMerchant(p_subMerchant: any): void;
+        subMerchant: any;
+        getSubMerchant(): any;
+        setTip(p_tip: any): void;
+        tip: any;
+        getTip(): any;
+        setProcessingOptions(p_processingOptions: any): void;
+        processingOptions: any;
+        getProcessingOptions(): any;
+        setSubsequentAuthInformation(p_subsequentAuthInformation: any): void;
+        subsequentAuthInformation: any;
+        getSubsequentAuthInformation(): any;
+        setOtherTax(p_otherTax: any): void;
+        otherTax: any;
+        getOtherTax(): any;
+        setShipFrom(p_shipFrom: any): void;
+        shipFrom: any;
+        getShipFrom(): any;
+        setAuthorizationIndicatorType(p_authorizationIndicatorType: any): void;
+        authorizationIndicatorType: any;
+        getAuthorizationIndicatorType(): any;
+    }
+    namespace TransactionRequestType {
+        class UserFields {
+            constructor(obj?: any);
+            setUserField(p_userField: string): void;
+            userField: string;
+            getUserField(): string;
+        }
+    }
 
 
     export class PaymentType {
