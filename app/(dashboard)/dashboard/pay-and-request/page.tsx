@@ -6,7 +6,6 @@ import { PayPalProvider } from "@/components/Paypal/PaypalProvider";
 import { GooglePayProvider } from "@/contexts/googlepay";
 import { getAdminUser, getConnections } from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs/server";
-import { useState } from "react";
 
 export default async function Dashboard() {
   const user = await currentUser();

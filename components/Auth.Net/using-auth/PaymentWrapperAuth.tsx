@@ -34,11 +34,7 @@ export default function Home() {
   };
 
   return (
-    <div className="bg-white p-8 rounded-lg shadow-md w-full max-w-md">
-      <h1 className="text-2xl font-bold mb-6 text-center">
-        Authorize.Net Payment
-      </h1>
-
+    <div className="auth-form-style p-5 rounded-2xl shadow-lg">
       {paymentStatus ? (
         <PaymentStatus
           success={paymentStatus.success || false}
