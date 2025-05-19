@@ -180,7 +180,7 @@ export default function AcceptPaymentForm({
   };
 
   return (
-    <div className="w-full max-w-md mx-auto">
+    <div className="w-full max-w-md mx-auto flex flex-col space-y-5">
       {/* Load the Accept.js script */}
       <Script
         src="https://js.authorize.net/v1/Accept.js"
@@ -195,6 +195,7 @@ export default function AcceptPaymentForm({
         </div>
       )}
 
+      <span className="text-2xl">Pay With Card</span>
       <form onSubmit={sendPaymentDataToAnet} className="space-y-7">
         <div>
           <label
@@ -253,7 +254,7 @@ export default function AcceptPaymentForm({
           )}
         </div>
 
-        <div className="flex space-x-2 w-full justify-between">
+        <div className="flex flex-col md:flex-row md:space-x-2 md:space-y-0 space-y-5 w-full justify-between">
           <div>
             <label
               htmlFor="expirationDate"
