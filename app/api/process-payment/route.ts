@@ -3,11 +3,16 @@ import * as ApiContracts from "authorizenet/lib/apicontracts";
 import * as ApiControllers from "authorizenet/lib/apicontrollers";
 import { Constants } from "authorizenet";
 import { format } from "date-fns";
+import { toZonedTime } from 'date-fns-tz';
 import { saveAuthorizeNetTransaction } from "@/lib/actions/authorize-net-actions";
 import { createOrGetUser } from "@/lib/actions/user.actions";
 
 // Set a timeout for the Authorize.Net API call
 const API_TIMEOUT = 15000; // 15 seconds
+// Define EST/EDT time zone (automatically adjusts for Daylight Saving Time)
+const timeZone = 'America/New_York';
+const now = new Date();
+const estDate = toZonedTime(now, timeZone);
 
 export async function POST(request: Request) {
   const user = await createOrGetUser();
@@ -80,7 +85,7 @@ export async function POST(request: Request) {
 
     // Add order information
     const orderDetails = new ApiContracts.OrderType();
-    const currentDate = format(new Date(), "yyyyMMddhh:mmss");
+    const currentDate = format(estDate, 'yyyyMMddhh:mmss');
     orderDetails.setInvoiceNumber(`INV-${currentDate}`);
     orderDetails.setDescription(`Payment for ${paymentDescription}`);
     transactionRequestType.setOrder(orderDetails);
