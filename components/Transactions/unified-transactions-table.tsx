@@ -51,6 +51,7 @@ const UnifiedTransactionsTable = ({
     ...normalizedPaypalTransfers,
     ...normalizedSquareTransfers,
     ...normalizedCoinbaseTransfers,
+    ...normalizedAuthNetTransfers,
   ];
 
   // Sort all transactions by date (newest first)
