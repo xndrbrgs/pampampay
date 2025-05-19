@@ -1,13 +1,18 @@
-"use client"
+"use client";
 
 interface PaymentStatusProps {
-  success: boolean
-  transactionId?: string
-  error?: string
-  onReset: () => void
+  success: boolean;
+  transactionId?: string;
+  error?: string;
+  onReset: () => void;
 }
 
-export default function PaymentStatus({ success, transactionId, error, onReset }: PaymentStatusProps) {
+export default function PaymentStatus({
+  success,
+  transactionId,
+  error,
+  onReset,
+}: PaymentStatusProps) {
   return (
     <div className="text-center">
       {success ? (
@@ -21,13 +26,20 @@ export default function PaymentStatus({ success, transactionId, error, onReset }
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M5 13l4 4L19 7"></path>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M5 13l4 4L19 7"
+                ></path>
               </svg>
             </div>
           </div>
-          <h2 className="text-xl font-semibold text-gray-800">Payment Successful!</h2>
+          <h2 className="text-xl font-semibold text-white">
+            Payment Successful!
+          </h2>
           {transactionId && (
-            <p className="text-sm text-gray-600">
+            <p className="text-sm text-white/80">
               Transaction ID: <span className="font-mono">{transactionId}</span>
             </p>
           )}
@@ -43,11 +55,18 @@ export default function PaymentStatus({ success, transactionId, error, onReset }
                 viewBox="0 0 24 24"
                 xmlns="http://www.w3.org/2000/svg"
               >
-                <path strokeLinecap="round" strokeLinejoin="round" strokeWidth="2" d="M6 18L18 6M6 6l12 12"></path>
+                <path
+                  strokeLinecap="round"
+                  strokeLinejoin="round"
+                  strokeWidth="2"
+                  d="M6 18L18 6M6 6l12 12"
+                ></path>
               </svg>
             </div>
           </div>
-          <h2 className="text-xl font-semibold text-gray-800">Payment Failed</h2>
+          <h2 className="text-xl font-semibold text-gray-800">
+            Payment Failed
+          </h2>
           {error && <p className="text-sm text-red-600">{error}</p>}
         </div>
       )}
@@ -59,5 +78,5 @@ export default function PaymentStatus({ success, transactionId, error, onReset }
         {success ? "Make Another Payment" : "Try Again"}
       </button>
     </div>
-  )
+  );
 }

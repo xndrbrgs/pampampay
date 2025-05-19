@@ -176,18 +176,18 @@ async function executeWithTimeout(controller: any, timeout: number) {
           }
 
           // Get the transaction response
-          const transactionResponse = apiResponse.getTransactionResponse();
+          const transactionResponse = apiResponse.transactionResponse;
 
           if (!transactionResponse) {
             resolve({
               success: false,
               error: "Invalid transaction response",
-              responseCode: apiResponse.getMessages().getResultCode(),
+              responseCode: apiResponse.messages?.resultCode,
             });
             return;
           }
 
-          const responseCode = transactionResponse.getResponseCode();
+          const responseCode = transactionResponse.responseCode;
           console.log("Response Code:", responseCode);
 
           // Check response code - "1" means approved
@@ -195,13 +195,13 @@ async function executeWithTimeout(controller: any, timeout: number) {
             // Successful transaction
             resolve({
               success: true,
-              transactionId: transactionResponse.getTransId(),
-              authCode: transactionResponse.getAuthCode(),
+              transactionId: transactionResponse.transId,
+              authCode: transactionResponse.authCode,
               message: "Transaction approved",
-              avsResultCode: transactionResponse.getAvsResultCode(),
-              cvvResultCode: transactionResponse.getCvvResultCode(),
-              accountNumber: transactionResponse.getAccountNumber(),
-              accountType: transactionResponse.getAccountType(),
+              avsResultCode: transactionResponse.avsResultCode,
+              cvvResultCode: transactionResponse.cvvResultCode,
+              accountNumber: transactionResponse.accountNumber,
+              accountType: transactionResponse.accountType,
             });
           } else {
             // Get detailed error message
@@ -209,13 +209,10 @@ async function executeWithTimeout(controller: any, timeout: number) {
             let errorCode = "";
 
             try {
-              if (
-                transactionResponse.getErrors() &&
-                transactionResponse.getErrors().getError().length > 0
-              ) {
-                const error = transactionResponse.getErrors().getError()[0];
-                errorCode = error.getErrorCode();
-                errorMessage = error.getErrorText();
+              if (transactionResponse.errors && transactionResponse.errors.length > 0) {
+                const error = transactionResponse.errors[0];
+                errorCode = error.errorCode;
+                errorMessage = error.errorText;
               }
             } catch (msgError) {
               console.error("Error getting error details:", msgError);
@@ -226,7 +223,7 @@ async function executeWithTimeout(controller: any, timeout: number) {
               error: errorMessage,
               errorCode: errorCode,
               responseCode: responseCode,
-              transactionId: transactionResponse.getTransId(), // Include transaction ID even for declined transactions
+              transactionId: transactionResponse.transId, // Include transaction ID even for declined transactions
             });
           }
         } catch (responseError) {

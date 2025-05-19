@@ -341,16 +341,38 @@ declare module "authorizenet/lib/apicontrollers" {
 
 
     export class CreateTransactionController {
-
+        constructor(obj?: any, ...args: any[]);
+        getJSON(): {
+            ErrorResponse: ANetApiResponse;
+        };
+        setRefId(p_refId: any): void;
+        refId: any;
+        getRefId(): any;
+        setMessages(p_messages: any): void;
+        messages: any;
+        getMessages(): any;
+        setSessionToken(p_sessionToken: any): void;
+        sessionToken: any;
+        getSessionToken(): any;
         constructor(request: object);
-
         setEnvironment(environment: string): void;
-
-        execute(callback: () => void): void;
-
-        getResponse(): any;
-
         getError(): any;
+        constructor(apiRequest: any);
+        _request: any;
+        _response: any;
+        _endpoint: string;
+        validateRequest(): void;
+        validate(): void;
+        getResponse(): any;
+        getResultcode(): any;
+        getMessagetype(): any;
+        beforeExecute(): void;
+        setClientId(): void;
+        setEnvironment(env: any): void;
+        execute(callback: any): void;
+        getRequestType(): string;
+        getTransactionResponse(): any;
+        getResponseCode(): string;
 
     }
 
