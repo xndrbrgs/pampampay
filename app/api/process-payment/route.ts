@@ -2,11 +2,16 @@ import { NextResponse } from "next/server";
 import * as ApiContracts from "authorizenet/lib/apicontracts";
 import * as ApiControllers from "authorizenet/lib/apicontrollers";
 import { Constants } from "authorizenet";
+import { format } from "date-fns";
+import { saveAuthorizeNetTransaction } from "@/lib/actions/authorize-net-actions";
+import { createOrGetUser } from "@/lib/actions/user.actions";
 
 // Set a timeout for the Authorize.Net API call
 const API_TIMEOUT = 15000; // 15 seconds
 
 export async function POST(request: Request) {
+  const user = await createOrGetUser();
+  const userId = user.id;
   try {
     // Parse the request body
     let body;
@@ -23,12 +28,13 @@ export async function POST(request: Request) {
       );
     }
 
-    const { dataDescriptor, dataValue, amount } = body;
+    const { dataDescriptor, dataValue, amount, recipientId, paymentDescription, email } = body;
 
     console.log("Received payment request with:", {
       dataDescriptor: dataDescriptor ? "Present" : "Missing",
       dataValue: dataValue ? "Present" : "Missing",
       amount,
+      email
     });
 
     // Validate required fields
@@ -74,15 +80,17 @@ export async function POST(request: Request) {
 
     // Add order information
     const orderDetails = new ApiContracts.OrderType();
-    orderDetails.setInvoiceNumber(`INV-${Date.now()}`);
-    orderDetails.setDescription("Online Payment");
+    const currentDate = format(new Date(), "yyyyMMddhh:mmss");
+    orderDetails.setInvoiceNumber(`INV-${currentDate}`);
+    orderDetails.setDescription(`Payment for ${paymentDescription}`);
     transactionRequestType.setOrder(orderDetails);
 
     // Add customer information
     const customerData = new ApiContracts.CustomerDataType();
     customerData.setType(ApiContracts.CustomerTypeEnum.INDIVIDUAL);
-    customerData.setId(`CUST-${Date.now()}`);
-    customerData.setEmail("testing@example.com"); // You might want to collect this from the user
+    const recipientIdPrefix = recipientId.slice(0, 5);
+    customerData.setId(`CUST-${recipientIdPrefix}`);
+    customerData.setEmail(email); // You might want to collect this from the user
     transactionRequestType.setCustomer(customerData);
 
     // Create the main request
@@ -105,7 +113,7 @@ export async function POST(request: Request) {
 
     // Execute the payment with a timeout
     try {
-      const result = await executeWithTimeout(createController, API_TIMEOUT);
+      const result = await executeWithTimeout(createController, API_TIMEOUT, amount, recipientId, paymentDescription, userId);
       console.log("Payment processing result:", result);
       return NextResponse.json(result);
     } catch (apiError) {
@@ -134,7 +142,7 @@ export async function POST(request: Request) {
 }
 
 // Helper function to execute the payment with a timeout
-async function executeWithTimeout(controller: any, timeout: number) {
+async function executeWithTimeout(controller: any, timeout: number, amount: number, recipientId: string, paymentDescription: string, userId: string) {
   return new Promise((resolve, reject) => {
     // Set a timeout to prevent function from hanging
     const timeoutId = setTimeout(() => {
@@ -143,7 +151,7 @@ async function executeWithTimeout(controller: any, timeout: number) {
     }, timeout);
 
     try {
-      controller.execute(() => {
+      controller.execute(async () => {
         // Clear the timeout since we got a response
         clearTimeout(timeoutId);
 
@@ -202,6 +210,16 @@ async function executeWithTimeout(controller: any, timeout: number) {
               cvvResultCode: transactionResponse.cvvResultCode,
               accountNumber: transactionResponse.accountNumber,
               accountType: transactionResponse.accountType,
+            });
+            await saveAuthorizeNetTransaction({
+              transactionId: transactionResponse.transId,
+              amount: amount,
+              id: transactionResponse.transId,
+              status: "COMPLETED",
+              description: paymentDescription,
+              senderId: userId,
+              receiverId: recipientId,
+              createdAt: new Date(),
             });
           } else {
             // Get detailed error message

@@ -4,17 +4,24 @@ import type React from "react";
 import valid from "card-validator";
 import Image from "next/image";
 import { useState } from "react";
-import { useRouter } from "next/navigation";
 import Script from "next/script";
 
 interface AcceptPaymentFormProps {
   onPaymentComplete: (result: any) => void;
   onPaymentError: (error: string) => void;
+  amount: number;
+  recipientId: string;
+  paymentDescription?: string;
+  email: string;
 }
 
 export default function AcceptPaymentForm({
   onPaymentComplete,
   onPaymentError,
+  amount,
+  recipientId,
+  paymentDescription,
+  email,
 }: AcceptPaymentFormProps) {
   const [cardNumber, setCardNumber] = useState("");
   const [expirationDate, setExpirationDate] = useState("");
@@ -23,7 +30,6 @@ export default function AcceptPaymentForm({
   const [cardType, setCardType] = useState<string | null>(null);
   const [cardNumberError, setCardNumberError] = useState("");
   const [cardCodeError, setCardCodeError] = useState("");
-  const [amount, setAmount] = useState("");
   const [isLoading, setIsLoading] = useState(false);
   const [scriptLoaded, setScriptLoaded] = useState(false);
   const [scriptError, setScriptError] = useState<string | null>(null);
@@ -71,7 +77,7 @@ export default function AcceptPaymentForm({
     }
 
     // Validate amount is a number
-    const amountNum = Number.parseFloat(amount);
+    const amountNum = amount;
     if (isNaN(amountNum) || amountNum <= 0) {
       onPaymentError("Please enter a valid amount");
       return;
@@ -128,6 +134,9 @@ export default function AcceptPaymentForm({
         dataDescriptor: response.opaqueData.dataDescriptor,
         dataValue: response.opaqueData.dataValue,
         amount: amount,
+        recipientId,
+        paymentDescription,
+        email,
       };
 
       console.log("Sending to server:", {
@@ -312,31 +321,12 @@ export default function AcceptPaymentForm({
           </div>
         </div>
 
-        <div>
-          <label
-            htmlFor="amount"
-            className="block text-md font-medium text-white/80"
-          >
-            Amount ($)
-          </label>
-          <input
-            type="text"
-            id="amount"
-            value={amount}
-            onChange={(e) => setAmount(e.target.value)}
-            placeholder="10.00"
-            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-black"
-            disabled={isLoading}
-            required
-          />
-        </div>
-
         <button
           type="submit"
           className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-md font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
           disabled={isLoading || !scriptLoaded}
         >
-          {isLoading ? "Processing..." : "Pay Now"}
+          {isLoading ? "Processing..." : `Pay ${amount}`}
         </button>
       </form>
     </div>

@@ -4,7 +4,19 @@ import { useState } from "react";
 import PaymentStatus from "./PaymentStatus";
 import AcceptPaymentForm from "./AuthProcessForm";
 
-export default function Home() {
+interface PaymentWrapperAuthProps {
+  amount: number;
+  recipientId: string;
+  paymentDescription?: string;
+  email?: string;
+}
+
+export default function PaymentWrapperAuth({
+  amount,
+  recipientId,
+  paymentDescription,
+  email,
+}: PaymentWrapperAuthProps) {
   const [paymentStatus, setPaymentStatus] = useState<{
     success?: boolean;
     error?: string;
@@ -46,6 +58,10 @@ export default function Home() {
         <AcceptPaymentForm
           onPaymentComplete={handlePaymentComplete}
           onPaymentError={handlePaymentError}
+          amount={amount}
+          recipientId={recipientId}
+          paymentDescription={paymentDescription}
+          email={email || ""}
         />
       )}
     </div>

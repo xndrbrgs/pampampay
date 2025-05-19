@@ -32,13 +32,11 @@ import {
 } from "lucide-react";
 import { toast } from "sonner";
 import { PayPalButtonsWrapper } from "../Paypal/paypal-buttons";
-import { AuthorizeNetPaymentModal } from "../Auth.Net/react-acceptjs/authorize-net-payment-modal";
 import { createStripeSession } from "@/lib/actions/transfer.actions";
-import ReactAuthNetForm from "./react-auth-net/ReactAuthForm";
-import ChatForm from "./chat-net/ChatForm";
-import AcceptFormHosted from "./chat-net/AcceptFormHosted";
+import PaymentWrapperAuth from "./using-auth/PaymentWrapperAuth";
 
 type UnifiedPaymentFormProps = {
+  email: string;
   connections: Array<{
     userId: string;
     email: string;
@@ -65,7 +63,10 @@ const formSchema = z.object({
   }),
 });
 
-export function AuthPaymentForm({ connections }: UnifiedPaymentFormProps) {
+export function AuthPaymentForm({
+  connections,
+  email,
+}: UnifiedPaymentFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showPayPal, setShowPayPal] = useState(false);
   const [showAuthorizeNet, setShowAuthorizeNet] = useState(false);
@@ -321,7 +322,7 @@ export function AuthPaymentForm({ connections }: UnifiedPaymentFormProps) {
                               <SelectValue placeholder="Select an amount" />
                             </SelectTrigger>
                             <SelectContent>
-                              {[0.5, 1].map((value) => (
+                              {[0.01, 1].map((value) => (
                                 <SelectItem
                                   key={value}
                                   value={value.toString()}
@@ -439,17 +440,29 @@ export function AuthPaymentForm({ connections }: UnifiedPaymentFormProps) {
             </motion.div>
           )}
 
-          {/* Authorize.Net Payment Modal */}
-          {/* <AuthorizeNetPaymentModal
-            isOpen={showAuthorizeNet}
-            onClose={() => setShowAuthorizeNet(false)}
-            amount={form.getValues().amount}
-            recipientId={form.getValues().recipientId}
-            recipientEmail={form.getValues().recipientEmail}
-            paymentDescription={form.getValues().paymentDescription}
-          /> */}
-          {/* <ReactAuthNetForm amount={form.getValues().amount} /> */}
-          <AcceptFormHosted />
+          {showAuthorizeNet && (
+            <motion.div
+              className="mt-5 w-full"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <PaymentWrapperAuth
+                amount={form.getValues().amount}
+                recipientId={form.getValues().recipientId}
+                paymentDescription={form.getValues().paymentDescription}
+                email={email}
+              />
+              <Button
+                variant="chosen"
+                className="w-full my-4"
+                onClick={() => setShowAuthorizeNet(false)}
+                disabled={isLoading}
+              >
+                Cancel
+              </Button>
+            </motion.div>
+          )}
         </CardContent>
       </motion.section>
     </Card>

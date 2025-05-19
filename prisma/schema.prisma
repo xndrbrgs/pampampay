@@ -30,6 +30,8 @@ model User {
   squareReceiverTransfers SquareTransfer[] @relation("SquareReceiverTransfers")
   coinbaseSentTransfers   CoinbaseTransfer[] @relation("CoinbaseSenderTransfers")
   coinbaseReceiverTransfers CoinbaseTransfer[] @relation("CoinbaseReceiverTransfers")
+  authnetSentTransfers   AuthNetTransfer[] @relation("AuthNetSenderTransfers")
+  authnetReceiverTransfers AuthNetTransfer[] @relation("AuthNetReceiverTransfers")
 }
 
 model Connection {
@@ -56,6 +58,19 @@ model Transfer {
   createdAt            DateTime       @default(now())
   updatedAt            DateTime       @updatedAt
   transactionReference String? // For additional tracking if needed
+}
+
+model AuthNetTransfer {
+  id                   String         @id @default(cuid())
+  amount               Float
+  description          String?
+  senderId             String
+  receiverId           String
+  sender               User           @relation("AuthNetSenderTransfers", fields: [senderId], references: [id])
+  receiver             User           @relation("AuthNetReceiverTransfers", fields: [receiverId], references: [id])
+  status               TransferStatus
+  createdAt            DateTime       @default(now())
+  updatedAt            DateTime       @updatedAt
 }
 
 model PaypalTransfer {

@@ -1,8 +1,6 @@
 import { AuthPaymentForm } from "@/components/Auth.Net/AuthPayForm";
-import PaymentWrapperAuth from "@/components/Auth.Net/using-auth/PaymentWrapperAuth";
 import AdminComponent from "@/components/Dashboard/AdminComponent";
 import Header from "@/components/General/Header";
-import { PayPalProvider } from "@/components/Paypal/PaypalProvider";
 import { GooglePayProvider } from "@/contexts/googlepay";
 import { getAdminUser, getConnections } from "@/lib/actions/user.actions";
 import { currentUser } from "@clerk/nextjs/server";
@@ -13,8 +11,9 @@ export default async function Dashboard() {
     return <div>User not found</div>;
   }
 
+  const userEmail = user.emailAddresses[0]?.emailAddress;
   const adminUser = await getAdminUser();
-  // const connections = await getConnections();
+  const connections = await getConnections();
 
   if (user.id !== adminUser?.clerkUserId) {
     return (
@@ -26,7 +25,7 @@ export default async function Dashboard() {
           />
 
           <div className="pt-4 max-w-3xl flex flex-col gap-y-5">
-            <PaymentWrapperAuth />
+            <AuthPaymentForm connections={connections} email={userEmail} />
           </div>
         </section>
       </GooglePayProvider>
