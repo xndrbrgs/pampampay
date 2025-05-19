@@ -326,7 +326,7 @@ export default function AcceptPaymentForm({
           className="w-full flex justify-center py-2 px-4 border border-transparent rounded-md shadow-sm text-md font-medium text-white bg-indigo-600 hover:bg-indigo-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-indigo-500 disabled:opacity-50"
           disabled={isLoading || !scriptLoaded}
         >
-          {isLoading ? "Processing..." : `Pay ${amount}`}
+          {isLoading ? "Processing..." : `Pay $${amount}`}
         </button>
       </form>
     </div>
