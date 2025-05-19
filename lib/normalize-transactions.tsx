@@ -1,14 +1,14 @@
 // This function normalizes transactions from different payment processors
 // into a unified format for display in the combined table
 
-import type { UnifiedTransaction } from "@/components/Transactions/unified-columns"
+import type { UnifiedTransaction } from "@/components/Transactions/unified-columns";
 
 export function normalizeTransactions(
   transactions: any[],
-  source: "stripe" | "paypal" | "square" | "coinbase",
+  source: "stripe" | "paypal" | "square" | "coinbase" | "authorize"
 ): UnifiedTransaction[] {
   if (!transactions || !Array.isArray(transactions)) {
-    return []
+    return [];
   }
 
   return transactions.map((transaction) => {
@@ -21,7 +21,7 @@ export function normalizeTransactions(
       status: transaction.status,
       email: "",
       source,
-    }
+    };
 
     // Source-specific normalizations
     switch (source) {
@@ -31,23 +31,31 @@ export function normalizeTransactions(
           transaction.senderEmail ||
           transaction.transaction?.source?.receipt_email ||
           transaction.customerEmail ||
-          "N/A"
-        break
+          "N/A";
+        break;
+
+      case "authorize":
+        baseTransaction.email = transaction.senderEmail ?? "N/A";
+        break;
 
       case "paypal":
-        baseTransaction.email = transaction.senderEmail || transaction.payer?.email_address || "N/A"
-        break
+        baseTransaction.email =
+          transaction.senderEmail || transaction.payer?.email_address || "N/A";
+        break;
 
       case "square":
-        baseTransaction.email = transaction.senderEmail || transaction.buyerEmail || "N/A"
-        break
+        baseTransaction.email =
+          transaction.senderEmail || transaction.buyerEmail || "N/A";
+        break;
 
       case "coinbase":
-        baseTransaction.email = transaction.senderEmail || transaction.transaction?.source?.receipt_email || "N/A"
-        break
+        baseTransaction.email =
+          transaction.senderEmail ||
+          transaction.transaction?.source?.receipt_email ||
+          "N/A";
+        break;
     }
 
-    return baseTransaction
-  })
+    return baseTransaction;
+  });
 }
-

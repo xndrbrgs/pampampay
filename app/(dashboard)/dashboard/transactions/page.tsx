@@ -6,6 +6,7 @@ import { getPayPalTransactions } from "@/lib/paypal";
 import { getSquareTransactions } from "@/lib/actions/square.actions";
 import { getCoinbaseCharges } from "@/lib/coinbase";
 import UnifiedTransactionsTable from "@/components/Transactions/unified-transactions-table";
+import { getAuthTransactions } from "@/lib/actions/authorize-net-actions";
 
 const TransactionsPage = async () => {
   const user = await createOrGetUser();
@@ -13,13 +14,19 @@ const TransactionsPage = async () => {
     redirect("/dashboard");
   }
 
-  const [stripeTransfers, paypalTransfers, squareTransfers, coinbaseTransfers] =
-    await Promise.all([
-      getUserStripeTransactions(),
-      getPayPalTransactions(),
-      getSquareTransactions(),
-      getCoinbaseCharges(),
-    ]);
+  const [
+    stripeTransfers,
+    paypalTransfers,
+    squareTransfers,
+    coinbaseTransfers,
+    authNetTransfers,
+  ] = await Promise.all([
+    getUserStripeTransactions(),
+    getPayPalTransactions(),
+    getSquareTransactions(),
+    getCoinbaseCharges(),
+    getAuthTransactions(),
+  ]);
 
   return (
     <section className="p-6 h-screen gap-y-4">
@@ -28,6 +35,7 @@ const TransactionsPage = async () => {
         subtext="View your transactions here."
       />
       <UnifiedTransactionsTable
+        authNetTransfers={authNetTransfers}
         stripeTransfers={stripeTransfers}
         paypalTransfers={paypalTransfers}
         squareTransfers={squareTransfers}

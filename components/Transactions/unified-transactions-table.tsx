@@ -11,6 +11,7 @@ interface UnifiedTransactionsTableProps {
   paypalTransfers: any[];
   squareTransfers: any[];
   coinbaseTransfers: any[];
+  authNetTransfers: any[];
 }
 
 const UnifiedTransactionsTable = ({
@@ -18,6 +19,7 @@ const UnifiedTransactionsTable = ({
   paypalTransfers,
   squareTransfers,
   coinbaseTransfers,
+  authNetTransfers,
 }: UnifiedTransactionsTableProps) => {
   const [activeTab, setActiveTab] = useState("all");
 
@@ -37,6 +39,10 @@ const UnifiedTransactionsTable = ({
   const normalizedCoinbaseTransfers = normalizeTransactions(
     coinbaseTransfers,
     "coinbase"
+  );
+  const normalizedAuthNetTransfers = normalizeTransactions(
+    authNetTransfers,
+    "authorize"
   );
 
   // Combine all transactions
@@ -63,6 +69,8 @@ const UnifiedTransactionsTable = ({
         return normalizedSquareTransfers;
       case "coinbase":
         return normalizedCoinbaseTransfers;
+      case "authorize":
+        return normalizedAuthNetTransfers;
       default:
         return allTransactions;
     }
@@ -73,6 +81,7 @@ const UnifiedTransactionsTable = ({
       <Tabs defaultValue="all" onValueChange={setActiveTab}>
         <TabsList className="mb-4">
           <TabsTrigger value="all">All Transactions</TabsTrigger>
+          <TabsTrigger value="authorize">Authorize.Net</TabsTrigger>
           <TabsTrigger value="stripe">Stripe</TabsTrigger>
           <TabsTrigger value="paypal">PayPal</TabsTrigger>
           <TabsTrigger value="square">Square</TabsTrigger>
@@ -83,6 +92,13 @@ const UnifiedTransactionsTable = ({
             columns={unifiedColumns}
             data={getFilteredTransactions()}
             source="all"
+          />
+        </TabsContent>
+        <TabsContent value="authorize" className="mt-0">
+          <UnifiedDataTable
+            columns={unifiedColumns}
+            data={getFilteredTransactions()}
+            source="authorize"
           />
         </TabsContent>
         <TabsContent value="stripe" className="mt-0">
