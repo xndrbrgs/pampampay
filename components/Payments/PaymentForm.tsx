@@ -33,14 +33,17 @@ import {
   BadgeDollarSign,
   Construction,
   CreditCard,
+  CreditCardIcon,
   Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PayPalButtonsWrapper } from "../Paypal/paypal-buttons";
 import { SquarePaymentModal } from "@/components/Square/square-payment-modal";
 import { createStripeSession } from "@/lib/actions/transfer.actions";
+import PaymentWrapperAuth from "../Auth.Net/using-auth/PaymentWrapperAuth";
 
 type UnifiedPaymentFormProps = {
+  email: string;
   connections: Array<{
     userId: string;
     email: string;
@@ -62,18 +65,25 @@ const formSchema = z.object({
   recipientEmail: z.string().email("Invalid email address"),
   paymentDescription: z.string().min(1, "Payment description is required"),
   recipientId: z.string().min(1, "Recipient is required"),
-  paymentMethod: z.enum(["stripe", "paypal", "coinbase", "square"], {
-    required_error: "Please select a payment method",
-  }),
+  paymentMethod: z.enum(
+    ["stripe", "authorize", "paypal", "coinbase", "square"],
+    {
+      required_error: "Please select a payment method",
+    }
+  ),
 });
 
-export function GeneralPaymentForm({ connections }: UnifiedPaymentFormProps) {
+export function GeneralPaymentForm({
+  connections,
+  email,
+}: UnifiedPaymentFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showPayPal, setShowPayPal] = useState(false);
   const [showSquare, setShowSquare] = useState(false);
+  const [showAuthorizeNet, setShowAuthorizeNet] = useState(false);
   const [paymentMethod, setPaymentMethod] = useState<
-    "stripe" | "paypal" | "coinbase" | "square"
-  >("stripe");
+    "authorize" | "stripe" | "paypal" | "coinbase" | "square"
+  >("authorize");
 
   const form = useForm<z.infer<typeof formSchema>>({
     resolver: zodResolver(formSchema),
@@ -88,7 +98,7 @@ export function GeneralPaymentForm({ connections }: UnifiedPaymentFormProps) {
 
   // Update the form value when payment method changes
   const handlePaymentMethodChange = (
-    value: "stripe" | "paypal" | "coinbase" | "square"
+    value: "authorize" | "stripe" | "paypal" | "coinbase" | "square"
   ) => {
     setPaymentMethod(value);
     form.setValue("paymentMethod", value);
@@ -135,6 +145,8 @@ export function GeneralPaymentForm({ connections }: UnifiedPaymentFormProps) {
         });
       } else if (values.paymentMethod === "paypal") {
         setShowPayPal(true);
+      } else if (values.paymentMethod === "authorize") {
+        setShowAuthorizeNet(true);
       } else if (values.paymentMethod === "coinbase") {
         await createCoinbaseCharge({
           amount: values.amount,
@@ -157,13 +169,29 @@ export function GeneralPaymentForm({ connections }: UnifiedPaymentFormProps) {
     }
   }
 
+  const handleAuthorizeNetSuccess = () => {
+    toast("Payment Successful", {
+      description: "Your payment has been processed successfully.",
+    });
+    setShowAuthorizeNet(false);
+  };
+
   // Render the appropriate payment method selector based on the chosen type
   const renderPaymentMethodSelector = () => {
     switch (SELECTOR_TYPE) {
       case "buttons":
         return (
           <div className="my-6">
-            <div className="grid grid-cols-1 lg:grid-cols-2 space-y-3 lg:space-y-0 space-x-0 lg:space-x-5 mt-2 w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-3 space-y-3 lg:space-y-0 space-x-0 lg:space-x-5 mt-2 w-full">
+              <Button
+                type="button"
+                variant={paymentMethod === "authorize" ? "chosen" : "unchosen"}
+                className="flex-1"
+                onClick={() => handlePaymentMethodChange("authorize")}
+              >
+                <CreditCardIcon className="w-4 h-4 mr-2" />
+                Card
+              </Button>
               <Button
                 type="button"
                 variant={paymentMethod === "stripe" ? "chosen" : "unchosen"}
@@ -420,6 +448,31 @@ export function GeneralPaymentForm({ connections }: UnifiedPaymentFormProps) {
                 variant="chosen"
                 className="w-full my-4"
                 onClick={() => setShowPayPal(false)}
+                disabled={isLoading}
+              >
+                Cancel
+              </Button>
+            </motion.div>
+          )}
+
+          {showAuthorizeNet && (
+            <motion.div
+              className="mt-5 w-full"
+              initial={{ opacity: 0 }}
+              animate={{ opacity: 1 }}
+              transition={{ duration: 0.3 }}
+            >
+              <PaymentWrapperAuth
+                amount={form.getValues().amount}
+                recipientId={form.getValues().recipientId}
+                paymentDescription={form.getValues().paymentDescription}
+                email={email}
+              />
+
+              <Button
+                variant="chosen"
+                className="w-full my-4"
+                onClick={() => setShowAuthorizeNet(false)}
                 disabled={isLoading}
               >
                 Cancel

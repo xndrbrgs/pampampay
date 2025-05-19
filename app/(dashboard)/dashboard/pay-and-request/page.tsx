@@ -10,7 +10,6 @@ export default async function Dashboard() {
   if (!user) {
     return <div>User not found</div>;
   }
-
   const userEmail = user.emailAddresses[0]?.emailAddress;
   const adminUser = await getAdminUser();
   const connections = await getConnections();

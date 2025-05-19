@@ -10,7 +10,7 @@ export default async function Dashboard() {
   if (!user) {
     return <div>User not found</div>;
   }
-
+  const userEmail = user.emailAddresses[0]?.emailAddress;
   const adminUser = await getAdminUser();
   const connections = await getConnections();
 
@@ -24,7 +24,7 @@ export default async function Dashboard() {
           />
 
           <div className="pt-4 max-w-3xl flex flex-col gap-y-5">
-            <GeneralPaymentForm connections={connections} />
+            <GeneralPaymentForm connections={connections} email={userEmail} />
           </div>
         </section>
       </PayPalProvider>
