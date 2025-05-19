@@ -199,7 +199,7 @@ export function GeneralPaymentForm({
                 onClick={() => handlePaymentMethodChange("stripe")}
               >
                 <CreditCard className="w-4 h-4" />
-                Amazon Pay, Cash App
+                Cash App
               </Button>
               {/* <Button
                 type="button"
