@@ -463,7 +463,7 @@ export function GeneralPaymentForm({
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
             >
-              <GooglePayButton amount={form.getValues().amount} />
+              {/* <GooglePayButton amount={form.getValues().amount} /> */}
               <PaymentWrapperAuth
                 amount={form.getValues().amount}
                 recipientId={form.getValues().recipientId}
