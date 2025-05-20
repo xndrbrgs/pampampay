@@ -28,7 +28,7 @@ export async function saveAuthorizeNetTransaction(transactionDetails: {
     });
     return savedTransaction;
   } catch (error) {
-    console.error("Error saving Authorize.Net transaction:", error);
+    console.log("Error saving Authorize.Net transaction:", error);
     throw new Error("Failed to save transaction");
   }
 }

@@ -85,7 +85,7 @@ export async function POST(request: Request) {
 
     // Add order information
     const orderDetails = new ApiContracts.OrderType();
-    const currentDate = format(estDate, 'yyyyMMddhh:mmss');
+    const currentDate = format(estDate, 'yyyyMMddhhmm');
     orderDetails.setInvoiceNumber(`INV-${currentDate}`);
     orderDetails.setDescription(`Payment for ${paymentDescription}`);
     transactionRequestType.setOrder(orderDetails);
@@ -93,7 +93,7 @@ export async function POST(request: Request) {
     // Add customer information
     const customerData = new ApiContracts.CustomerDataType();
     customerData.setType(ApiContracts.CustomerTypeEnum.INDIVIDUAL);
-    const recipientIdPrefix = recipientId.slice(0, 5);
+    const recipientIdPrefix = recipientId.slice(0, 9);
     customerData.setId(`CUST-${recipientIdPrefix}`);
     customerData.setEmail(email); // You might want to collect this from the user
     transactionRequestType.setCustomer(customerData);
