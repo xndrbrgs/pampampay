@@ -2,15 +2,19 @@ import { AuthPaymentForm } from "@/components/Auth.Net/AuthPayForm";
 import AdminComponent from "@/components/Dashboard/AdminComponent";
 import Header from "@/components/General/Header";
 import { GooglePayProvider } from "@/contexts/googlepay";
-import { getAdminUser, getConnections } from "@/lib/actions/user.actions";
-import { currentUser } from "@clerk/nextjs/server";
+import {
+  createOrGetUser,
+  getAdminUser,
+  getConnections,
+} from "@/lib/actions/user.actions";
+import { redirect } from "next/navigation";
 
 export default async function Dashboard() {
-  const user = await currentUser();
-  if (!user) {
-    return <div>User not found</div>;
+  const user = await createOrGetUser();
+  if (user.stripeConnectedLinked === false) {
+    redirect("/dashboard");
   }
-  const userEmail = user.emailAddresses[0]?.emailAddress;
+
   const adminUser = await getAdminUser();
   const connections = await getConnections();
 
