@@ -5,7 +5,6 @@ import { TransferStatus } from './../../node_modules/.prisma/client/index.d';
 import { getEmailBySenderId } from "./user.actions";
 
 export async function saveAuthorizeNetTransaction(transactionDetails: {
-  transactionId: string;
   amount: number;
   status: TransferStatus;
   senderId: string;

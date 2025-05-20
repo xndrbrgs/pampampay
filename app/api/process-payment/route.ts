@@ -3,14 +3,14 @@ import * as ApiContracts from "authorizenet/lib/apicontracts";
 import * as ApiControllers from "authorizenet/lib/apicontrollers";
 import { Constants } from "authorizenet";
 import { format } from "date-fns";
-import { toZonedTime } from 'date-fns-tz';
+import { toZonedTime } from "date-fns-tz";
 import { saveAuthorizeNetTransaction } from "@/lib/actions/authorize-net-actions";
 import { createOrGetUser } from "@/lib/actions/user.actions";
 
 // Set a timeout for the Authorize.Net API call
 const API_TIMEOUT = 15000; // 15 seconds
 // Define EST/EDT time zone (automatically adjusts for Daylight Saving Time)
-const timeZone = 'America/New_York';
+const timeZone = "America/New_York";
 const now = new Date();
 const estDate = toZonedTime(now, timeZone);
 
@@ -33,13 +33,20 @@ export async function POST(request: Request) {
       );
     }
 
-    const { dataDescriptor, dataValue, amount, recipientId, paymentDescription, email } = body;
+    const {
+      dataDescriptor,
+      dataValue,
+      amount,
+      recipientId,
+      paymentDescription,
+      email,
+    } = body;
 
     console.log("Received payment request with:", {
       dataDescriptor: dataDescriptor ? "Present" : "Missing",
       dataValue: dataValue ? "Present" : "Missing",
       amount,
-      email
+      email,
     });
 
     // Validate required fields
@@ -85,7 +92,7 @@ export async function POST(request: Request) {
 
     // Add order information
     const orderDetails = new ApiContracts.OrderType();
-    const currentDate = format(estDate, 'yyyyMMddhhmm');
+    const currentDate = format(estDate, "yyyyMMddhhmm");
     orderDetails.setInvoiceNumber(`INV-${currentDate}`);
     orderDetails.setDescription(`Payment for ${paymentDescription}`);
     transactionRequestType.setOrder(orderDetails);
@@ -118,7 +125,14 @@ export async function POST(request: Request) {
 
     // Execute the payment with a timeout
     try {
-      const result = await executeWithTimeout(createController, API_TIMEOUT, amount, recipientId, paymentDescription, userId);
+      const result = await executeWithTimeout(
+        createController,
+        API_TIMEOUT,
+        amount,
+        recipientId,
+        paymentDescription,
+        userId
+      );
       console.log("Payment processing result:", result);
       return NextResponse.json(result);
     } catch (apiError) {
@@ -147,7 +161,14 @@ export async function POST(request: Request) {
 }
 
 // Helper function to execute the payment with a timeout
-async function executeWithTimeout(controller: any, timeout: number, amount: number, recipientId: string, paymentDescription: string, userId: string) {
+async function executeWithTimeout(
+  controller: any,
+  timeout: number,
+  amount: number,
+  recipientId: string,
+  paymentDescription: string,
+  userId: string
+) {
   return new Promise((resolve, reject) => {
     // Set a timeout to prevent function from hanging
     const timeoutId = setTimeout(() => {
@@ -216,8 +237,7 @@ async function executeWithTimeout(controller: any, timeout: number, amount: numb
               accountNumber: transactionResponse.accountNumber,
               accountType: transactionResponse.accountType,
             });
-            await saveAuthorizeNetTransaction({
-              transactionId: transactionResponse.transId,
+            const authPayment = await saveAuthorizeNetTransaction({
               amount: amount,
               id: transactionResponse.transId,
               status: "COMPLETED",
@@ -226,13 +246,17 @@ async function executeWithTimeout(controller: any, timeout: number, amount: numb
               receiverId: recipientId,
               createdAt: new Date(),
             });
+            console.log("Saved transaction:", authPayment);
           } else {
             // Get detailed error message
             let errorMessage = "Transaction declined";
             let errorCode = "";
 
             try {
-              if (transactionResponse.errors && transactionResponse.errors.length > 0) {
+              if (
+                transactionResponse.errors &&
+                transactionResponse.errors.length > 0
+              ) {
                 const error = transactionResponse.errors[0];
                 errorCode = error.errorCode;
                 errorMessage = error.errorText;
