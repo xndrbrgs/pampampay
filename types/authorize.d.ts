@@ -9,7 +9,94 @@ declare module "authorizenet/lib/apicontracts" {
 
     }
 
+    export class LineItemType {
+        constructor(obj?: any, ...args: any[]);
+        setItemId(p_itemId: any): void;
+        itemId: any;
+        getItemId(): any;
+        setName(p_name: any): void;
+        name: any;
+        getName(): any;
+        setDescription(p_description: any): void;
+        description: any;
+        getDescription(): any;
+        setQuantity(p_quantity: any): void;
+        quantity: any;
+        getQuantity(): any;
+        setUnitPrice(p_unitPrice: any): void;
+        unitPrice: any;
+        getUnitPrice(): any;
+        setTaxable(p_taxable: any): void;
+        taxable: any;
+        getTaxable(): any;
+        setUnitOfMeasure(p_unitOfMeasure: any): void;
+        unitOfMeasure: any;
+        getUnitOfMeasure(): any;
+        setTypeOfSupply(p_typeOfSupply: any): void;
+        typeOfSupply: any;
+        getTypeOfSupply(): any;
+        setTaxRate(p_taxRate: any): void;
+        taxRate: any;
+        getTaxRate(): any;
+        setTaxAmount(p_taxAmount: any): void;
+        taxAmount: any;
+        getTaxAmount(): any;
+        setNationalTax(p_nationalTax: any): void;
+        nationalTax: any;
+        getNationalTax(): any;
+        setLocalTax(p_localTax: any): void;
+        localTax: any;
+        getLocalTax(): any;
+        setVatRate(p_vatRate: any): void;
+        vatRate: any;
+        getVatRate(): any;
+        setAlternateTaxId(p_alternateTaxId: any): void;
+        alternateTaxId: any;
+        getAlternateTaxId(): any;
+        setAlternateTaxType(p_alternateTaxType: any): void;
+        alternateTaxType: any;
+        getAlternateTaxType(): any;
+        setAlternateTaxTypeApplied(p_alternateTaxTypeApplied: any): void;
+        alternateTaxTypeApplied: any;
+        getAlternateTaxTypeApplied(): any;
+        setAlternateTaxRate(p_alternateTaxRate: any): void;
+        alternateTaxRate: any;
+        getAlternateTaxRate(): any;
+        setAlternateTaxAmount(p_alternateTaxAmount: any): void;
+        alternateTaxAmount: any;
+        getAlternateTaxAmount(): any;
+        setTotalAmount(p_totalAmount: any): void;
+        totalAmount: any;
+        getTotalAmount(): any;
+        setCommodityCode(p_commodityCode: any): void;
+        commodityCode: any;
+        getCommodityCode(): any;
+        setProductCode(p_productCode: any): void;
+        productCode: any;
+        getProductCode(): any;
+        setProductSKU(p_productSKU: any): void;
+        productSKU: any;
+        getProductSKU(): any;
+        setDiscountRate(p_discountRate: any): void;
+        discountRate: any;
+        getDiscountRate(): any;
+        setDiscountAmount(p_discountAmount: any): void;
+        discountAmount: any;
+        getDiscountAmount(): any;
+        setTaxIncludedInTotal(p_taxIncludedInTotal: any): void;
+        taxIncludedInTotal: any;
+        getTaxIncludedInTotal(): any;
+        setTaxIsAfterDiscount(p_taxIsAfterDiscount: any): void;
+        taxIsAfterDiscount: any;
+        getTaxIsAfterDiscount(): any;
+    }
 
+    export class ArrayOfLineItem {
+        constructor(obj?: any, ...args: any[]);
+        setLineItem(p_lineItem: any): void;
+        lineItem: any;
+        getLineItem(): any;
+    }
 
     export class CreditCardType {
 

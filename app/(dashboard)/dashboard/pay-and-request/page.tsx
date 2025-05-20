@@ -1,6 +1,6 @@
-import { AuthPaymentForm } from "@/components/Auth.Net/AuthPayForm";
 import AdminComponent from "@/components/Dashboard/AdminComponent";
 import Header from "@/components/General/Header";
+import { GeneralPaymentForm } from "@/components/Payments/PaymentForm";
 import { GooglePayProvider } from "@/contexts/googlepay";
 import {
   createOrGetUser,
@@ -9,12 +9,12 @@ import {
 } from "@/lib/actions/user.actions";
 import { redirect } from "next/navigation";
 
-export default async function Dashboard() {
+export default async function PayAndRequestDash() {
   const user = await createOrGetUser();
   if (user.stripeConnectedLinked === false) {
     redirect("/dashboard");
   }
-
+  const userEmail = user.email;
   const adminUser = await getAdminUser();
   const connections = await getConnections();
 
@@ -28,7 +28,7 @@ export default async function Dashboard() {
           />
 
           <div className="pt-4 max-w-3xl flex flex-col gap-y-5">
-            <AuthPaymentForm connections={connections} email={userEmail} />
+            <GeneralPaymentForm connections={connections} email={userEmail} />
           </div>
         </section>
       </GooglePayProvider>

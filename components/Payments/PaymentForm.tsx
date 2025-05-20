@@ -41,6 +41,7 @@ import { PayPalButtonsWrapper } from "../Paypal/paypal-buttons";
 import { SquarePaymentModal } from "@/components/Square/square-payment-modal";
 import { createStripeSession } from "@/lib/actions/transfer.actions";
 import PaymentWrapperAuth from "../Auth.Net/using-auth/PaymentWrapperAuth";
+import GooglePayButton from "../Auth.Net/wallets/GooglePayButton";
 
 type UnifiedPaymentFormProps = {
   email: string;
@@ -336,8 +337,7 @@ export function GeneralPaymentForm({
                             </SelectTrigger>
                             <SelectContent>
                               {[
-                                10, 15, 20, 25, 30, 40, 50, 60, 70, 80,
-                                90, 100,
+                                10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100,
                               ].map((value) => (
                                 <SelectItem
                                   key={value}
@@ -463,6 +463,7 @@ export function GeneralPaymentForm({
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
             >
+              <GooglePayButton amount={form.getValues().amount} />
               <PaymentWrapperAuth
                 amount={form.getValues().amount}
                 recipientId={form.getValues().recipientId}

@@ -100,8 +100,7 @@ export async function POST(request: Request) {
     // Add customer information
     const customerData = new ApiContracts.CustomerDataType();
     customerData.setType(ApiContracts.CustomerTypeEnum.INDIVIDUAL);
-    const recipientIdPrefix = recipientId.slice(0, 9);
-    customerData.setId(`CUST-${recipientIdPrefix}`);
+    customerData.setId(userId);
     customerData.setEmail(email); // You might want to collect this from the user
     transactionRequestType.setCustomer(customerData);
 
@@ -237,7 +236,7 @@ async function executeWithTimeout(
               createdAt: new Date(),
             });
             console.log("Saved transaction:", authPayment);
-            
+
             resolve({
               success: true,
               transactionId: transactionResponse.transId,
