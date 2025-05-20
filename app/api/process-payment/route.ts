@@ -227,16 +227,6 @@ async function executeWithTimeout(
           // Check response code - "1" means approved
           if (responseCode === "1") {
             // Successful transaction
-            resolve({
-              success: true,
-              transactionId: transactionResponse.transId,
-              authCode: transactionResponse.authCode,
-              message: "Transaction approved",
-              avsResultCode: transactionResponse.avsResultCode,
-              cvvResultCode: transactionResponse.cvvResultCode,
-              accountNumber: transactionResponse.accountNumber,
-              accountType: transactionResponse.accountType,
-            });
             const authPayment = await saveAuthorizeNetTransaction({
               amount: amount,
               id: transactionResponse.transId,
@@ -247,6 +237,18 @@ async function executeWithTimeout(
               createdAt: new Date(),
             });
             console.log("Saved transaction:", authPayment);
+            
+            resolve({
+              success: true,
+              transactionId: transactionResponse.transId,
+              authCode: transactionResponse.authCode,
+              message: "Transaction approved",
+              avsResultCode: transactionResponse.avsResultCode,
+              cvvResultCode: transactionResponse.cvvResultCode,
+              accountNumber: transactionResponse.accountNumber,
+              accountType: transactionResponse.accountType,
+            });
+
           } else {
             // Get detailed error message
             let errorMessage = "Transaction declined";
