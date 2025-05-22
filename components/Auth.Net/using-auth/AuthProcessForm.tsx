@@ -23,6 +23,11 @@ export default function AcceptPaymentForm({
   paymentDescription,
   email,
 }: AcceptPaymentFormProps) {
+  const [firstName, setFirstName] = useState("");
+  const [lastName, setLastName] = useState("");
+  const [address, setAddress] = useState("");
+  const [city, setCity] = useState("");
+  const [phoneNumber, setPhoneNumber] = useState("");
   const [cardNumber, setCardNumber] = useState("");
   const [expirationDate, setExpirationDate] = useState("");
   const [cardCode, setCardCode] = useState("");
@@ -137,6 +142,11 @@ export default function AcceptPaymentForm({
         recipientId,
         paymentDescription,
         email,
+        firstName,
+        lastName,
+        address,
+        city,
+        phoneNumber,
       };
 
       console.log("Sending to server:", {
@@ -197,57 +207,148 @@ export default function AcceptPaymentForm({
 
       <span className="text-2xl">Pay With Card</span>
       <form onSubmit={sendPaymentDataToAnet} className="space-y-7">
-        <div>
+        <div className="flex flex-col space-y-5">
+          <div className="flex flex-col md:flex-row md:space-x-2 md:space-y-0 space-y-5 w-full justify-between">
+            <div>
+              <label
+                htmlFor="firstName"
+                className="block text-md font-medium text-white/80"
+              >
+                First Name
+              </label>
+              <input
+                type="text"
+                id="firstName"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-black"
+                disabled={isLoading}
+                required
+                placeholder="John"
+                onChange={(e) => setFirstName(e.target.value)}
+              />
+            </div>
+
+            <div>
+              <label
+                htmlFor="lastName"
+                className="block text-md font-medium text-white/80"
+              >
+                Last Name
+              </label>
+              <input
+                type="text"
+                id="lastName"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-black"
+                disabled={isLoading}
+                required
+                placeholder="Doe"
+                onChange={(e) => setLastName(e.target.value)}
+              />
+            </div>
+          </div>
+
+          <div>
+            <label
+              htmlFor="address"
+              className="block text-md font-medium text-white/80"
+            >
+              Address
+            </label>
+            <input
+              type="text"
+              id="address"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-black"
+              disabled={isLoading}
+              required
+              placeholder="123 PamPamPay St."
+              onChange={(e) => setAddress(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="address"
+              className="block text-md font-medium text-white/80"
+            >
+              City
+            </label>
+            <input
+              type="text"
+              id="address"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-black"
+              disabled={isLoading}
+              required
+              placeholder="PPP City"
+              onChange={(e) => setCity(e.target.value)}
+            />
+          </div>
+
+          <div>
+            <label
+              htmlFor="phoneNumber"
+              className="block text-md font-medium text-white/80"
+            >
+              Phone Number
+            </label>
+            <input
+              type="tel"
+              id="phoneNumber"
+              pattern="[0-9]{10}"
+              inputMode="numeric"
+              placeholder="1234567890"
+              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-black"
+              disabled={isLoading}
+              required
+              onChange={(e) => setPhoneNumber(e.target.value)}
+            />
+          </div>
           <label
             htmlFor="cardNumber"
             className="block text-md font-medium text-white/80"
           >
             Card Number
           </label>
-          <div className="space-y-3">
-            <input
-              type="text"
-              inputMode="numeric"
-              pattern="[0-9]*"
-              id="cardNumber"
-              value={cardNumber}
-              onChange={(e) => {
-                const value = e.target.value.replace(/\D/g, "");
-                if (value.length <= 19) {
-                  setCardNumber(value);
+          <input
+            type="text"
+            inputMode="numeric"
+            pattern="[0-9]*"
+            id="cardNumber"
+            value={cardNumber}
+            onChange={(e) => {
+              const value = e.target.value.replace(/\D/g, "");
+              if (value.length <= 19) {
+                setCardNumber(value);
 
-                  const numberValidation = valid.number(value);
-                  if (numberValidation.card) {
-                    setCardType(numberValidation.card.type);
-                  } else {
-                    setCardType(null);
-                  }
-
-                  setCardNumberError(
-                    numberValidation.isPotentiallyValid &&
-                      numberValidation.isValid
-                      ? ""
-                      : "Invalid card number"
-                  );
+                const numberValidation = valid.number(value);
+                if (numberValidation.card) {
+                  setCardType(numberValidation.card.type);
+                } else {
+                  setCardType(null);
                 }
-              }}
-              placeholder="4111111111111111"
-              className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-black"
-              disabled={isLoading}
-              required
-            />
-            {cardType && (
-              <div className="mt-2">
-                <Image
-                  src={`/images/card-types/${cardType}.svg`}
-                  alt={cardType}
-                  width={60}
-                  height={30}
-                  className="object-contain"
-                />
-              </div>
-            )}
-          </div>
+
+                setCardNumberError(
+                  numberValidation.isPotentiallyValid &&
+                    numberValidation.isValid
+                    ? ""
+                    : "Invalid card number"
+                );
+              }
+            }}
+            placeholder="4111111111111111"
+            className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-black"
+            disabled={isLoading}
+            required
+          />
+          {cardType && (
+            <div className="mt-2">
+              <Image
+                src={`/images/card-types/${cardType}.svg`}
+                alt={cardType}
+                width={60}
+                height={30}
+                className="object-contain"
+              />
+            </div>
+          )}
 
           {cardNumberError && (
             <p className="text-sm text-red-500 mt-1">{cardNumberError}</p>

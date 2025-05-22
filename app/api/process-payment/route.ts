@@ -40,6 +40,11 @@ export async function POST(request: Request) {
       recipientId,
       paymentDescription,
       email,
+      firstName,
+      lastName,
+      address,
+      city,
+      phoneNumber
     } = body;
 
     console.log("Received payment request with:", {
@@ -100,9 +105,17 @@ export async function POST(request: Request) {
     // Add customer information
     const customerData = new ApiContracts.CustomerDataType();
     customerData.setType(ApiContracts.CustomerTypeEnum.INDIVIDUAL);
-    customerData.setId(userId);
-    customerData.setEmail(email); // You might want to collect this from the user
+    customerData.setId(userId.substring(0, 10));
+    customerData.setEmail(email);
     transactionRequestType.setCustomer(customerData);
+
+    const billTo = new ApiContracts.CustomerAddressType();
+    billTo.setFirstName(firstName);
+    billTo.setLastName(lastName);
+    billTo.setAddress(address);
+    billTo.setCity(city);
+    billTo.setPhoneNumber(phoneNumber);
+    transactionRequestType.setBillTo(billTo);
 
     // Create the main request
     const createRequest = new ApiContracts.CreateTransactionRequest();

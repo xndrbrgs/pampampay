@@ -17,7 +17,7 @@ export default async function Dashboard() {
   if (user.id !== adminUser?.clerkUserId) {
     return (
       <PayPalProvider>
-        <section className="p-6 h-screen">
+        <section className="p-6 h-full">
           <Header
             title="My Dashboard"
             subtext="Access and manage your account and transactions"

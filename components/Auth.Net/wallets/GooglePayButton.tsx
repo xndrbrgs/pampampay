@@ -34,6 +34,7 @@ export default function GooglePayButton({ amount }: GooglePayButtonProps) {
     const addGooglePayButton = (paymentsClient: any) => {
       const button = paymentsClient.createButton({
         onClick: onGooglePaymentButtonClicked,
+        buttonSizeMode: "fill",
       });
       const container = document.getElementById("google-pay-button-container");
       if (container && !container.hasChildNodes()) {
@@ -96,7 +97,7 @@ export default function GooglePayButton({ amount }: GooglePayButtonProps) {
         totalPrice: amount,
       },
       merchantInfo: {
-        merchantName: "Example Merchant",
+        merchantId: process.env.NEXT_PUBLIC_GOOGLE_PAY_MERCHANT_ID!,
       },
     });
 

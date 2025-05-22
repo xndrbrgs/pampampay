@@ -336,17 +336,17 @@ export function GeneralPaymentForm({
                               <SelectValue placeholder="Select an amount" />
                             </SelectTrigger>
                             <SelectContent>
-                              {[
-                                10, 15, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100,
-                              ].map((value) => (
-                                <SelectItem
-                                  key={value}
-                                  value={value.toString()}
-                                  className="py-2 border-b border-gray-200"
-                                >
-                                  ${value}
-                                </SelectItem>
-                              ))}
+                              {[20, 25, 30, 40, 50, 60, 70, 80, 90, 100].map(
+                                (value) => (
+                                  <SelectItem
+                                    key={value}
+                                    value={value.toString()}
+                                    className="py-2 border-b border-gray-200"
+                                  >
+                                    ${value}
+                                  </SelectItem>
+                                )
+                              )}
                             </SelectContent>
                           </Select>
                         </FormControl>

@@ -166,6 +166,34 @@ declare module "authorizenet/lib/apicontracts" {
         getAmexDataTAA4(): any;
     }
 
+    export class NameAndAddressType {
+        constructor(obj?: any, ...args: any[]);
+        setFirstName(p_firstName: any): void;
+        firstName: any;
+        getFirstName(): any;
+        setLastName(p_lastName: any): void;
+        lastName: any;
+        getLastName(): any;
+        setCompany(p_company: any): void;
+        company: any;
+        getCompany(): any;
+        setAddress(p_address: any): void;
+        address: any;
+        getAddress(): any;
+        setCity(p_city: any): void;
+        city: any;
+        getCity(): any;
+        setState(p_state: any): void;
+        state: any;
+        getState(): any;
+        setZip(p_zip: any): void;
+        zip: any;
+        getZip(): any;
+        setCountry(p_country: any): void;
+        country: any;
+        getCountry(): any;
+    }
+
     export class CustomerDataType {
         constructor(obj?: any, ...args: any[]);
         setType(p_type: any): void;
@@ -183,6 +211,44 @@ declare module "authorizenet/lib/apicontracts" {
         setTaxId(p_taxId: any): void;
         taxId: any;
         getTaxId(): any;
+        constructor(obj?: any, ...args: any[]);
+        setFirstName(p_firstName: any): void;
+        firstName: any;
+        getFirstName(): any;
+        setLastName(p_lastName: any): void;
+        lastName: any;
+        getLastName(): any;
+        setCompany(p_company: any): void;
+        company: any;
+        getCompany(): any;
+        setAddress(p_address: any): void;
+        address: any;
+        getAddress(): any;
+        setCity(p_city: any): void;
+        city: any;
+        getCity(): any;
+        setState(p_state: any): void;
+        state: any;
+        getState(): any;
+        setZip(p_zip: any): void;
+        zip: any;
+        getZip(): any;
+        setCountry(p_country: any): void;
+        country: any;
+        getCountry(): any;
+        setPhoneNumber(p_phoneNumber: any): void;
+    }
+
+    export class CustomerAddressType extends NameAndAddressType {
+        setPhoneNumber(p_phoneNumber: any): void;
+        phoneNumber: any;
+        getPhoneNumber(): any;
+        setFaxNumber(p_faxNumber: any): void;
+        faxNumber: any;
+        getFaxNumber(): any;
+        setEmail(p_email: any): void;
+        email: any;
+        getEmail(): any;
     }
     namespace CustomerTypeEnum {
         const INDIVIDUAL: string;
