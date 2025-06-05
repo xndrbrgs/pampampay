@@ -290,7 +290,7 @@ export default function AcceptPaymentForm({
             <div>
               <label
                 htmlFor="state"
-                className="block text-md font-medium text-black/80"
+                className="block text-md font-medium text-white/80"
               >
                 State
               </label>
@@ -307,7 +307,7 @@ export default function AcceptPaymentForm({
             <div>
               <label
                 htmlFor="zip"
-                className="block text-md font-medium text-black/80"
+                className="block text-md font-medium text-white/80"
               >
                 City
               </label>
