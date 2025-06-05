@@ -44,6 +44,8 @@ export async function POST(request: Request) {
       lastName,
       address,
       city,
+      state,
+      zipCode,
       phoneNumber
     } = body;
 
@@ -114,6 +116,9 @@ export async function POST(request: Request) {
     billTo.setLastName(lastName);
     billTo.setAddress(address);
     billTo.setCity(city);
+    billTo.setState(state);
+    billTo.setZip(zipCode);
+    billTo.setCountry('USA');
     billTo.setPhoneNumber(phoneNumber);
     transactionRequestType.setBillTo(billTo);
 

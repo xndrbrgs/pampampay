@@ -28,6 +28,8 @@ export default function AcceptPaymentForm({
   const [address, setAddress] = useState("");
   const [city, setCity] = useState("");
   const [phoneNumber, setPhoneNumber] = useState("");
+  const [state, setState] = useState("");
+  const [zipCode, setZipCode] = useState("");
   const [cardNumber, setCardNumber] = useState("");
   const [expirationDate, setExpirationDate] = useState("");
   const [cardCode, setCardCode] = useState("");
@@ -146,6 +148,8 @@ export default function AcceptPaymentForm({
         lastName,
         address,
         city,
+        state,
+        zipCode,
         phoneNumber,
       };
 
@@ -280,6 +284,43 @@ export default function AcceptPaymentForm({
               placeholder="PPP City"
               onChange={(e) => setCity(e.target.value)}
             />
+          </div>
+
+          <div className="flex flex-col md:space-y-0 space-y-5 md:flex-row justify-between">
+            <div>
+              <label
+                htmlFor="state"
+                className="block text-md font-medium text-black/80"
+              >
+                State
+              </label>
+              <input
+                type="text"
+                id="address"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-black"
+                disabled={isLoading}
+                required
+                placeholder="NY, FL, TX"
+                onChange={(e) => setState(e.target.value)}
+              />
+            </div>
+            <div>
+              <label
+                htmlFor="zip"
+                className="block text-md font-medium text-black/80"
+              >
+                City
+              </label>
+              <input
+                type="text"
+                id="address"
+                className="mt-1 block w-full px-3 py-2 border border-gray-300 rounded-md shadow-sm focus:outline-none focus:ring-indigo-500 focus:border-indigo-500 text-black"
+                disabled={isLoading}
+                required
+                placeholder="12345"
+                onChange={(e) => setZipCode(e.target.value)}
+              />
+            </div>
           </div>
 
           <div>
