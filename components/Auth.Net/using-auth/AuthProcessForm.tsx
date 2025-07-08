@@ -309,7 +309,7 @@ export default function AcceptPaymentForm({
                 htmlFor="zip"
                 className="block text-md font-medium text-white/80"
               >
-                City
+                Zip Code
               </label>
               <input
                 type="text"
