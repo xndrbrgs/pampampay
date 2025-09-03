@@ -372,7 +372,7 @@ export function GeneralPaymentForm({
                               <SelectValue placeholder="Select an amount" />
                             </SelectTrigger>
                             <SelectContent>
-                              {[20, 25, 30, 40, 50, 60, 70, 80, 90, 100].map(
+                              {[5, 20, 25, 30, 40, 50, 60, 70, 80, 90, 100].map(
                                 (value) => (
                                   <SelectItem
                                     key={value}
