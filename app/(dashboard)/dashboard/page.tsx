@@ -1,3 +1,4 @@
+import VideoExplanation from "@/components/BTCPay/VideoExplanation";
 import AdminComponent from "@/components/Dashboard/AdminComponent";
 import Header from "@/components/General/Header";
 import { GeneralPaymentForm } from "@/components/Payments/PaymentForm";
@@ -24,6 +25,7 @@ export default async function Dashboard() {
           />
 
           <div className="pt-4 max-w-3xl flex flex-col gap-y-5">
+            <VideoExplanation />
             <GeneralPaymentForm connections={connections} email={userEmail} />
           </div>
         </section>
