@@ -235,11 +235,7 @@ export function GeneralPaymentForm({
                 className="flex-1 mt-3 lg:mt-0 items-center"
                 onClick={() => handlePaymentMethodChange("btcpay")}
               >
-                <img
-                  src="/images/cashapp.svg"
-                  alt="Cashapp logo"
-                  className="h-4 w-4 mr-2 inline-block"
-                />
+                <BadgeDollarSign className="w-4 h-4" />
                 BTC via CashApp
               </Button>
               {/* <Button
@@ -516,7 +512,7 @@ export function GeneralPaymentForm({
 
                   setShowBTCPay(false);
                 }}
-                className="block text-black rounded-xl text-md bg-red-500 border hover:text-white hover:border-white/20 cursor-pointer shadow-sm md:col-start-5 md:col-end-9 col-span-12 mb-6 py-2 font-semibold transition duration-150"
+                className="text-white text-md border transition duration-150 cursor-pointer bg-black hover:border-gray-600 focus:outline-2 focus:outline-offset-2 focus:outline-brownish active:bg-brownish shadow-sm"
               >
                 Continue to Checkout
               </button>
