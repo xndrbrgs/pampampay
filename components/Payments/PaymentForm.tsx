@@ -236,13 +236,13 @@ export function GeneralPaymentForm({
                 onClick={() => handlePaymentMethodChange("btcpay")}
               >
                 <img
-                  src="/svg/cashapp.svg"
+                  src="/images/cashapp.svg"
                   alt="Cashapp logo"
                   className="h-4 w-4 mr-2 inline-block"
                 />
                 BTC via CashApp
               </Button>
-              <Button
+              {/* <Button
                 type="button"
                 variant={paymentMethod === "paypal" ? "chosen" : "unchosen"}
                 className="flex-1"
@@ -250,7 +250,7 @@ export function GeneralPaymentForm({
               >
                 <Wallet className="w-4 h-4 mr-2" />
                 PayPal, Venmo
-              </Button>
+              </Button> */}
               {/* <Button
                 type="button"
                 variant={paymentMethod === "square" ? "chosen" : "unchosen"}
@@ -260,7 +260,7 @@ export function GeneralPaymentForm({
                 <Construction className="w-4 h-4" />
                 Google Pay, Card
               </Button> */}
-              <Button
+              {/* <Button
                 type="button"
                 variant={paymentMethod === "coinbase" ? "chosen" : "unchosen"}
                 className="flex-1 mt-3 lg:mt-0 items-center"
@@ -268,7 +268,7 @@ export function GeneralPaymentForm({
               >
                 <BadgeDollarSign className="w-4 h-4" />
                 Coinbase
-              </Button>
+              </Button> */}
             </div>
             <FormDescription className="mt-2">
               Select how you would like to make your payment
