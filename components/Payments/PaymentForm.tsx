@@ -512,7 +512,7 @@ export function GeneralPaymentForm({
 
                   setShowBTCPay(false);
                 }}
-                className="text-white text-md border transition duration-150 cursor-pointer bg-black hover:border-gray-600 focus:outline-2 focus:outline-offset-2 focus:outline-brownish active:bg-brownish shadow-sm"
+                className="block text-md bg-black border text-white hover:border-white/20 cursor-pointer shadow-sm md:col-start-5 md:col-end-9 col-span-12 mb-6 py-2 font-semibold transition duration-150"
               >
                 Continue to Checkout
               </button>
