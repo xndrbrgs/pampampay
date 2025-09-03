@@ -22,7 +22,7 @@ const VideoExplanation = () => {
         collapsible
       >
         <AccordionItem value="item-1">
-          <AccordionTrigger className="text-2xl md:text-3xl flex items-center space-x-3">
+          <AccordionTrigger className="flex items-center space-x-3 text-lg md:text-xl lg:text-2xl leading-none tracking-tight p-6 no-underline">
             How To Deposit BTC via CashApp?
           </AccordionTrigger>
           <AccordionContent>
