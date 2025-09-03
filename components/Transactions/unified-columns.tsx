@@ -14,7 +14,7 @@ export type UnifiedTransaction = {
   createdAt: string;
   status: string;
   email: string;
-  source: "stripe" | "paypal" | "square" | "coinbase" | "authorize";
+  source: "stripe" | "btcpay" | "paypal" | "square" | "coinbase" | "authorize";
 };
 
 export const unifiedColumns: ColumnDef<UnifiedTransaction>[] = [
@@ -78,7 +78,7 @@ export const unifiedColumns: ColumnDef<UnifiedTransaction>[] = [
     accessorKey: "status",
     header: "Status",
     cell: ({ row }) => (
-      <div className="capitalize">
+      <div className="uppercase">
         <Badge>
           {row.original.source === "coinbase" && (
             <div className="w-2 h-2 bg-green-500 rounded-full mr-1" />

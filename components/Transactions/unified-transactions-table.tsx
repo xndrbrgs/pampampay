@@ -12,6 +12,7 @@ interface UnifiedTransactionsTableProps {
   squareTransfers: any[];
   coinbaseTransfers: any[];
   authNetTransfers: any[];
+  btcTransfers: any[];
 }
 
 const UnifiedTransactionsTable = ({
@@ -20,6 +21,7 @@ const UnifiedTransactionsTable = ({
   squareTransfers,
   coinbaseTransfers,
   authNetTransfers,
+  btcTransfers
 }: UnifiedTransactionsTableProps) => {
   const [activeTab, setActiveTab] = useState("all");
 
@@ -44,6 +46,10 @@ const UnifiedTransactionsTable = ({
     authNetTransfers,
     "authorize"
   );
+  const normalizedBTCPayTransfers = normalizeTransactions(
+    btcTransfers,
+    "btcpay"
+  );
 
   // Combine all transactions
   const allTransactions = [
@@ -52,6 +58,7 @@ const UnifiedTransactionsTable = ({
     ...normalizedSquareTransfers,
     ...normalizedCoinbaseTransfers,
     ...normalizedAuthNetTransfers,
+    ...normalizedBTCPayTransfers
   ];
 
   // Sort all transactions by date (newest first)
@@ -64,6 +71,8 @@ const UnifiedTransactionsTable = ({
     switch (activeTab) {
       case "stripe":
         return normalizedStripeTransfers;
+      case "btcpay":
+        return normalizedBTCPayTransfers;
       case "paypal":
         return normalizedPaypalTransfers;
       case "square":
@@ -83,6 +92,7 @@ const UnifiedTransactionsTable = ({
         <TabsList className="mb-4">
           <TabsTrigger value="all">All Transactions</TabsTrigger>
           <TabsTrigger value="authorize">Authorize.Net</TabsTrigger>
+          <TabsTrigger value="btcpay">BTCPay</TabsTrigger>
           <TabsTrigger value="stripe">Stripe</TabsTrigger>
           <TabsTrigger value="paypal">PayPal</TabsTrigger>
           <TabsTrigger value="square">Square</TabsTrigger>
@@ -100,6 +110,13 @@ const UnifiedTransactionsTable = ({
             columns={unifiedColumns}
             data={getFilteredTransactions()}
             source="authorize"
+          />
+        </TabsContent>
+        <TabsContent value="btcpay" className="mt-0">
+          <UnifiedDataTable
+            columns={unifiedColumns}
+            data={getFilteredTransactions()}
+            source="btcpay"
           />
         </TabsContent>
         <TabsContent value="stripe" className="mt-0">

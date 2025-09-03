@@ -32,16 +32,14 @@ import { motion } from "framer-motion";
 import {
   BadgeDollarSign,
   Construction,
-  CreditCard,
   CreditCardIcon,
   Wallet,
 } from "lucide-react";
 import { toast } from "sonner";
 import { PayPalButtonsWrapper } from "../Paypal/paypal-buttons";
 import { SquarePaymentModal } from "@/components/Square/square-payment-modal";
-import { createStripeSession } from "@/lib/actions/transfer.actions";
+import { createStripeSession } from "@/lib/actions/stripe.actions";
 import PaymentWrapperAuth from "../Auth.Net/using-auth/PaymentWrapperAuth";
-import GooglePayButton from "../Auth.Net/wallets/GooglePayButton";
 
 type UnifiedPaymentFormProps = {
   email: string;
@@ -67,17 +65,14 @@ const formSchema = z.object({
   paymentDescription: z.string().min(1, "Payment description is required"),
   recipientId: z.string().min(1, "Recipient is required"),
   paymentMethod: z.enum(
-    ["stripe", "btcpay", "authorize", "paypal", "coinbase", "square"],
+    ["authorize", "btcpay", "stripe", "paypal", "coinbase", "square"],
     {
       required_error: "Please select a payment method",
     }
   ),
 });
 
-export function GeneralPaymentForm({
-  connections,
-  email,
-}: UnifiedPaymentFormProps) {
+export function TestingForm({ connections, email }: UnifiedPaymentFormProps) {
   const [isLoading, setIsLoading] = useState(false);
   const [showPayPal, setShowPayPal] = useState(false);
   const [showSquare, setShowSquare] = useState(false);
@@ -87,6 +82,7 @@ export function GeneralPaymentForm({
     checkoutLink: string;
     qrCodeDataUrl: string;
   } | null>(null);
+
   const [paymentMethod, setPaymentMethod] = useState<
     "authorize" | "btcpay" | "stripe" | "paypal" | "coinbase" | "square"
   >("authorize");
@@ -110,8 +106,7 @@ export function GeneralPaymentForm({
     form.setValue("paymentMethod", value);
   };
 
-  // Add createCoinbaseCharge function
-
+  // Coinbase charge function
   const createCoinbaseCharge = async (data: {
     amount: number;
     paymentDescription: string;
@@ -136,7 +131,6 @@ export function GeneralPaymentForm({
   };
 
   async function onSubmit(values: z.infer<typeof formSchema>) {
-    // Ensure the payment method is set correctly
     values.paymentMethod = paymentMethod;
 
     setIsLoading(true);
@@ -149,10 +143,10 @@ export function GeneralPaymentForm({
           recipientId: values.recipientId,
           ssn: "", // Optional SSN field
         });
-      } else if (values.paymentMethod === "paypal") {
-        setShowPayPal(true);
       } else if (values.paymentMethod === "authorize") {
         setShowAuthorizeNet(true);
+      } else if (values.paymentMethod === "paypal") {
+        setShowPayPal(true);
       } else if (values.paymentMethod === "coinbase") {
         await createCoinbaseCharge({
           amount: values.amount,
@@ -161,7 +155,6 @@ export function GeneralPaymentForm({
           recipientId: values.recipientId,
         });
       } else if (values.paymentMethod === "square") {
-        // Show Square payment modal instead of redirecting
         setShowSquare(true);
       } else if (values.paymentMethod === "btcpay") {
         const res = await fetch("/api/btcpay/create-payment", {
@@ -204,13 +197,12 @@ export function GeneralPaymentForm({
     setShowAuthorizeNet(false);
   };
 
-  // Render the appropriate payment method selector based on the chosen type
   const renderPaymentMethodSelector = () => {
     switch (SELECTOR_TYPE) {
       case "buttons":
         return (
           <div className="my-6">
-            <div className="grid grid-cols-1 lg:grid-cols-3 space-y-3 lg:space-y-0 space-x-0 lg:space-x-5 mt-2 w-full">
+            <div className="grid grid-cols-1 lg:grid-cols-4 space-y-3 lg:space-y-0 space-x-0 lg:space-x-5 mt-2 w-full">
               <Button
                 type="button"
                 variant={paymentMethod === "authorize" ? "chosen" : "unchosen"}
@@ -219,15 +211,6 @@ export function GeneralPaymentForm({
               >
                 <CreditCardIcon className="w-4 h-4 mr-2" />
                 Card
-              </Button>
-              <Button
-                type="button"
-                variant={paymentMethod === "stripe" ? "chosen" : "unchosen"}
-                className="flex-1 items-center"
-                onClick={() => handlePaymentMethodChange("stripe")}
-              >
-                <CreditCard className="w-4 h-4" />
-                Cash App
               </Button>
               <Button
                 type="button"
@@ -240,26 +223,17 @@ export function GeneralPaymentForm({
                   alt="Cashapp logo"
                   className="h-4 w-4 mr-2 inline-block"
                 />
-                BTC via CashApp
+                CashApp
               </Button>
               <Button
                 type="button"
                 variant={paymentMethod === "paypal" ? "chosen" : "unchosen"}
-                className="flex-1"
+                className="flex-1 mt-3 lg:mt-0 items-center"
                 onClick={() => handlePaymentMethodChange("paypal")}
               >
-                <Wallet className="w-4 h-4 mr-2" />
-                PayPal, Venmo
+                <BadgeDollarSign className="w-4 h-4" />
+                Paypal
               </Button>
-              {/* <Button
-                type="button"
-                variant={paymentMethod === "square" ? "chosen" : "unchosen"}
-                className="flex-1 mt-3 lg:mt-0 items-center"
-                onClick={() => handlePaymentMethodChange("square")}
-              >
-                <Construction className="w-4 h-4" />
-                Google Pay, Card
-              </Button> */}
               <Button
                 type="button"
                 variant={paymentMethod === "coinbase" ? "chosen" : "unchosen"}
@@ -282,7 +256,7 @@ export function GeneralPaymentForm({
   };
 
   return (
-    <Card className="border bg-white/10 border-gray-600 rounded-xl shadow-lg mt-3 max-w-7xl">
+    <Card className="border border-gray-600 rounded-xl shadow-lg mt-3 max-w-7xl">
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
@@ -290,7 +264,8 @@ export function GeneralPaymentForm({
       >
         <CardHeader className="border-b border-gray-600">
           <CardTitle className="text-2xl md:text-3xl flex items-center space-x-3">
-            <span>Initiate Transfer</span>
+            <BadgeDollarSign className="w-7 h-7" />
+            <span>Perform Transfer</span>
           </CardTitle>
           <CardDescription className="text-sm text-gray-400">
             Select a payment method to initiate a transfer.
@@ -302,7 +277,6 @@ export function GeneralPaymentForm({
               onSubmit={form.handleSubmit(onSubmit)}
               className="flex flex-col gap-y-5"
             >
-              {/* Payment Method Selector */}
               {renderPaymentMethodSelector()}
 
               <div className="grid grid-cols-12 gap-x-5 space-y-6 lg:space-y-0">
@@ -324,27 +298,39 @@ export function GeneralPaymentForm({
                             <SelectContent>
                               <SelectItem
                                 value="GV"
-                                className="border-b border-gray-200"
+                                className="border-b border-red-500"
                               >
                                 GV
                               </SelectItem>
                               <SelectItem
                                 value="PR"
-                                className="border-b border-gray-200"
+                                className="border-b border-red-500"
                               >
                                 PR
                               </SelectItem>
                               <SelectItem
                                 value="JW"
-                                className="border-b border-gray-200"
+                                className="border-b border-red-500"
                               >
                                 JW
                               </SelectItem>
                               <SelectItem
-                                value="OS"
-                                className="border-b border-gray-200"
+                                value="VB"
+                                className="border-b border-red-500"
                               >
-                                OS
+                                VB
+                              </SelectItem>
+                              <SelectItem
+                                value="BD"
+                                className="border-b border-red-500"
+                              >
+                                BD
+                              </SelectItem>
+                              <SelectItem
+                                value="FK"
+                                className="border-b border-red-500"
+                              >
+                                FK
                               </SelectItem>
                             </SelectContent>
                           </Select>
@@ -376,17 +362,15 @@ export function GeneralPaymentForm({
                               <SelectValue placeholder="Select an amount" />
                             </SelectTrigger>
                             <SelectContent>
-                              {[20, 25, 30, 40, 50, 60, 70, 80, 90, 100].map(
-                                (value) => (
-                                  <SelectItem
-                                    key={value}
-                                    value={value.toString()}
-                                    className="py-2 border-b border-gray-200"
-                                  >
-                                    ${value}
-                                  </SelectItem>
-                                )
-                              )}
+                              {[5].map((value) => (
+                                <SelectItem
+                                  key={value}
+                                  value={value.toString()}
+                                  className="py-2 border-b border-red-500"
+                                >
+                                  ${value}
+                                </SelectItem>
+                              ))}
                             </SelectContent>
                           </Select>
                         </FormControl>
@@ -435,7 +419,6 @@ export function GeneralPaymentForm({
                                     src={
                                       connection.profileImage ||
                                       "/default-profile.png" ||
-                                      "/placeholder.svg" ||
                                       "/placeholder.svg"
                                     }
                                     alt={connection.username || "User"}
@@ -473,6 +456,7 @@ export function GeneralPaymentForm({
               )}
             </form>
           </Form>
+
           {showPayPal && (
             <motion.div
               className="mt-5"
@@ -523,14 +507,29 @@ export function GeneralPaymentForm({
             </div>
           )}
 
+          {/* {showBTCPay &&
+            btcpayData &&
+            (() => {
+              // Open the BTCPay checkout link in a new window automatically
+              if (typeof window !== "undefined" && btcpayData.checkoutLink) {
+                window.open(
+                  btcpayData.checkoutLink,
+                  "_blank",
+                  "noopener,noreferrer"
+                );
+              }
+              // Reset showBTCPay so it doesn't keep opening
+              setShowBTCPay(false);
+              return null;
+            })()} */}
+
           {showAuthorizeNet && (
             <motion.div
-              className="mt-5 w-full"
+              className="mt-5 w-full flex flex-col items-center"
               initial={{ opacity: 0 }}
               animate={{ opacity: 1 }}
               transition={{ duration: 0.3 }}
             >
-              {/* <GooglePayButton amount={form.getValues().amount} /> */}
               <PaymentWrapperAuth
                 amount={form.getValues().amount}
                 recipientId={form.getValues().recipientId}
@@ -549,7 +548,6 @@ export function GeneralPaymentForm({
             </motion.div>
           )}
 
-          {/* Square Payment Modal */}
           <SquarePaymentModal
             isOpen={showSquare}
             onClose={() => setShowSquare(false)}
