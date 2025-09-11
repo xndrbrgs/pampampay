@@ -91,18 +91,18 @@ export function BTCPayoutForm({ email }: { email?: string }) {
   }
 
   return (
-    <Card className="border border-gray-600 rounded-xl shadow-lg mt-3 max-w-7xl">
+    <Card className="border bg-white/10 border-gray-600 rounded-xl shadow-lg mt-3 max-w-7xl">
       <motion.section
         initial={{ opacity: 0 }}
         animate={{ opacity: 1 }}
         transition={{ duration: 0.3 }}
       >
-        <CardHeader>
-          <CardTitle className="text-2xl flex items-center gap-2">
+        <CardHeader className="border-b border-gray-600">
+          <CardTitle className="text-2xl md:text-3xl flex items-center space-x-3">
             Request BTC Payout
             <BadgeDollarSign className="w-6 h-6" />
           </CardTitle>
-          <CardDescription>
+          <CardDescription className="text-sm text-gray-400">
             Receive BTC payouts directly to your BTC address!
           </CardDescription>
         </CardHeader>
@@ -116,7 +116,7 @@ export function BTCPayoutForm({ email }: { email?: string }) {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="flex flex-col gap-y-5"
               >
-                <div className="grid grid-cols-12 gap-x-5 space-y-6">
+                <div className="grid grid-cols-12 gap-x-5 space-y-6 lg:space-y-0">
                   <div className="col-span-12 lg:col-span-6">
                     <FormField
                       control={form.control}
@@ -219,7 +219,12 @@ export function BTCPayoutForm({ email }: { email?: string }) {
                   </div>
                 </div>
 
-                <Button type="submit" disabled={isLoading} className="my-4">
+                <Button
+                  type="submit"
+                  variant="chosen"
+                  disabled={isLoading}
+                  className="my-4"
+                >
                   {isLoading ? "Processing..." : "Request BTC Payout"}
                 </Button>
               </form>
