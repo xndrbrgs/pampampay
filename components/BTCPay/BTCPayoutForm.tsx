@@ -98,8 +98,8 @@ export function BTCPayoutForm({ email }: { email?: string }) {
         transition={{ duration: 0.3 }}
       >
         <CardHeader className="border-b border-gray-600">
-          <CardTitle className="text-2xl md:text-3xl flex items-center space-x-3">
-            Request BTC Payout
+          <CardTitle className="text-2xl md:text-3xl flex items-center space-x-2">
+            <span>Request BTC Payout</span>
             <BadgeDollarSign className="w-6 h-6" />
           </CardTitle>
           <CardDescription className="text-sm text-gray-400">
@@ -116,7 +116,7 @@ export function BTCPayoutForm({ email }: { email?: string }) {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="flex flex-col gap-y-5"
               >
-                <div className="grid grid-cols-12 gap-x-5 space-y-6 lg:space-y-0">
+                <div className="grid grid-cols-12 gap-x-5 space-y-6 pt-5">
                   <div className="col-span-12 lg:col-span-6">
                     <FormField
                       control={form.control}
