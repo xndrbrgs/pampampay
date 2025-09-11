@@ -1,4 +1,4 @@
-import { BadgeDollarSign } from "lucide-react";
+import { BadgeDollarSign, Bitcoin } from "lucide-react";
 import {
   Card,
   CardContent,
@@ -6,15 +6,13 @@ import {
   CardHeader,
   CardTitle,
 } from "../ui/card";
-import { getBTCPayBalances } from "@/lib/actions/btc-actions";
+import { getBTCBalanceInUSD } from "@/lib/actions/btc-actions";
 
 const BTCBalance = async () => {
-  const balances = await getBTCPayBalances();
-
-  console.log("BTC Balances:", balances);
+  const { btcBalance, balanceUSD } = await getBTCBalanceInUSD();
 
   return (
-    <Card className="border border-gray-600 rounded-xl shadow-lg mt-3 max-w-3xl">
+    <Card className="border bg-white/10 border-gray-600 rounded-xl shadow-lg mt-3 max-w-2xl">
       <CardHeader>
         <CardTitle className="text-2xl flex items-center gap-2">
           BTC Balance
@@ -25,8 +23,13 @@ const BTCBalance = async () => {
         </CardDescription>
       </CardHeader>
       <CardContent className="pb-4">
-        <p>On-chain confirmed: {balances.onchainData.confirmedBalance} BTC</p>
-        <p>On-chain unconfirmed: {balances.onchainData.unconfirmedBalance} BTC</p>
+        <p className="text-2xl flex items-center gap-2">
+          <Bitcoin className="w-6 h-6 text-yellow-300" />
+          {btcBalance} BTC
+        </p>
+        <p className="text-xl flex items-center gap-2">
+          ≈ <span className="text-green-500">${balanceUSD.toFixed(2)}</span> USD
+        </p>
       </CardContent>
     </Card>
   );

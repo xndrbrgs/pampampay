@@ -104,7 +104,7 @@ export function BTCRefill({ connections }: BTCPayFormProps) {
   }
 
   return (
-    <Card className="border border-gray-600 rounded-xl shadow-lg mt-3 max-w-7xl">
+    <Card className="border bg-white/10 border-gray-600 rounded-xl shadow-lg mt-3 max-w-7xl">
       <section>
         <CardHeader className="border-b border-gray-600">
           <CardTitle className="text-xl md:text-2xl flex items-center space-x-3">

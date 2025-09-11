@@ -46,7 +46,7 @@ export default function ApproveButton({
   return (
     <Button
       type="submit"
-      className="hover:cursor-pointer"
+      className="hover:cursor-pointer bg-white text-black hover:bg-white/70"
       onClick={handleApprove}
       disabled={loading}
     >

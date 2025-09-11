@@ -5,7 +5,7 @@ import Image from "next/image";
 
 export default function BitcoinAnimation() {
   return (
-    <div className="relative flex flex-col items-center justify-center">
+    <div className="relative flex flex-col items-center justify-center pt-6">
       <motion.div
         initial={{ opacity: 0, y: 100, rotate: 0 }}
         animate={{
