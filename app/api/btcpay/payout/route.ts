@@ -7,7 +7,7 @@ const BTCPAY_STORE_ID = process.env.BTCPAY_STORE_ID!;
 
 export async function POST(req: NextRequest) {
     try {
-        const { amount, recipientAddress, description, recipientEmail } = await req.json();
+        const { amount, recipientAddress, description, recipientEmail, personName } = await req.json();
 
         if (!amount || !recipientAddress || !description || !recipientEmail) {
             return NextResponse.json({ error: "Missing required fields" }, { status: 400 });
@@ -46,12 +46,12 @@ export async function POST(req: NextRequest) {
                     "Content-Type": "application/json",
                 },
                 body: JSON.stringify({
-                    name: `Sent to ${recipientEmail} - ${description}`,
+                    name: `${personName} - ${recipientEmail}`,
+                    description: description,
                     amount,
                     currency: "USD",
-                    autoApproveClaims: true, // auto-execute payouts
+                    // autoApproveClaims: true, // auto-execute payouts
                     paymentMethod,           // must match payout
-                    // "BOLT11Expiration": 30, // for LN payments, set expiration to 30 minutes
                 }),
             }
         );

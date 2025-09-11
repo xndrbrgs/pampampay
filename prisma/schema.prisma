@@ -18,14 +18,15 @@ model User {
   username                  String?
   profileImage              String?
   isAdmin                   Boolean            @default(false)
+  canSeePayouts             Boolean            @default(false)
   connectedAccountId        String             @unique
   stripeConnectedLinked     Boolean            @default(false)
   connections               Connection[]       @relation("UserConnections")
   connectedTo               Connection[]       @relation("ConnectedToUser")
   sentTransfers             Transfer[]         @relation("SenderTransfers")
   receivedTransfers         Transfer[]         @relation("ReceiverTransfers")
-  btcSentTransfers       BTCTransfer[]   @relation("BTCSenderTransfers")
-  btcReceiverTransfers   BTCTransfer[]   @relation("BTCReceiverTransfers")
+  btcSentTransfers          BTCTransfer[]      @relation("BTCSenderTransfers")
+  btcReceiverTransfers      BTCTransfer[]      @relation("BTCReceiverTransfers")
   paypalSentTransfers       PaypalTransfer[]   @relation("PaypalSenderTransfers")
   paypalReceiverTransfers   PaypalTransfer[]   @relation("PaypalReceiverTransfers")
   coinbaseSentTransfers     CoinbaseTransfer[] @relation("CoinbaseSenderTransfers")
@@ -63,29 +64,42 @@ model Transfer {
 }
 
 model BTCTransfer {
-  id                   String         @id @default(cuid())
-  amount               String
-  description          String?
-  senderId             String
-  receiverId           String
-  sender               User           @relation("BTCSenderTransfers", fields: [senderId], references: [id])
-  receiver             User           @relation("BTCReceiverTransfers", fields: [receiverId], references: [id])
-  status               TransferStatus
-  createdAt            DateTime       @default(now())
-  updatedAt            DateTime       @updatedAt
+  id          String         @id @default(cuid())
+  amount      String
+  description String?
+  senderId    String
+  receiverId  String
+  sender      User           @relation("BTCSenderTransfers", fields: [senderId], references: [id])
+  receiver    User           @relation("BTCReceiverTransfers", fields: [receiverId], references: [id])
+  status      TransferStatus
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
+}
+
+model Payouts {
+  id          String         @id @default(cuid())
+  payoutId    String         @unique
+  amount      String
+  approvedBy  String?
+  description String?
+  name        String
+  address     String
+  status      TransferStatus
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 }
 
 model AuthNetTransfer {
-  id String @id @default(cuid())
-  amount Float
+  id          String         @id @default(cuid())
+  amount      Float
   description String?
-  senderId String
-  receiverId String
-  sender User @relation("AuthNetSenderTransfers", fields: [senderId], references: [id])
-  receiver User @relation("AuthNetReceiverTransfers", fields: [receiverId], references: [id])
-  status TransferStatus
-  createdAt DateTime @default(now())
-  updatedAt DateTime @updatedAt
+  senderId    String
+  receiverId  String
+  sender      User           @relation("AuthNetSenderTransfers", fields: [senderId], references: [id])
+  receiver    User           @relation("AuthNetReceiverTransfers", fields: [receiverId], references: [id])
+  status      TransferStatus
+  createdAt   DateTime       @default(now())
+  updatedAt   DateTime       @updatedAt
 }
 
 model PaypalTransfer {
