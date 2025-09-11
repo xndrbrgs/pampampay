@@ -116,8 +116,8 @@ export function BTCPayoutForm({ email }: { email?: string }) {
                 onSubmit={form.handleSubmit(onSubmit)}
                 className="flex flex-col gap-y-5"
               >
-                <div className="grid grid-cols-12 gap-x-5 space-y-6 pt-5">
-                  <div className="col-span-12 lg:col-span-6">
+                <div className="grid grid-cols-12 gap-x-5 space-y-6 lg:space-y-0 pt-5">
+                  <div className="col-span-12 lg:col-span-6 pb-0 lg:pb-6">
                     <FormField
                       control={form.control}
                       name="personName"
@@ -137,7 +137,7 @@ export function BTCPayoutForm({ email }: { email?: string }) {
                     />
                   </div>
 
-                  <div className="col-span-12 lg:col-span-6">
+                  <div className="col-span-12 lg:col-span-6 pb-0 lg:pb-6">
                     <FormField
                       control={form.control}
                       name="paymentDescription"
@@ -184,7 +184,7 @@ export function BTCPayoutForm({ email }: { email?: string }) {
                         <FormItem>
                           <FormLabel>
                             Max cashout per day:
-                            <span className="text-green-500">$300</span>
+                            <span className="text-green-500 pl-3">$300</span>
                           </FormLabel>
                           <FormControl>
                             <Select
@@ -204,7 +204,7 @@ export function BTCPayoutForm({ email }: { email?: string }) {
                                   <SelectItem
                                     key={value}
                                     value={value.toString()}
-                                    className="py-2 border-b border-red-500"
+                                    className="py-2 border-b border-gray-200"
                                   >
                                     ${value}
                                   </SelectItem>
