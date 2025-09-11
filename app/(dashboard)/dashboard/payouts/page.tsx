@@ -20,7 +20,7 @@ export default async function PayoutsPage() {
   if (payoutAdmin?.[0]?.canSeePayouts !== true) {
     return (
       <PayPalProvider>
-        <div className="mt-8">
+        <div className="p-6 h-screen">
           <Header
             title="Request your payout!"
             subtext="Request BTC payouts with ease in RLC Pay"
@@ -33,7 +33,7 @@ export default async function PayoutsPage() {
     );
   } else {
     return (
-      <div className="mt-8">
+      <div className="p-6 h-full">
         <Header
           title="Admin Payout Dashboard"
           subtext="Confirm customer payouts with ease"
