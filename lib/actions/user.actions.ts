@@ -195,6 +195,20 @@ export async function getAdminUser() {
   return adminUser;
 }
 
+export async function getPayoutAdmins() {
+  const user = await currentUser();
+  if (!user) throw new Error("Not authenticated");
+
+  const adminUser = await prisma.user.findMany({
+    where: { clerkUserId: user.id },
+    select: {
+      canSeePayouts: true,
+    },
+  });
+
+  return adminUser;
+}
+
 export const fetchActiveMonths = async () => {
   const transfers = await prisma.transfer.findMany({
     where: {
