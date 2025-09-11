@@ -26,7 +26,7 @@ const PayoutApprove = async () => {
   const email = user?.emailAddresses[0]?.emailAddress;
 
   return (
-    <Card className="border border-gray-600 rounded-xl shadow-lg mt-3 max-w-7xl">
+    <Card className="border bg-white/10 border-gray-600 rounded-xl shadow-lg mt-3 max-w-7xl">
       <CardHeader>
         <CardTitle className="text-2xl flex items-center gap-2">
           Payouts List
